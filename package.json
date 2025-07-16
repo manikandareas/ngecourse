@@ -17,6 +17,7 @@
     "react-router": "^7.5.3"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.1.1",
     "@react-router/dev": "^7.5.3",
     "@tailwindcss/vite": "^4.1.4",
     "@types/node": "^20",
@@ -24,6 +25,7 @@
     "@types/react-dom": "^19.1.2",
     "tailwindcss": "^4.1.4",
     "typescript": "^5.8.3",
+    "ultracite": "5.0.36",
     "vite": "^6.3.3",
     "vite-tsconfig-paths": "^5.1.4"
   }
