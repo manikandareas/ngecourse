@@ -23,8 +23,8 @@ export function Navbar() {
             link: '/courses',
         },
         {
-            name: 'Contact',
-            link: '#contact',
+            name: 'Threads',
+            link: '/threads',
         },
     ];
 

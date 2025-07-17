@@ -90,7 +90,7 @@
   --sidebar-ring: #0071e3;
   /* Apple Fonts */
   --font-apple-system:
-    -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue",
+    Inter, -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue",
     Helvetica, sans-serif;
   --font-sf-mono: "SF Mono", Menlo, monospace;
   --font-sans: var(--font-apple-system);
@@ -160,4 +160,11 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.press-start-2p-regular {
+  font-family: "Press Start 2P", var(--font-apple-system);
+  font-weight: 400;
+  font-size: 0.8em;
+  font-style: normal;
 }
