@@ -8,8 +8,8 @@ import {
 export default [
     layout('routes/layout.tsx', [
         index('routes/home.tsx'),
-        route('/courses', 'routes/courses.tsx'),
-        route('/courses/:slug', 'routes/course-detail.tsx'),
+        route('/courses', 'routes/courses/index.tsx'),
+        route('/courses/:slug', 'routes/courses/detail.tsx'),
     ]),
 
     route('sign-in/*', 'routes/sign-in.tsx'),

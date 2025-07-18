@@ -1,6 +1,18 @@
 import { CourseInfo } from '~/features/courses/detail/course-info';
 import { HeroSection } from '~/features/courses/detail/hero-section';
 import { PathSection } from '~/features/courses/detail/path-section';
+import type { Route } from './+types/detail';
+
+export function loader() {
+    return "Python";
+}
+
+export function meta({data}: Route.MetaArgs) {
+    return [
+        { title: `NgeCourse | ${data}` },
+        { name: 'description', content: 'Course detail page of NgeCourse!' },
+    ];
+}
 
 export default function CourseDetailPage() {
     return (
