@@ -6,11 +6,11 @@ import { LearningLayout } from '~/features/courses/detail/chapters/learning-layo
 export default function CoursesLayout() {
   const tabs = [
     { title: 'Previous', icon: ArrowLeft },
-    { type: 'separator' },
+    { type: 'separator' as const },
     { title: 'Maximize', icon: Maximize },
     { title: 'Appearance', icon: Settings },
     { title: 'Theme', icon: Moon },
-    { type: 'separator' },
+    { type: 'separator' as const },
     { title: 'Complete', icon: ArrowRight },
   ];
   return (

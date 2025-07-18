@@ -17,8 +17,11 @@ export async function loader({ params }: Route.LoaderArgs) {
 
 export function meta({ data }: Route.MetaArgs) {
   return [
-    { title: `NgeCourse | ${data}` },
-    { name: 'description', content: 'Course detail page of NgeCourse!' },
+    { title: `NgeCourse | ${data?.title}` },
+    {
+      name: 'description',
+      content: data?.description || 'Course detail page of NgeCourse!',
+    },
   ];
 }
 

@@ -1,6 +1,6 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, type Transition } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
-import React from 'react';
+import React, { type ComponentRef } from 'react';
 import { useOnClickOutside } from 'usehooks-ts';
 import { cn } from '~/lib/utils';
 
@@ -54,9 +54,9 @@ export function ExpandableTabs({
   onChange,
 }: ExpandableTabsProps) {
   const [selected, setSelected] = React.useState<number | null>(null);
-  const outsideClickRef = React.useRef(null);
+  const outsideClickRef = React.useRef<ComponentRef<'div'>>(null);
 
-  useOnClickOutside(outsideClickRef, () => {
+  useOnClickOutside(outsideClickRef as React.RefObject<HTMLDivElement>, () => {
     setSelected(null);
     onChange?.(null);
   });
@@ -93,7 +93,7 @@ export function ExpandableTabs({
               initial={false}
               key={tab.title}
               onClick={() => handleSelect(index)}
-              transition={transition}
+              transition={transition as Transition}
               variants={buttonVariants}
             >
               <AnimatePresence initial={false}>
@@ -102,7 +102,7 @@ export function ExpandableTabs({
                   className="overflow-hidden"
                   exit="exit"
                   initial="initial"
-                  transition={transition}
+                  transition={transition as Transition}
                   variants={spanVariants}
                 >
                   {tab.title}
@@ -125,7 +125,7 @@ export function ExpandableTabs({
             initial={false}
             key={tab.title}
             onClick={() => handleSelect(index)}
-            transition={transition}
+            transition={transition as Transition}
             variants={buttonVariants}
           >
             <Icon size={20} />
@@ -136,7 +136,7 @@ export function ExpandableTabs({
                   className="overflow-hidden"
                   exit="exit"
                   initial="initial"
-                  transition={transition}
+                  transition={transition as Transition}
                   variants={spanVariants}
                 >
                   {tab.title}

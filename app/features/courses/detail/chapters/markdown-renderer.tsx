@@ -48,6 +48,7 @@ export function MarkdownRenderer({
         'prose-ol:mb-3 sm:prose-ol:mb-4',
         className
       )}
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: Needed to render a content
       dangerouslySetInnerHTML={{ __html: content }}
     />
   );

@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: Any type generated from directus */
 export type DirectusAccess = {
   id: string;
   policy: string | DirectusPolicies;
