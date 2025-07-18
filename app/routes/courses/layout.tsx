@@ -1,11 +1,4 @@
-import {
-  ArrowLeft,
-  ArrowRight,
-  ChevronLeft,
-  Maximize,
-  Moon,
-  Settings,
-} from 'lucide-react';
+import { ArrowLeft, ArrowRight, Maximize, Moon, Settings } from 'lucide-react';
 import { Outlet } from 'react-router';
 import { ExpandableTabs } from '~/components/ui/expandable-tabs';
 import { LearningLayout } from '~/features/courses/detail/chapters/learning-layout';

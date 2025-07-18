@@ -1,12 +1,5 @@
-import {
-  CheckCircle,
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-  PlayCircle,
-} from 'lucide-react';
+import { Clock, PlayCircle } from 'lucide-react';
 import { Badge } from '~/components/ui/badge';
-import { Button } from '~/components/ui/button';
 import { MarkdownRenderer } from '~/features/courses/detail/chapters/markdown-renderer';
 import type { Route } from './+types/lesson-detail';
 
