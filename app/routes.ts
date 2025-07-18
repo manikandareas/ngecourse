@@ -1,17 +1,37 @@
 import {
-    index,
-    layout,
-    route,
-    type RouteConfig,
+  index,
+  layout,
+  type RouteConfig,
+  route,
 } from '@react-router/dev/routes';
 
 export default [
-    layout('routes/layout.tsx', [
-        index('routes/home.tsx'),
-        route('/courses', 'routes/courses/index.tsx'),
-        route('/courses/:slug', 'routes/courses/detail.tsx'),
-    ]),
+  // Root routes
+  layout('routes/layout.tsx', [
+    index('routes/home.tsx'),
+    route('/courses', 'routes/courses/index.tsx'),
+    route('/courses/:slug', 'routes/courses/detail.tsx'),
+  ]),
 
-    route('sign-in/*', 'routes/sign-in.tsx'),
-    route('sign-up/*', 'routes/sign-up.tsx'),
+  // Courses routes
+  layout('routes/courses/layout.tsx', [
+    route(
+      '/courses/:slug/chapters/:chapterSlug',
+      'routes/courses/chapter-detail.tsx'
+    ),
+    route(
+      '/courses/:slug/chapters/:chapterSlug/lessons/:lessonSlug',
+      'routes/courses/lesson-detail.tsx'
+    ),
+  ]),
+
+  // Courses quiz routes
+  route(
+    '/courses/:slug/chapters/:chapterSlug/quizzes/:quizSlug',
+    'routes/courses/quiz.tsx'
+  ),
+
+  //   Auth routes
+  route('sign-in/*', 'routes/sign-in.tsx'),
+  route('sign-up/*', 'routes/sign-up.tsx'),
 ] satisfies RouteConfig;
