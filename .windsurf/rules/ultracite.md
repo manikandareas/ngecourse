@@ -1,7 +1,7 @@
 ---
+trigger: always_on
 description: Ultracite Rules - AI-Ready Formatter and Linter
 globs: "**/*.{ts,tsx,js,jsx}"
-alwaysApply: true
 ---
 
 # Project Context

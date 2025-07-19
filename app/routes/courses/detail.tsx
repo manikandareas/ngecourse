@@ -8,11 +8,11 @@ import { PathSection } from '~/features/courses/detail/path-section';
 import type { Route } from './+types/detail';
 
 export async function loader({ params }: Route.LoaderArgs) {
-  const course = await dataCourses.one(params.slug);
-  if (!course) {
+  const courseWithContents = await dataCourses.withContents(params.slug);
+  if (!courseWithContents) {
     throw new Response('Course Not Found', { status: 404 });
   }
-  return course;
+  return courseWithContents;
 }
 
 export function meta({ data }: Route.MetaArgs) {
@@ -31,10 +31,10 @@ export default function CourseDetailPage(props: Route.ComponentProps) {
       <HeroSection {...toHeroSection(props.loaderData)} />
 
       {/* Main Content */}
-      <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 py-8 md:flex-row">
-        <PathSection />
+      <main className="relative mx-auto flex w-full max-w-6xl flex-col gap-8 py-8 md:flex-row">
+        <PathSection course={props.loaderData} />
         {/* Sidebar */}
-        <aside className="w-full flex-shrink-0 md:w-80 lg:w-96">
+        <aside className="w-full flex-shrink-0 md:w-80 lg:sticky lg:top-28 lg:h-screen lg:w-96">
           <div className="slide-in-from-right-4 animate-in space-y-6 duration-500">
             <div className="fade-in-50 animate-in delay-100 duration-700">
               <CourseInfo.Trailer

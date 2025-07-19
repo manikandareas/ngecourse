@@ -1,99 +1,240 @@
+import {
+  BookOpen,
+  CheckCircle2,
+  ChevronDown,
+  ChevronRight,
+  Clock,
+  HelpCircle,
+} from 'lucide-react';
 import { useState } from 'react';
+import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
-
-export interface CourseItem {
-	type: 'exercise' | 'bonus';
-	number?: number;
-	title: string;
-	status: 'start' | 'locked' | 'completed';
-}
-
-export interface Chapter {
-	id: number;
-	title: string;
-	description: string;
-	items: CourseItem[];
-	type?: 'checkpoint';
-}
+import { Progress } from '~/components/ui/progress';
+import type {
+  LmsChapters,
+  LmsChaptersContents,
+  LmsLessons,
+  LmsQuizzes,
+} from '~/types/directus';
 
 interface ChapterItemProps {
-	chapter: Chapter;
-	isFirst: boolean;
-	isLast: boolean;
+  chapter: LmsChapters & {
+    contents: (LmsChaptersContents & { item: LmsLessons | LmsQuizzes })[];
+  };
+  isLast: boolean;
+  chapterNumber: number;
 }
 
-export function ChapterItem({ chapter, isFirst, isLast }: ChapterItemProps) {
-	const [isExpanded, setIsExpanded] = useState(isFirst);
+// Helper functions to reduce complexity
+function getChapterNodeStyles(
+  isCompleted: boolean,
+  isHovered: boolean
+): string {
+  if (isCompleted) {
+    return 'border-green-500 bg-green-500';
+  }
+  if (isHovered) {
+    return 'border-blue-500 bg-blue-500 scale-110';
+  }
+  return 'border-blue-400 bg-blue-400';
+}
 
-	const handleToggle = () => {
-		setIsExpanded(!isExpanded);
-	};
+function getContentIconStyles(
+  isItemCompleted: boolean,
+  isLesson: boolean
+): string {
+  if (isItemCompleted) {
+    return 'bg-green-100 text-green-600';
+  }
+  if (isLesson) {
+    return 'bg-blue-100 text-blue-600';
+  }
+  return 'bg-purple-100 text-purple-600';
+}
 
-	return (
-		<div className="flex">
-			<div className='mr-6 flex flex-col items-center'>
-				<div className='flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-gray-300 bg-gray-100 font-bold text-gray-600'>
-					{chapter.type === 'checkpoint' ? (
-						<svg
-							fill="none"
-							height="20"
-							stroke="currentColor"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth="2"
-							viewBox="0 0 24 24"
-							width="20"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<title>Checkpoint</title>
-							<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-							<circle cx="12" cy="10" r="3" />
-						</svg>
-					) : (
-						chapter.id
-					)}
-				</div>
-				{!isLast && <div className='h-full w-0.5 bg-gray-200' />}
-			</div>
-			<div className="w-full">
-				<button
-					className='flex w-full cursor-pointer items-center justify-between border-none bg-transparent py-2 text-left'
-					onClick={handleToggle}
-					type="button"
-				>
-					<h2 className='font-sans font-semibold text-2xl'>{chapter.title}</h2>
-					<span
-						className={`inline-block border-black border-t-0 border-r-2 border-b-2 border-l-0 border-solid p-0.5 transition-transform duration-200 ${isExpanded ? '-rotate-135 transform' : 'rotate-45 transform'}`}
-					/>
-				</button>
-				{isExpanded && (
-					<div className='mt-2 rounded-lg bg-secondary-background p-4'>
-						<p className="text-muted-foreground text-sm">{chapter.description}</p>
-						<ul className='m-0 list-none p-0'>
-							{chapter.items.map((item) => (
-								<li
-									className='flex items-center justify-between border-gray-200 border-b py-3 text-sm last:border-b-0'
-									key={item.title}
-								>
-									<span>
-										{item.type === 'exercise'
-											? `Exercise ${item.number}`
-											: 'Bonus Article'}
-										: {item.title}
-									</span>
-									<Button
-										className="font-heading"
-										type="button"
-										variant={item.status === 'start' ? 'default' : 'outline'}
-									>
-										{item.status === 'start' ? 'Start' : '???'}
-									</Button>
-								</li>
-							))}
-						</ul>
-					</div>
-				)}
-			</div>
-		</div>
-	);
+function getContentBadgeStyles(isLesson: boolean): string {
+  if (isLesson) {
+    return 'border-blue-200 text-blue-700';
+  }
+  return 'border-purple-200 text-purple-700';
+}
+
+export function ChapterItem({
+  chapter,
+  isLast,
+  chapterNumber,
+}: ChapterItemProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleToggle = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  // Mock completion status - replace with actual data
+  const completedItems = 0; // Replace with actual completed count
+  const totalItems = chapter.contents.length;
+  const progressPercentage =
+    totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
+  const isCompleted = completedItems === totalItems && totalItems > 0;
+
+  const nodeStyles = getChapterNodeStyles(isCompleted, isHovered);
+
+  return (
+    <div className="relative" id={isLast ? 'last-chapter' : ''}>
+      {/* Chapter Node */}
+      <div className="relative z-10 flex">
+        <div className="mr-6 flex flex-col items-center">
+          <button
+            aria-label={`Chapter ${chapterNumber}: ${chapter.title}`}
+            className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border-2 font-bold text-white shadow-lg transition-all duration-300 ${nodeStyles}`}
+            onClick={handleToggle}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            type="button"
+          >
+            {isCompleted ? (
+              <CheckCircle2 className="h-6 w-6" />
+            ) : (
+              <span className="text-sm">{chapterNumber}</span>
+            )}
+          </button>
+        </div>
+
+        <div className="flex-1 pb-8">
+          {/* Chapter Header */}
+          <div
+            className={`rounded-lg border bg-white p-4 shadow-sm transition-all duration-200 hover:shadow-md ${
+              isExpanded ? 'border-blue-200 bg-blue-50' : 'border-gray-200'
+            }`}
+          >
+            <button
+              className="flex w-full items-center justify-between text-left"
+              onClick={handleToggle}
+              type="button"
+            >
+              <div className="flex-1">
+                <div className="mb-2 flex items-center space-x-3">
+                  <h3 className="font-semibold text-gray-900 text-lg">
+                    {chapter.title}
+                  </h3>
+                  <div className="flex items-center space-x-2">
+                    <Badge className="text-xs" variant="secondary">
+                      {totalItems} {totalItems === 1 ? 'item' : 'items'}
+                    </Badge>
+                    {isCompleted && (
+                      <Badge
+                        className="bg-green-100 text-green-800"
+                        variant="default"
+                      >
+                        Completed
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+
+                {chapter.description && (
+                  <p className="mb-3 text-gray-600 text-sm">
+                    {chapter.description}
+                  </p>
+                )}
+
+                {totalItems > 0 && (
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-gray-500 text-xs">
+                      <span>Progress</span>
+                      <span>
+                        {completedItems} of {totalItems} completed
+                      </span>
+                    </div>
+                    <Progress className="h-1.5" value={progressPercentage} />
+                  </div>
+                )}
+              </div>
+
+              <div className="ml-4 flex items-center">
+                {isExpanded ? (
+                  <ChevronDown className="h-5 w-5 text-gray-400 transition-transform" />
+                ) : (
+                  <ChevronRight className="h-5 w-5 text-gray-400 transition-transform" />
+                )}
+              </div>
+            </button>
+          </div>
+
+          {/* Chapter Contents */}
+          {isExpanded && (
+            <div className="mt-4 space-y-2">
+              {chapter.contents.map(({ item, collection }) => {
+                const content = item as { title: string; id: string };
+                const isLesson = collection === 'lms_lessons';
+                const isItemCompleted = false; // Replace with actual completion status
+
+                const iconStyles = getContentIconStyles(
+                  isItemCompleted,
+                  isLesson
+                );
+                const badgeStyles = getContentBadgeStyles(isLesson);
+
+                return (
+                  <div
+                    className="group flex items-center justify-between rounded-lg border border-gray-100 bg-white p-3 transition-all duration-200 hover:border-gray-200 hover:shadow-sm"
+                    key={content.id}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div
+                        className={`flex h-8 w-8 items-center justify-center rounded-full ${iconStyles}`}
+                      >
+                        {isItemCompleted && (
+                          <CheckCircle2 className="h-4 w-4" />
+                        )}
+                        {!isItemCompleted &&
+                          (isLesson ? (
+                            <BookOpen className="h-4 w-4" />
+                          ) : (
+                            <HelpCircle className="h-4 w-4" />
+                          ))}
+                      </div>
+
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2">
+                          <span className="font-medium text-gray-900 text-sm">
+                            {content.title}
+                          </span>
+                          <Badge
+                            className={`text-xs ${badgeStyles}`}
+                            variant="outline"
+                          >
+                            {isLesson ? 'Lesson' : 'Quiz'}
+                          </Badge>
+                        </div>
+
+                        <div className="mt-1 flex items-center space-x-4 text-gray-500 text-xs">
+                          <div className="flex items-center space-x-1">
+                            <Clock className="h-3 w-3" />
+                            <span>{isLesson ? '15 min' : '5 min'}</span>
+                          </div>
+                          {isItemCompleted && (
+                            <span className="text-green-600">✓ Completed</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <Button
+                      className="opacity-0 transition-opacity group-hover:opacity-100"
+                      size="sm"
+                      variant={isItemCompleted ? 'outline' : 'default'}
+                    >
+                      {isItemCompleted ? 'Review' : 'Start'}
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
