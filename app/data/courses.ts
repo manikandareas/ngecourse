@@ -20,11 +20,15 @@ const getCourse = async (slug: string) => {
 };
 
 export type CourseWithContents = LmsCourses & {
-  chapters: (LmsChapters & {
-    contents: (LmsChaptersContents & {
-      item: LmsLessons | LmsQuizzes;
-    })[];
-  })[];
+  chapters: Chapter[];
+};
+
+export type Chapter = LmsChapters & {
+  contents: ChapterContent[];
+};
+
+export type ChapterContent = LmsChaptersContents & {
+  item: LmsLessons | LmsQuizzes;
 };
 
 const getCourseContents = async (slug: string) => {

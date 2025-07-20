@@ -10,17 +10,10 @@ import { useState } from 'react';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { Progress } from '~/components/ui/progress';
-import type {
-  LmsChapters,
-  LmsChaptersContents,
-  LmsLessons,
-  LmsQuizzes,
-} from '~/types/directus';
+import type { Chapter } from '~/data/courses';
 
 interface ChapterItemProps {
-  chapter: LmsChapters & {
-    contents: (LmsChaptersContents & { item: LmsLessons | LmsQuizzes })[];
-  };
+  chapter: Chapter;
   isLast: boolean;
   chapterNumber: number;
 }
