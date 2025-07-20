@@ -1,15 +1,22 @@
-import { ArrowRightIcon, Share2Icon } from 'lucide-react';
+import { Share2Icon } from 'lucide-react';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { toFileUrl } from '~/data/utils';
 import { cn } from '~/lib/utils';
-import type { LmsCourses } from '~/types/directus';
+import type {
+  LmsCourses,
+  LmsCoursesLmsTopics,
+  LmsTopics,
+} from '~/types/directus';
+import EnrollDialog from './enroll-dialog';
 
 interface IHeroSection {
   difficulty: string;
   title: string;
   description: string;
+  topics: LmsTopics[];
   image: string;
+  id: string;
 }
 
 export function HeroSection(props: IHeroSection) {
@@ -22,14 +29,23 @@ export function HeroSection(props: IHeroSection) {
           <p className="max-w-2xl text-pretty text-muted-foreground text-sm">
             {props.description}
           </p>
+          <div className="flex flex-wrap gap-2">
+            {props.topics.map((topic) => (
+              <Badge
+                className="capitalize"
+                key={topic.id}
+                variant={'secondary'}
+              >
+                {topic.title}
+              </Badge>
+            ))}
+          </div>
         </div>
         <div className="flex items-center gap-2.5">
           <Button size={'icon'} variant={'outline'}>
             <Share2Icon />
           </Button>
-          <Button size={'lg'}>
-            Start Learning Now <ArrowRightIcon />
-          </Button>
+          <EnrollDialog {...props} />
         </div>
       </div>
       <img
@@ -41,7 +57,7 @@ export function HeroSection(props: IHeroSection) {
   );
 }
 
-function CourseBadge(props: { difficulty: string }) {
+export function CourseBadge(props: { difficulty: string }) {
   return (
     <Badge
       className={cn('capitalize', {
@@ -58,9 +74,13 @@ function CourseBadge(props: { difficulty: string }) {
 export const toHeroSection = (course: LmsCourses) => {
   const imageUrl = toFileUrl((course.thumbnail as string) || '');
   return {
+    topics: course.topics.map(
+      (topic: LmsCoursesLmsTopics) => topic.lms_topics_id as LmsTopics
+    ),
     difficulty: course.difficulty || 'beginner',
     title: course.title || 'Course Title',
     description: course.description || 'Course Description',
     image: imageUrl,
+    id: course.id,
   };
 };

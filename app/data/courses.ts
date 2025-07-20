@@ -1,10 +1,11 @@
-import { readItems } from '@directus/sdk';
+import { readItem, readItems } from '@directus/sdk';
 import type { AxiosResponse } from 'axios';
 import { directusClient, directusClientAxios } from '~/lib/directus-client';
 import type {
   LmsChapters,
   LmsChaptersContents,
   LmsCourses,
+  LmsCoursesLmsTopics,
   LmsLessons,
   LmsQuizzes,
 } from '~/types/directus';
@@ -19,8 +20,13 @@ const getCourse = async (slug: string) => {
     .then((res) => (res.length > 0 ? res[0] : null));
 };
 
+const getCourseById = async (id: string) => {
+  return await directusClient.request(readItem('lms_courses', id));
+};
+
 export type CourseWithContents = LmsCourses & {
   chapters: Chapter[];
+  topics: LmsCoursesLmsTopics[];
 };
 
 export type Chapter = LmsChapters & {
@@ -38,6 +44,7 @@ const getCourseContents = async (slug: string) => {
         'filter[slug][_eq]': slug,
         fields: [
           '*',
+          'topics.*.*',
           'chapters.*',
           'chapters.contents.*',
           'chapters.contents.item.*',
@@ -53,4 +60,5 @@ export const dataCourses = {
   many: getCourses,
   one: getCourse,
   withContents: getCourseContents,
+  oneById: getCourseById,
 };
