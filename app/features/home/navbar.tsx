@@ -1,6 +1,8 @@
 'use client';
 import { SignedIn, SignedOut, UserButton } from '@clerk/react-router';
+import { Ticket } from 'lucide-react';
 import { useState } from 'react';
+import { Button } from '~/components/ui/3d-button';
 import {
   MobileNav,
   MobileNavHeader,
@@ -45,6 +47,10 @@ export function Navbar() {
             <NavbarButton variant="primary">Book a call</NavbarButton>
           </SignedOut>
           <SignedIn>
+            <Button size={'sm'} variant={'solid'}>
+              <Ticket />
+              Send Feedback
+            </Button>
             <UserButton />
           </SignedIn>
         </div>
@@ -92,6 +98,10 @@ export function Navbar() {
               </NavbarButton>
             </SignedOut>
             <SignedIn>
+              <Button size={'xs'} variant={'solid'}>
+                <Ticket />
+                Feedback
+              </Button>
               <UserButton />
             </SignedIn>
           </div>

@@ -1,6 +1,6 @@
 import { ArrowRightIcon, Share2Icon } from 'lucide-react';
+import { Button } from '~/components/ui/3d-button';
 import { Badge } from '~/components/ui/badge';
-import { Button } from '~/components/ui/button';
 import { toFileUrl } from '~/data/utils';
 import { cn } from '~/lib/utils';
 import type {
@@ -50,7 +50,7 @@ export function HeroSection(props: IHeroSection) {
             <Share2Icon />
           </Button>
           {props.enrollment ? (
-            <Button className="group" size="lg">
+            <Button className="group">
               Continue Learning
               <ArrowRightIcon className="ml-2 size-4 transition-transform group-hover:translate-x-1" />
             </Button>
