@@ -22,13 +22,16 @@ export function meta({ data }: Route.MetaArgs) {
 
 export async function loader(args: Route.LoaderArgs) {
   const currentSession = await getCurrentSession(args);
-  const enrollment = await dataEnrollment.oneByUserId(currentSession?.id || '');
 
   const courseWithContents = await dataCourses.withContents(args.params.slug);
 
   if (!courseWithContents) {
     throw new Response('Course Not Found', { status: 404 });
   }
+  const enrollment = await dataEnrollment.oneByUserId(
+    currentSession?.id || '',
+    courseWithContents.id
+  );
 
   return {
     course: courseWithContents,
@@ -64,7 +67,10 @@ export default function CourseDetailPage(props: Route.ComponentProps) {
 
       {/* Main Content */}
       <main className="relative mx-auto flex w-full max-w-6xl flex-col gap-8 py-8 md:flex-row">
-        <PathSection course={props.loaderData.course} />
+        <PathSection
+          course={props.loaderData.course}
+          enrollment={props.loaderData.enrollment}
+        />
         {/* Sidebar */}
         <aside className="w-full flex-shrink-0 md:w-80 lg:sticky lg:top-28 lg:h-screen lg:w-96">
           <div className="slide-in-from-right-4 animate-in space-y-6 duration-500">

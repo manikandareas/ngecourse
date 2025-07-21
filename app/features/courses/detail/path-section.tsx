@@ -2,19 +2,23 @@ import { Badge } from '~/components/ui/badge';
 import { Card } from '~/components/ui/card';
 import { Progress } from '~/components/ui/progress';
 import type { CourseWithContents } from '~/data/courses';
+import { useContentProgression } from '~/hooks/use-content-progression';
 import { cn } from '~/lib/utils';
+import type { LmsEnrollments } from '~/types/directus';
 import { ChapterItem } from './chapter-item';
 
-export function PathSection({ course }: { course: CourseWithContents }) {
-  const totalContents = course.chapters.reduce(
-    (total, chapter) => total + chapter.contents.length,
-    0
+export function PathSection({
+  course,
+  enrollment,
+}: {
+  course: CourseWithContents;
+  enrollment: LmsEnrollments | null;
+}) {
+  const { contentProgression, courseProgress } = useContentProgression(
+    course,
+    enrollment
   );
-
-  // Mock progress calculation - you can replace this with actual progress data
-  const completedContents = 0; // Replace with actual completed count
-  const progressPercentage =
-    totalContents > 0 ? (completedContents / totalContents) * 100 : 0;
+  const { completedCount, totalCount, progressPercentage } = courseProgress;
 
   return (
     <div className="space-y-6">
@@ -40,7 +44,7 @@ export function PathSection({ course }: { course: CourseWithContents }) {
             <div className="flex justify-between text-gray-600 text-sm">
               <span>Course Progress</span>
               <span>
-                {completedContents} of {totalContents} completed
+                {completedCount} of {totalCount} completed
               </span>
             </div>
             <Progress className="h-2" value={progressPercentage} />
@@ -72,6 +76,7 @@ export function PathSection({ course }: { course: CourseWithContents }) {
               <ChapterItem
                 chapter={chapter}
                 chapterNumber={index + 1}
+                contentProgression={contentProgression}
                 isLast={index === course.chapters.length - 1}
                 key={chapter.id}
               />

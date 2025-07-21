@@ -1,28 +1,26 @@
 import {
-  BookOpen,
   CheckCircle2,
   ChevronDown,
   ChevronRight,
-  Clock,
-  HelpCircle,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Badge } from '~/components/ui/badge';
-import { Button } from '~/components/ui/button';
 import { Progress } from '~/components/ui/progress';
 import type { Chapter } from '~/data/courses';
+import type { ContentWithProgression } from '~/utils/content-progression';
+import { ContentItem } from './content-item';
 
 interface ChapterItemProps {
   chapter: Chapter;
   isLast: boolean;
   chapterNumber: number;
+  contentProgression: ContentWithProgression[];
 }
 
-// Helper functions to reduce complexity
-function getChapterNodeStyles(
-  isCompleted: boolean,
-  isHovered: boolean
-): string {
+/**
+ * Get chapter node styling based on completion and hover state
+ */
+function getChapterNodeStyles(isCompleted: boolean, isHovered: boolean): string {
   if (isCompleted) {
     return 'border-green-500 bg-green-500';
   }
@@ -32,30 +30,11 @@ function getChapterNodeStyles(
   return 'border-blue-400 bg-blue-400';
 }
 
-function getContentIconStyles(
-  isItemCompleted: boolean,
-  isLesson: boolean
-): string {
-  if (isItemCompleted) {
-    return 'bg-green-100 text-green-600';
-  }
-  if (isLesson) {
-    return 'bg-blue-100 text-blue-600';
-  }
-  return 'bg-purple-100 text-purple-600';
-}
-
-function getContentBadgeStyles(isLesson: boolean): string {
-  if (isLesson) {
-    return 'border-blue-200 text-blue-700';
-  }
-  return 'border-purple-200 text-purple-700';
-}
-
 export function ChapterItem({
   chapter,
   isLast,
   chapterNumber,
+  contentProgression,
 }: ChapterItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -64,11 +43,15 @@ export function ChapterItem({
     setIsExpanded(!isExpanded);
   };
 
-  // Mock completion status - replace with actual data
-  const completedItems = 0; // Replace with actual completed count
+  // Calculate chapter progress
+  const chapterContentIds = chapter.contents.map(content => content.id.toString());
+  const chapterProgression = contentProgression.filter(item => 
+    chapterContentIds.includes(item.id)
+  );
+  
+  const completedItems = chapterProgression.filter(item => item.state === 'completed').length;
   const totalItems = chapter.contents.length;
-  const progressPercentage =
-    totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
+  const progressPercentage = totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
   const isCompleted = completedItems === totalItems && totalItems > 0;
 
   const nodeStyles = getChapterNodeStyles(isCompleted, isHovered);
@@ -158,70 +141,17 @@ export function ChapterItem({
           {/* Chapter Contents */}
           {isExpanded && (
             <div className="mt-4 space-y-2">
-              {chapter.contents.map(({ item, collection }) => {
-                const content = item as { title: string; id: string };
-                const isLesson = collection === 'lms_lessons';
-                const isItemCompleted = false; // Replace with actual completion status
-
-                const iconStyles = getContentIconStyles(
-                  isItemCompleted,
-                  isLesson
+              {chapter.contents.map(content => {
+                const contentState = contentProgression.find(
+                  item => item.id === content.id.toString()
                 );
-                const badgeStyles = getContentBadgeStyles(isLesson);
-
+                
                 return (
-                  <div
-                    className="group flex items-center justify-between rounded-lg border border-gray-100 bg-white p-3 transition-all duration-200 hover:border-gray-200 hover:shadow-sm"
+                  <ContentItem
                     key={content.id}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div
-                        className={`flex h-8 w-8 items-center justify-center rounded-full ${iconStyles}`}
-                      >
-                        {isItemCompleted && (
-                          <CheckCircle2 className="h-4 w-4" />
-                        )}
-                        {!isItemCompleted &&
-                          (isLesson ? (
-                            <BookOpen className="h-4 w-4" />
-                          ) : (
-                            <HelpCircle className="h-4 w-4" />
-                          ))}
-                      </div>
-
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2">
-                          <span className="font-medium text-gray-900 text-sm">
-                            {content.title}
-                          </span>
-                          <Badge
-                            className={`text-xs ${badgeStyles}`}
-                            variant="outline"
-                          >
-                            {isLesson ? 'Lesson' : 'Quiz'}
-                          </Badge>
-                        </div>
-
-                        <div className="mt-1 flex items-center space-x-4 text-gray-500 text-xs">
-                          <div className="flex items-center space-x-1">
-                            <Clock className="h-3 w-3" />
-                            <span>{isLesson ? '15 min' : '5 min'}</span>
-                          </div>
-                          {isItemCompleted && (
-                            <span className="text-green-600">✓ Completed</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    <Button
-                      className="opacity-0 transition-opacity group-hover:opacity-100"
-                      size="sm"
-                      variant={isItemCompleted ? 'outline' : 'default'}
-                    >
-                      {isItemCompleted ? 'Review' : 'Start'}
-                    </Button>
-                  </div>
+                    content={content}
+                    contentState={contentState}
+                  />
                 );
               })}
             </div>

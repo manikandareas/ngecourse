@@ -7,7 +7,7 @@ const enroll = async (courseSlug: string, userId: string) => {
     if (!course) {
       throw new Error('Course not found');
     }
-    const enrollment = await dataEnrollment.oneByUserId(userId);
+    const enrollment = await dataEnrollment.oneByUserId(userId, course.id);
     if (enrollment) {
       throw new Error('User already enrolled in this course');
     }

@@ -15,11 +15,12 @@ const enrollCourse = async (data: EnrollCourse) => {
   );
 };
 
-const getEnrollmentByUserId = async (userId: string) => {
+const getEnrollmentByUserId = async (userId: string, courseId: string) => {
   return await directusClient
     .request(
       readItems('lms_enrollments', {
-        filter: { user_enrolled: { _eq: userId } },
+        filter: { user_enrolled: { _eq: userId }, course: { _eq: courseId } },
+        fields: ['*'],
       })
     )
     .then((res) => (res.length > 0 ? res[0] : null));
