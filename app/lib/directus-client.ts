@@ -1,4 +1,9 @@
-import { createDirectus, rest, staticToken } from '@directus/sdk';
+import {
+  authentication,
+  createDirectus,
+  rest,
+  staticToken,
+} from '@directus/sdk';
 import axios from 'axios';
 import type { CustomDirectusTypes } from '~/types/directus';
 
@@ -8,6 +13,12 @@ const BEARER_TOKEN = import.meta.env.VITE_BACKEND_KEY;
 
 export const directusClient = createDirectus<CustomDirectusTypes>(BACKEND_URL)
   .with(staticToken(BEARER_TOKEN))
+  .with(rest());
+
+export const directusAuthclient = createDirectus<CustomDirectusTypes>(
+  BACKEND_URL
+)
+  .with(authentication('json'))
   .with(rest());
 
 export const directusClientAxios = axios.create({

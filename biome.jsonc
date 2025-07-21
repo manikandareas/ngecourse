@@ -5,6 +5,9 @@
     "rules": {
       "performance": {
         "noImgElement": "off"
+      },
+      "suspicious": {
+        "noConsole": "info"
       }
     }
   }

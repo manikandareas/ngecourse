@@ -34,4 +34,7 @@ export default [
   //   Auth routes
   route('sign-in/*', 'routes/sign-in.tsx'),
   route('sign-up/*', 'routes/sign-up.tsx'),
+
+  // Webhooks routes
+  route('api/webhooks', 'routes/api/webhooks.ts'),
 ] satisfies RouteConfig;

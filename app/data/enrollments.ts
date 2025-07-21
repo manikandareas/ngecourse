@@ -1,9 +1,18 @@
 import { createItem, readItems } from '@directus/sdk';
 import { directusClient } from '~/lib/directus-client';
-import type { LmsEnrollments } from '~/types/directus';
 
-const enrollCourse = async (data: LmsEnrollments) => {
-  return await directusClient.request(createItem('lms_enrollments', data));
+type EnrollCourse = {
+  courseId: string;
+  userId: string;
+};
+
+const enrollCourse = async (data: EnrollCourse) => {
+  return await directusClient.request(
+    createItem('lms_enrollments', {
+      course: data.courseId,
+      user_enrolled: data.userId,
+    })
+  );
 };
 
 const getEnrollmentByUserId = async (userId: string) => {
@@ -18,5 +27,5 @@ const getEnrollmentByUserId = async (userId: string) => {
 
 export const dataEnrollment = {
   enrollCourse,
-  onByUserId: getEnrollmentByUserId,
+  oneByUserId: getEnrollmentByUserId,
 };

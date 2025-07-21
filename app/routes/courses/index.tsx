@@ -1,3 +1,5 @@
+import React from 'react';
+import { Await } from 'react-router';
 import { Badge } from '~/components/ui/badge';
 import { dataCourses } from '~/data/courses';
 import { CourseCard, toCourseCard } from '~/features/courses/course-card';
@@ -10,8 +12,8 @@ export function meta() {
   ];
 }
 
-export async function loader() {
-  return await dataCourses.many();
+export function loader() {
+  return dataCourses.many();
 }
 
 export default function CoursesPage(props: Route.ComponentProps) {
@@ -32,9 +34,18 @@ export default function CoursesPage(props: Route.ComponentProps) {
           </div>
         </div>
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {props.loaderData?.map((course) => (
-            <CourseCard key={course.id} {...toCourseCard(course)} />
-          ))}
+          <React.Suspense fallback={<div>Loading...</div>}>
+            <Await
+              errorElement={<div>Could not load courses 😬</div>}
+              resolve={props.loaderData}
+            >
+              {(resolvedCourses) =>
+                resolvedCourses.map((course) => (
+                  <CourseCard key={course.id} {...toCourseCard(course)} />
+                ))
+              }
+            </Await>
+          </React.Suspense>
         </div>
       </div>
     </div>

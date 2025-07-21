@@ -4,7 +4,9 @@ import {
   BookOpen,
   Clock,
   InfinityIcon,
+  Loader2,
 } from 'lucide-react';
+import { useFetcher } from 'react-router';
 import { Button } from '~/components/ui/button';
 import {
   Dialog,
@@ -16,6 +18,7 @@ import {
   DialogTrigger,
 } from '~/components/ui/dialog';
 import { Separator } from '~/components/ui/separator';
+import type { action } from '~/routes/courses/detail';
 import type { LmsTopics } from '~/types/directus';
 import { CourseBadge } from './hero-section';
 
@@ -28,6 +31,7 @@ interface IEnrollDialogProps {
   difficulty: string;
   duration?: string;
   lessonsCount?: number;
+  slug?: string;
 }
 
 interface CourseFeatureProps {
@@ -50,11 +54,13 @@ const EnrollDialog = ({
   topics,
   duration = '10 hours',
   lessonsCount = 15,
+  slug,
 }: IEnrollDialogProps) => {
+  const fetcher = useFetcher<typeof action>();
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="group" size="lg">
+        <Button className="group" size="lg" type="button">
           Start Learning Now
           <ArrowRightIcon className="ml-2 size-4 transition-transform group-hover:translate-x-1" />
         </Button>
@@ -98,12 +104,22 @@ const EnrollDialog = ({
         </DialogHeader>
 
         <DialogFooter className="border-t px-6 py-4">
-          <Button
-            className="w-full bg-primary transition-colors hover:bg-primary/90"
-            size="lg"
-          >
-            Enroll Now - Free
-          </Button>
+          <fetcher.Form action={`/courses/${slug}`} method="POST">
+            <Button
+              className="w-full bg-primary transition-colors hover:bg-primary/90"
+              disabled={fetcher.state !== 'idle'}
+              size="lg"
+              type="submit"
+            >
+              {fetcher.state === 'idle' ? (
+                'Enroll Now - Free'
+              ) : (
+                <>
+                  Processing enrollment <Loader2 className="animate-spin" />
+                </>
+              )}
+            </Button>
+          </fetcher.Form>
         </DialogFooter>
       </DialogContent>
     </Dialog>

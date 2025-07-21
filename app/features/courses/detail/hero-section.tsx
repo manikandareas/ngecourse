@@ -1,4 +1,4 @@
-import { Share2Icon } from 'lucide-react';
+import { ArrowRightIcon, Share2Icon } from 'lucide-react';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { toFileUrl } from '~/data/utils';
@@ -6,6 +6,7 @@ import { cn } from '~/lib/utils';
 import type {
   LmsCourses,
   LmsCoursesLmsTopics,
+  LmsEnrollments,
   LmsTopics,
 } from '~/types/directus';
 import EnrollDialog from './enroll-dialog';
@@ -17,6 +18,9 @@ interface IHeroSection {
   topics: LmsTopics[];
   image: string;
   id: string;
+  slug: string;
+
+  enrollment: LmsEnrollments | null;
 }
 
 export function HeroSection(props: IHeroSection) {
@@ -45,7 +49,14 @@ export function HeroSection(props: IHeroSection) {
           <Button size={'icon'} variant={'outline'}>
             <Share2Icon />
           </Button>
-          <EnrollDialog {...props} />
+          {props.enrollment ? (
+            <Button className="group" size="lg">
+              Continue Learning
+              <ArrowRightIcon className="ml-2 size-4 transition-transform group-hover:translate-x-1" />
+            </Button>
+          ) : (
+            <EnrollDialog {...props} />
+          )}
         </div>
       </div>
       <img
@@ -71,7 +82,10 @@ export function CourseBadge(props: { difficulty: string }) {
   );
 }
 
-export const toHeroSection = (course: LmsCourses) => {
+export const toHeroSection = (
+  course: LmsCourses,
+  enrollment: LmsEnrollments | null
+) => {
   const imageUrl = toFileUrl((course.thumbnail as string) || '');
   return {
     topics: course.topics.map(
@@ -82,5 +96,7 @@ export const toHeroSection = (course: LmsCourses) => {
     description: course.description || 'Course Description',
     image: imageUrl,
     id: course.id,
+    slug: course.slug as string,
+    enrollment,
   };
 };

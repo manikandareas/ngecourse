@@ -338,6 +338,7 @@ export type DirectusUsers = {
   appearance?: string | null;
   auth_data?: unknown | null;
   avatar?: string | DirectusFiles | null;
+  clerk_id?: string | null;
   description?: string | null;
   email?: string | null;
   email_notifications?: boolean | null;
@@ -398,6 +399,7 @@ export type LmsChapters = {
   date_updated?: string | null;
   description?: string | null;
   id: string;
+  slug?: string | null;
   sort?: number | null;
   title?: string | null;
   user_created?: string | DirectusUsers | null;
@@ -474,6 +476,7 @@ export type LmsLessons = {
 export type LmsQuizzes = {
   date_created?: string | null;
   date_updated?: string | null;
+  description?: string | null;
   id: string;
   questions?: unknown | null;
   slug?: string | null;
