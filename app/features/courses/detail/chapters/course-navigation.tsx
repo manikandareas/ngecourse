@@ -6,9 +6,13 @@ import {
   HelpCircle,
   Lock,
   PlayCircle,
+  Trophy,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
+import { Badge } from '~/components/ui/badge';
+import { Button } from '~/components/ui/button';
+import { Progress } from '~/components/ui/progress';
 import type { CourseWithContents } from '~/data/courses';
 import { useContentProgression } from '~/hooks/use-content-progression';
 import { cn } from '~/lib/utils';
@@ -43,6 +47,25 @@ export function CourseNavigation({
     isContentCurrent,
   } = useContentProgression(course, enrollment);
 
+  // Auto-expand current chapter based on URL params
+  useEffect(() => {
+    const currentChapterSlug = params.chapterSlug;
+    if (currentChapterSlug) {
+      // Find the chapter that matches the current URL
+      const currentChapter = course.chapters.find(
+        (chapter) => chapter.slug === currentChapterSlug
+      );
+
+      if (currentChapter) {
+        setExpandedChapters((prev) => {
+          const newExpanded = new Set(prev);
+          newExpanded.add(currentChapter.id);
+          return newExpanded;
+        });
+      }
+    }
+  }, [params.chapterSlug, course.chapters]);
+
   const toggleChapter = (chapterId: string) => {
     const newExpanded = new Set(expandedChapters);
     if (newExpanded.has(chapterId)) {
@@ -53,10 +76,7 @@ export function CourseNavigation({
     setExpandedChapters(newExpanded);
   };
 
-  const isChapterActive = (chapter: LmsChapters) => {
-    return params.chapterSlug === chapter.slug;
-  };
-
+  // Check if content is currently active
   const isContentActive = (
     chapter: LmsChapters,
     content: LmsChaptersContents
@@ -81,9 +101,10 @@ export function CourseNavigation({
       (item) => item.state === 'completed'
     ).length;
     const totalItems = chapter.contents.length;
-    const isChapterCompleted = completedItems === totalItems && totalItems > 0;
+    const progressPercentage =
+      totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
 
-    return { completedItems, totalItems, isChapterCompleted };
+    return { completedItems, totalItems, progressPercentage };
   };
 
   // Generate content navigation path
@@ -93,178 +114,272 @@ export function CourseNavigation({
   ) => {
     const isLesson = content.collection === 'lms_lessons';
     return isLesson
-      ? `/courses/${course.slug}/chapters/${chapter.slug}/lessons/${content.item.slug}`
-      : `/courses/${course.slug}/chapters/${chapter.slug}/quizzes/${content.item.slug}`;
+      ? `/courses/${course.slug}/${chapter.slug}/lessons/${content.item.slug}`
+      : `/courses/${course.slug}/${chapter.slug}/quizzes/${content.item.slug}`;
   };
 
   return (
     <div
       className={cn(
-        'w-80 border-r bg-muted/30 p-3 sm:w-72 sm:p-4 lg:w-80',
+        'sticky top-0 flex h-screen w-full flex-col overflow-clip bg-white dark:bg-gray-900',
+        'border-gray-200 border-r dark:border-gray-700',
+        'lg:w-80 xl:w-96',
         className
       )}
     >
-      <div className="mb-4 sm:mb-6">
-        <h2 className="font-semibold text-base text-foreground sm:text-lg">
-          {course.title}
-        </h2>
-        <div className="mt-2 space-y-1">
-          <p className="text-muted-foreground text-xs sm:text-sm">
-            {course.chapters.length} chapters
-          </p>
-          <div className="flex items-center gap-2 text-muted-foreground text-xs">
-            <span>
-              {courseProgress.completedCount} of {courseProgress.totalCount}{' '}
-              completed
-            </span>
-            <div className="h-1 w-16 rounded-full bg-muted">
-              <div
-                className="h-1 rounded-full bg-primary transition-all duration-300"
-                style={{ width: `${courseProgress.progressPercentage}%` }}
-              />
+      {/* Course Header */}
+      <div className="border-border border-b bg-blue-500 p-4 sm:p-6 dark:bg-primary ">
+        <div className="flex items-start gap-3">
+          <div className="flex-shrink-0 rounded-lg bg-blue-100 p-2 dark:bg-blue-900">
+            <BookOpen className="h-5 w-5 text-primary" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h1 className="font-bold text-lg text-primary-foreground leading-tight sm:text-xl ">
+              {course.title}
+            </h1>
+            <div className="mt-3 space-y-2">
+              <div className="flex items-center gap-2 text-primary-foreground text-sm">
+                <Trophy className="h-4 w-4" />
+                <span>
+                  {courseProgress.completedCount} of {courseProgress.totalCount}{' '}
+                  completed
+                </span>
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-primary-foreground">Progress</span>
+                  <span className="font-medium text-primary-foreground">
+                    {Math.round(courseProgress.progressPercentage)}%
+                  </span>
+                </div>
+                <Progress
+                  className="h-2 bg-primary-foreground"
+                  value={courseProgress.progressPercentage}
+                />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <nav className="space-y-2">
-        {course.chapters.map((chapter) => {
-          const isExpanded = expandedChapters.has(chapter.id);
-          const isActive = isChapterActive(chapter);
-          const { completedItems, totalItems, isChapterCompleted } =
-            getChapterProgress(chapter);
+      {/* Navigation Content */}
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4">
+        <nav className="space-y-1">
+          {course.chapters.map((chapter, chapterIndex) => {
+            const isExpanded = expandedChapters.has(chapter.id);
+            const { completedItems, totalItems, progressPercentage } =
+              getChapterProgress(chapter);
+            const isChapterCompleted =
+              completedItems === totalItems && totalItems > 0;
 
-          return (
-            <div className="space-y-1" key={chapter.id}>
-              <div className="flex items-center gap-2">
-                <button
-                  className="flex min-h-[44px] items-center gap-2 rounded-md p-2 transition-colors hover:bg-muted/50 sm:min-h-[auto]"
-                  onClick={() => toggleChapter(chapter.id)}
-                  type="button"
-                >
-                  {isExpanded ? (
-                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                  ) : (
-                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                  )}
-                </button>
-                <Link
-                  className={cn(
-                    'inline-flex min-h-[44px] flex-1 items-center gap-2 rounded-md px-2 py-2 transition-colors hover:bg-muted/50 sm:min-h-[auto]',
-                    isActive && 'bg-primary/10 text-primary'
-                  )}
-                  to={`/courses/${course.slug}/chapters/${chapter.slug}`}
-                >
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="h-4 w-4 text-muted-foreground" />
-                    {isChapterCompleted && (
-                      <CheckCircle2 className="h-3 w-3 text-green-500" />
+            return (
+              <div className="group" key={chapter.id}>
+                {/* Chapter Header */}
+                <div className="flex items-center gap-2 rounded-lg p-2 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800">
+                  <Button
+                    className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    onClick={() => toggleChapter(chapter.id)}
+                    size="sm"
+                    variant="ghost"
+                  >
+                    {isExpanded ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4" />
                     )}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <span className="text-left font-medium text-sm sm:text-sm">
-                        {chapter.title}
-                      </span>
-                      <span className="text-muted-foreground text-xs">
-                        {completedItems}/{totalItems}
-                      </span>
-                    </div>
-                    {completedItems > 0 && (
-                      <div className="mt-1 h-1 w-full rounded-full bg-muted">
-                        <div
-                          className="h-1 rounded-full bg-primary transition-all duration-300"
-                          style={{
-                            width: `${(completedItems / totalItems) * 100}%`,
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-                </Link>
-              </div>
+                  </Button>
 
-              {isExpanded && (
-                <div className="ml-10 space-y-1">
-                  {/** biome-ignore lint/complexity/noExcessiveCognitiveComplexity: false positive */}
-                  {chapter.contents.map((content) => {
-                    const isContentItemActive = isContentActive(
-                      chapter,
-                      content
-                    );
-                    const contentPath = getContentPath(chapter, content);
-                    const contentId = content.id.toString();
-
-                    const isCompleted = isContentCompleted(contentId);
-                    const isLocked = isContentLocked(contentId);
-                    const isCurrent = isContentCurrent(contentId);
-                    const isLesson = content.collection === 'lms_lessons';
-
-                    return (
-                      <Link
+                  <div className="flex flex-1 items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <div
                         className={cn(
-                          'flex min-h-[44px] items-center gap-2 rounded-md p-2 transition-colors sm:min-h-[auto]',
-                          isContentItemActive && 'bg-primary/10 text-primary',
-                          isLocked && 'cursor-not-allowed opacity-60',
-                          isCurrent && 'border border-blue-200 bg-blue-50',
-                          isCompleted && 'bg-green-50',
-                          !(isLocked || isContentItemActive) &&
-                            'hover:bg-muted/50'
+                          'flex h-6 w-6 items-center justify-center rounded-full font-medium text-xs',
+                          isChapterCompleted
+                            ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
+                            : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
                         )}
-                        key={content.id}
-                        onClick={(e) => {
-                          if (isLocked) {
-                            e.preventDefault();
-                          }
-                        }}
-                        to={isLocked ? '#' : contentPath}
                       >
-                        <div className="flex items-center gap-2">
-                          {isCompleted && (
-                            <CheckCircle2 className="h-4 w-4 text-green-500" />
+                        {isChapterCompleted ? (
+                          <CheckCircle2 className="h-3 w-3" />
+                        ) : (
+                          chapterIndex + 1
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-medium text-gray-900 text-sm leading-tight dark:text-white">
+                          {chapter.title}
+                        </h3>
+                        <div className="mt-1 flex items-center gap-2">
+                          <span className="text-gray-500 text-xs dark:text-gray-400">
+                            {completedItems}/{totalItems} completed
+                          </span>
+                          {progressPercentage > 0 && (
+                            <div className="h-1 w-12 rounded-full bg-gray-200 dark:bg-gray-700">
+                              <div
+                                className="h-1 rounded-full bg-blue-500 transition-all duration-300"
+                                style={{ width: `${progressPercentage}%` }}
+                              />
+                            </div>
                           )}
-                          {isLocked && (
-                            <Lock className="h-4 w-4 text-muted-foreground" />
-                          )}
-                          {!(isCompleted || isLocked) &&
-                            (isLesson ? (
-                              <PlayCircle className="h-4 w-4 text-muted-foreground" />
-                            ) : (
-                              <HelpCircle className="h-4 w-4 text-muted-foreground" />
-                            ))}
                         </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <span
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Chapter Content */}
+                {isExpanded && (
+                  <div className="mt-2 ml-10 space-y-1">
+                    {chapter.contents.map((content) => {
+                      const isContentItemActive = isContentActive(
+                        chapter,
+                        content
+                      );
+                      const contentPath = getContentPath(chapter, content);
+                      const contentId = content.id.toString();
+
+                      const isCompleted = isContentCompleted(contentId);
+                      const isLocked = isContentLocked(contentId);
+                      const isCurrent = isContentCurrent(contentId);
+                      const isLesson = content.collection === 'lms_lessons';
+
+                      return (
+                        <div className="group/content" key={content.id}>
+                          {isLocked ? (
+                            <div
                               className={cn(
-                                'text-xs sm:text-sm',
-                                isLocked && 'text-muted-foreground',
-                                isCurrent && 'font-medium'
+                                'flex items-center gap-3 rounded-lg p-3 transition-colors',
+                                'border border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800/50',
+                                'opacity-60'
                               )}
                             >
-                              {content.item.title}
-                            </span>
-                            {isCurrent && (
-                              <span className="rounded-full bg-blue-100 px-2 py-1 text-blue-700 text-xs">
-                                Current
-                              </span>
-                            )}
-                          </div>
-                          {isLocked && (
-                            <p className="mt-1 text-muted-foreground text-xs">
-                              Complete previous content to unlock
-                            </p>
+                              <div className="flex-shrink-0">
+                                <Lock className="h-4 w-4 text-gray-400" />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="font-medium text-gray-500 text-sm dark:text-gray-400">
+                                  {content.item.title}
+                                </p>
+                                <p className="text-gray-400 text-xs dark:text-gray-500">
+                                  Complete previous content to unlock
+                                </p>
+                              </div>
+                            </div>
+                          ) : (
+                            <Link
+                              className={cn(
+                                'flex items-center gap-3 rounded-lg p-3 transition-all duration-200',
+                                'border border-transparent hover:border-gray-200 hover:bg-gray-50',
+                                'dark:hover:border-gray-700 dark:hover:bg-gray-800/50',
+                                isContentItemActive && [
+                                  'border-blue-200 bg-blue-50 shadow-sm',
+                                  'dark:border-blue-800 dark:bg-blue-900/20',
+                                ],
+                                isCurrent &&
+                                  !isContentItemActive && [
+                                    'border-orange-200 bg-orange-50',
+                                    'dark:border-orange-800 dark:bg-orange-900/20',
+                                  ],
+                                isCompleted &&
+                                  !isContentItemActive &&
+                                  !isCurrent && [
+                                    'border-green-200 bg-green-50',
+                                    'dark:border-green-800 dark:bg-green-900/20',
+                                  ]
+                              )}
+                              to={contentPath}
+                            >
+                              <div className="flex-shrink-0">
+                                {isCompleted ? (
+                                  <div className="rounded-full bg-green-100 p-1 dark:bg-green-900">
+                                    <CheckCircle2 className="h-3 w-3 text-green-600 dark:text-green-400" />
+                                  </div>
+                                ) : isLesson ? (
+                                  <div
+                                    className={cn(
+                                      'rounded-full p-1',
+                                      isCurrent
+                                        ? 'bg-orange-100 dark:bg-orange-900'
+                                        : 'bg-blue-100 dark:bg-blue-900'
+                                    )}
+                                  >
+                                    <PlayCircle
+                                      className={cn(
+                                        'h-3 w-3',
+                                        isCurrent
+                                          ? 'text-orange-600 dark:text-orange-400'
+                                          : 'text-blue-600 dark:text-blue-400'
+                                      )}
+                                    />
+                                  </div>
+                                ) : (
+                                  <div
+                                    className={cn(
+                                      'rounded-full p-1',
+                                      isCurrent
+                                        ? 'bg-orange-100 dark:bg-orange-900'
+                                        : 'bg-purple-100 dark:bg-purple-900'
+                                    )}
+                                  >
+                                    <HelpCircle
+                                      className={cn(
+                                        'h-3 w-3',
+                                        isCurrent
+                                          ? 'text-orange-600 dark:text-orange-400'
+                                          : 'text-purple-600 dark:text-purple-400'
+                                      )}
+                                    />
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center justify-between">
+                                  <p
+                                    className={cn(
+                                      'font-medium text-sm leading-tight',
+                                      isContentItemActive
+                                        ? 'text-blue-900 dark:text-blue-100'
+                                        : 'text-gray-900 dark:text-white'
+                                    )}
+                                  >
+                                    {content.item.title}
+                                  </p>
+                                  {isCurrent && (
+                                    <Badge
+                                      className="ml-2 bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300"
+                                      variant="secondary"
+                                    >
+                                      Current
+                                    </Badge>
+                                  )}
+                                </div>
+                                <div className="mt-1 flex items-center gap-2">
+                                  <Badge className="text-xs" variant="outline">
+                                    {isLesson ? 'Lesson' : 'Quiz'}
+                                  </Badge>
+                                  {isCompleted && (
+                                    <Badge
+                                      className="bg-green-100 text-green-700 text-xs dark:bg-green-900 dark:text-green-300"
+                                      variant="secondary"
+                                    >
+                                      Completed
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                            </Link>
                           )}
                         </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </nav>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </nav>
+      </div>
     </div>
   );
 }

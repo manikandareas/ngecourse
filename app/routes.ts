@@ -15,19 +15,16 @@ export default [
 
   // Courses routes
   layout('routes/courses/layout.tsx', [
+    route('/courses/:slug/:chapterSlug', 'routes/courses/chapter-detail.tsx'),
     route(
-      '/courses/:slug/chapters/:chapterSlug',
-      'routes/courses/chapter-detail.tsx'
-    ),
-    route(
-      '/courses/:slug/chapters/:chapterSlug/lessons/:lessonSlug',
+      '/courses/:slug/:chapterSlug/lessons/:lessonSlug',
       'routes/courses/lesson-detail.tsx'
     ),
   ]),
 
   // Courses quiz routes
   route(
-    '/courses/:slug/chapters/:chapterSlug/quizzes/:quizSlug',
+    '/courses/:slug/:chapterSlug/quizzes/:quizSlug',
     'routes/courses/quiz.tsx'
   ),
 

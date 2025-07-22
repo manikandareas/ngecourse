@@ -149,16 +149,19 @@ export function ContentItem({
           }
           if (isLesson) {
             navigate(
-              `/courses/${slug}/chapters/${chapterSlug}/lessons/${content.item.slug}`
+              `/courses/${slug}/${chapterSlug}/lessons/${content.item.slug}`
             );
             return;
           }
 
-          navigate(
-            `/courses/${slug}/chapters/${chapterSlug}/quizzes/${content.item.slug}`
-          );
+          if (!isLesson) {
+            navigate(
+              `/courses/${slug}/${chapterSlug}/quizzes/${content.item.slug}`
+            );
+          }
         }}
         size="sm"
+        type="button"
         variant={isCompleted ? 'outline' : 'default'}
       >
         {buttonText}
