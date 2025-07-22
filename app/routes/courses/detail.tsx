@@ -32,7 +32,7 @@ export async function loader(args: Route.LoaderArgs) {
     currentSession?.id || '',
     courseWithContents.id
   );
-
+  console.log(enrollment);
   return {
     course: courseWithContents,
     enrollment,

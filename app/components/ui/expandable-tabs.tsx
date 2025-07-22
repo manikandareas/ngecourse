@@ -1,6 +1,7 @@
 import { AnimatePresence, motion, type Transition } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
 import React, { type ComponentRef } from 'react';
+import { useParams } from 'react-router';
 import { useOnClickOutside } from 'usehooks-ts';
 import { cn } from '~/lib/utils';
 
@@ -53,6 +54,12 @@ export function ExpandableTabs({
   activeColor = 'text-primary',
   onChange,
 }: ExpandableTabsProps) {
+  const { slug, chapterSlug, quizSlug, lessonSlug } = useParams<{
+    slug: string;
+    chapterSlug: string;
+    quizSlug: string | undefined;
+    lessonSlug: string | undefined;
+  }>();
   const [selected, setSelected] = React.useState<number | null>(null);
   const outsideClickRef = React.useRef<ComponentRef<'div'>>(null);
 

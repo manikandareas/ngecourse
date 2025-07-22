@@ -1,8 +1,4 @@
-import {
-  CheckCircle2,
-  ChevronDown,
-  ChevronRight,
-} from 'lucide-react';
+import { CheckCircle2, ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import { Badge } from '~/components/ui/badge';
 import { Progress } from '~/components/ui/progress';
@@ -20,7 +16,10 @@ interface ChapterItemProps {
 /**
  * Get chapter node styling based on completion and hover state
  */
-function getChapterNodeStyles(isCompleted: boolean, isHovered: boolean): string {
+function getChapterNodeStyles(
+  isCompleted: boolean,
+  isHovered: boolean
+): string {
   if (isCompleted) {
     return 'border-green-500 bg-green-500';
   }
@@ -44,14 +43,19 @@ export function ChapterItem({
   };
 
   // Calculate chapter progress
-  const chapterContentIds = chapter.contents.map(content => content.id.toString());
-  const chapterProgression = contentProgression.filter(item => 
+  const chapterContentIds = chapter.contents.map((content) =>
+    content.id.toString()
+  );
+  const chapterProgression = contentProgression.filter((item) =>
     chapterContentIds.includes(item.id)
   );
-  
-  const completedItems = chapterProgression.filter(item => item.state === 'completed').length;
+
+  const completedItems = chapterProgression.filter(
+    (item) => item.state === 'completed'
+  ).length;
   const totalItems = chapter.contents.length;
-  const progressPercentage = totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
+  const progressPercentage =
+    totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
   const isCompleted = completedItems === totalItems && totalItems > 0;
 
   const nodeStyles = getChapterNodeStyles(isCompleted, isHovered);
@@ -141,16 +145,17 @@ export function ChapterItem({
           {/* Chapter Contents */}
           {isExpanded && (
             <div className="mt-4 space-y-2">
-              {chapter.contents.map(content => {
+              {chapter.contents.map((content) => {
                 const contentState = contentProgression.find(
-                  item => item.id === content.id.toString()
+                  (item) => item.id === content.id.toString()
                 );
-                
+
                 return (
                   <ContentItem
-                    key={content.id}
+                    chapterSlug={chapter.slug as string}
                     content={content}
                     contentState={contentState}
+                    key={content.id}
                   />
                 );
               })}

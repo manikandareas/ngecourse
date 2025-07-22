@@ -56,9 +56,36 @@ const getCourseContents = async (slug: string) => {
     );
 };
 
+const countCourseContents = async (id: string) => {
+  const contents = await directusClientAxios
+    .get<AxiosResponse<CourseWithContents[]>>('/items/lms_courses', {
+      params: {
+        'filter[id][_eq]': id,
+        fields: ['chapters.*', 'chapters.contents.*'],
+      },
+    })
+    .then((res) =>
+      res.data.data.length > 0 ? (res.data.data[0] as CourseWithContents) : null
+    );
+  return (
+    contents?.chapters?.reduce(
+      (total, chapter) => total + chapter.contents.length,
+      0
+    ) || 0
+  );
+};
+
+const getLessonBySlug = async (slug: string) => {
+  return await directusClient
+    .request(readItems('lms_lessons', { filter: { slug: { _eq: slug } } }))
+    .then((res) => (res.length > 0 ? res[0] : null));
+};
+
 export const dataCourses = {
   many: getCourses,
   one: getCourse,
   withContents: getCourseContents,
   oneById: getCourseById,
+  countContents: countCourseContents,
+  getLessonBySlug,
 };

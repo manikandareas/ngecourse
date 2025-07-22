@@ -1,36 +1,20 @@
 import type { ReactNode } from 'react';
+import type { CourseWithContents } from '~/data/courses';
+import type { LmsEnrollments } from '~/types/directus';
 import { CourseNavigation } from './course-navigation';
 
-interface Course {
-  id: string;
-  title: string;
-  slug: string;
-  chapters: Array<{
-    id: string;
-    title: string;
-    slug: string;
-    contents: Array<{
-      id: string;
-      title: string;
-      type: 'lesson' | 'quiz';
-      slug: string;
-      completed?: boolean;
-    }>;
-    completed?: boolean;
-  }>;
-}
-
 interface LearningLayoutProps {
-  course: Course;
+  course: CourseWithContents;
+  enrollment: LmsEnrollments | null;
   children: ReactNode;
 }
 
-export function LearningLayout({ course, children }: LearningLayoutProps) {
+export function LearningLayout({ course, enrollment, children }: LearningLayoutProps) {
   return (
     <div className="flex min-h-screen bg-background">
       {/* Desktop Navigation - Hidden on mobile */}
       <div className="hidden lg:block">
-        <CourseNavigation course={course} />
+        <CourseNavigation course={course} enrollment={enrollment} />
       </div>
 
       {/* Mobile Navigation - Shown only on mobile */}
@@ -38,6 +22,7 @@ export function LearningLayout({ course, children }: LearningLayoutProps) {
         <CourseNavigation
           className="-translate-x-full fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out"
           course={course}
+          enrollment={enrollment}
         />
       </div>
 

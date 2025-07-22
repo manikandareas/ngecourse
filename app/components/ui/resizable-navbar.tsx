@@ -237,7 +237,7 @@ export const NavbarLogo = () => {
         src="https://assets.aceternity.com/logo-dark.png"
         width={30}
       />
-      <span className="font-medium text-black dark:text-white">NgeCourse</span>
+      <span className="font-medium text-black dark:text-white">Genii</span>
     </Link>
   );
 };

@@ -1,4 +1,5 @@
 import { BookOpen, CheckCircle2, Clock, HelpCircle, Lock } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import type { LmsChaptersContents } from '~/types/directus';
@@ -7,6 +8,7 @@ import type { ContentWithProgression } from '~/utils/content-progression';
 interface ContentItemProps {
   content: LmsChaptersContents;
   contentState: ContentWithProgression | undefined;
+  chapterSlug: string;
 }
 
 /**
@@ -14,11 +16,19 @@ interface ContentItemProps {
  */
 
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: the logic is necessary
-export function ContentItem({ content, contentState }: ContentItemProps) {
+export function ContentItem({
+  content,
+  contentState,
+  chapterSlug,
+}: ContentItemProps) {
   const isLesson = content.collection === 'lms_lessons';
   const isCompleted = contentState?.state === 'completed';
   const isLocked = contentState?.state === 'locked';
   const isCurrent = contentState?.isCurrentContent;
+
+  const navigate = useNavigate();
+
+  const { slug } = useParams();
 
   // Container styles based on state
   const containerClass = [
@@ -130,6 +140,24 @@ export function ContentItem({ content, contentState }: ContentItemProps) {
       <Button
         className={buttonClass}
         disabled={isLocked}
+        onClick={() => {
+          if (isLocked) {
+            return;
+          }
+          if (isCompleted) {
+            return;
+          }
+          if (isLesson) {
+            navigate(
+              `/courses/${slug}/chapters/${chapterSlug}/lessons/${content.item.slug}`
+            );
+            return;
+          }
+
+          navigate(
+            `/courses/${slug}/chapters/${chapterSlug}/quizzes/${content.item.slug}`
+          );
+        }}
         size="sm"
         variant={isCompleted ? 'outline' : 'default'}
       >

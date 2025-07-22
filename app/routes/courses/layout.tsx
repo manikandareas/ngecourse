@@ -1,9 +1,36 @@
 import { ArrowLeft, ArrowRight, Maximize, Moon, Settings } from 'lucide-react';
 import { Outlet } from 'react-router';
 import { ExpandableTabs } from '~/components/ui/expandable-tabs';
+import { dataCourses } from '~/data/courses';
+import { dataEnrollment } from '~/data/enrollments';
 import { LearningLayout } from '~/features/courses/detail/chapters/learning-layout';
+import { getCurrentSession } from '~/root';
+import type { Route } from './+types/layout';
 
-export default function CoursesLayout() {
+export async function loader(args: Route.LoaderArgs) {
+  const currentSession = await getCurrentSession(args);
+
+  if (!currentSession) {
+    throw new Response('Unauthorized', { status: 401 });
+  }
+
+  const courseWithContents = await dataCourses.withContents(args.params.slug);
+
+  if (!courseWithContents) {
+    throw new Response('Course Not Found', { status: 404 });
+  }
+  const enrollment = await dataEnrollment.oneByUserId(
+    currentSession?.id || '',
+    courseWithContents.id
+  );
+
+  return {
+    course: courseWithContents,
+    enrollment,
+  };
+}
+
+export default function CoursesLayout(args: Route.ComponentProps) {
   const tabs = [
     { title: 'Previous', icon: ArrowLeft },
     { type: 'separator' as const },
@@ -13,9 +40,12 @@ export default function CoursesLayout() {
     { type: 'separator' as const },
     { title: 'Complete', icon: ArrowRight },
   ];
+
+  const { course, enrollment } = args.loaderData;
+
   return (
     <div className="relative min-h-screen">
-      <LearningLayout course={mockCourse}>
+      <LearningLayout course={course} enrollment={enrollment}>
         <Outlet />
       </LearningLayout>
       <div className="-translate-x-1/2 -translate-y-1/2 fixed right-1/2 bottom-4 left-1/2 z-50 flex w-max gap-4">
@@ -28,99 +58,3 @@ export default function CoursesLayout() {
     </div>
   );
 }
-
-// Mock data - in a real app, this would come from your API/database
-const mockCourse = {
-  id: '1',
-  title: 'UI/UX Design Fundamentals',
-  slug: 'ui-ux-fundamentals',
-  chapters: [
-    {
-      id: '1',
-      title: 'Introduction to UI/UX',
-      slug: 'introduction',
-      contents: [
-        {
-          id: '1',
-          title: 'What is UI/UX?',
-          type: 'lesson' as const,
-          slug: 'what-is-ui-ux',
-        },
-        {
-          id: '2',
-          title: 'Design Principles',
-          type: 'lesson' as const,
-          slug: 'design-principles',
-        },
-        {
-          id: '3',
-          title: 'Quiz: Basics',
-          type: 'quiz' as const,
-          slug: 'basics-quiz',
-        },
-      ],
-    },
-    {
-      id: '2',
-      title: 'Usability Principles',
-      slug: 'usability-principles',
-      contents: [
-        {
-          id: '4',
-          title: 'Visibility of System Status',
-          type: 'lesson' as const,
-          slug: 'visibility-system-status',
-        },
-        {
-          id: '5',
-          title: 'User Control and Freedom',
-          type: 'lesson' as const,
-          slug: 'user-control-freedom',
-        },
-        {
-          id: '6',
-          title: 'Consistency and Standards',
-          type: 'lesson' as const,
-          slug: 'consistency-standards',
-        },
-        {
-          id: '7',
-          title: 'Quiz: Usability',
-          type: 'quiz' as const,
-          slug: 'usability-quiz',
-        },
-      ],
-    },
-    {
-      id: '3',
-      title: 'Design Process',
-      slug: 'design-process',
-      contents: [
-        {
-          id: '8',
-          title: 'Research Phase',
-          type: 'lesson' as const,
-          slug: 'research-phase',
-        },
-        {
-          id: '9',
-          title: 'Wireframing',
-          type: 'lesson' as const,
-          slug: 'wireframing',
-        },
-        {
-          id: '10',
-          title: 'Prototyping',
-          type: 'lesson' as const,
-          slug: 'prototyping',
-        },
-        {
-          id: '11',
-          title: 'Final Quiz',
-          type: 'quiz' as const,
-          slug: 'final-quiz',
-        },
-      ],
-    },
-  ],
-};
