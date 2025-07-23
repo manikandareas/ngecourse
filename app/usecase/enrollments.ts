@@ -22,52 +22,99 @@ const enroll = async (courseSlug: string, userId: string) => {
   }
 };
 
-type AddProgression = {
+type AddProgressionParams = {
   chapterId: string;
   contentId: number;
   courseId: string;
   userId: string;
+  nextPath?: string;
 };
 
-const addProgression = async (data: AddProgression) => {
+type ProgressionResult = {
+  isCompleted: boolean;
+  percentage: number;
+  response: unknown;
+  nextPath?: string;
+};
+
+class ProgressionError extends Error {
+  code: string;
+  
+  constructor(message: string, code: string) {
+    super(message);
+    this.name = 'ProgressionError';
+    this.code = code;
+  }
+}
+
+const addProgression = async (params: AddProgressionParams): Promise<ProgressionResult> => {
+  const { userId, courseId, contentId, nextPath } = params;
+
   try {
-    const enrollment = await dataEnrollment.oneByUserId(
-      data.userId,
-      data.courseId
-    );
-    if (!enrollment) {
-      throw new Error('User not enrolled in this course');
+    // Validate user enrollment
+    const userEnrollment = await dataEnrollment.oneByUserId(userId, courseId);
+    if (!userEnrollment) {
+      throw new ProgressionError('User not enrolled in this course', 'NOT_ENROLLED');
     }
 
-    const completedContentsId = enrollment.contents_completed?.map(
+    // Extract completed content IDs for validation
+    const existingCompletedContentIds = userEnrollment.contents_completed?.map(
+      (content) => content.lms_chapters_contents_id as number
+    ) ?? [];
+
+    const existingCompletedIds = userEnrollment.contents_completed?.map(
       (content) => content.id
-    );
+    ) ?? [];
 
-    if (completedContentsId?.includes(data.contentId)) {
-      throw new Error('Content already completed');
+    // Prevent duplicate completion
+    if (existingCompletedContentIds.includes(contentId)) {
+      throw new ProgressionError('Content already completed', 'ALREADY_COMPLETED');
     }
 
-    // Check and calculate percentage
-    const contentsCount = await dataCourses.countContents(data.courseId);
-
-    const percentage = (completedContentsId?.length || 0) / contentsCount;
-    const isCompleted = percentage === 1;
-
-    const response = await dataEnrollment.addProgression({
-      chapterId: data.chapterId,
-      contents_completed: [...completedContentsId, data.contentId],
-      is_completed: isCompleted,
-      percent_complete: percentage,
-      date_completed: isCompleted ? new Date().toISOString() : undefined,
+    // Add new completed content
+    const newCompletedContent = await dataEnrollment.addCompletedContent({
+      enrollmentId: userEnrollment.id,
+      contentId,
     });
+
+    if (!newCompletedContent) {
+      throw new ProgressionError('Failed to record content completion', 'COMPLETION_FAILED');
+    }
+
+    // Calculate updated progress
+    const updatedCompletedIds = [...existingCompletedIds, newCompletedContent.id];
+    const totalContentCount = await dataCourses.countContents(courseId);
+    
+    if (totalContentCount === 0) {
+      throw new ProgressionError('Course has no content to complete', 'INVALID_COURSE');
+    }
+
+    const completionPercentage = updatedCompletedIds.length / totalContentCount;
+    const isCourseCompleted = completionPercentage >= 1;
+
+    // Update enrollment progression
+    const progressionResponse = await dataEnrollment.addProgression({
+      enrollmentId: userEnrollment.id,
+      contents_completed: updatedCompletedIds,
+      is_completed: isCourseCompleted,
+      percent_complete: completionPercentage,
+      date_completed: isCourseCompleted ? new Date().toISOString() : undefined,
+    });
+
     return {
-      isCompleted,
-      percentage,
-      response,
+      isCompleted: isCourseCompleted,
+      percentage: completionPercentage,
+      response: progressionResponse,
+      nextPath,
     };
   } catch (error) {
-    console.error(error);
-    return null;
+    if (error instanceof ProgressionError) {
+      console.error(`Progression Error [${error.code}]:`, error.message);
+      throw error; // Re-throw custom errors for proper handling upstream
+    }
+    
+    console.error('Unexpected error in addProgression:', error);
+    throw new ProgressionError('An unexpected error occurred', 'UNKNOWN_ERROR');
   }
 };
 

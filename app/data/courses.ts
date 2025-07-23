@@ -81,6 +81,12 @@ const getLessonBySlug = async (slug: string) => {
     .then((res) => (res.length > 0 ? res[0] : null));
 };
 
+const getChapterBySlug = async (slug: string) => {
+  return await directusClient
+    .request(readItems('lms_chapters', { filter: { slug: { _eq: slug } } }))
+    .then((res) => (res.length > 0 ? res[0] : null));
+};
+
 export const dataCourses = {
   many: getCourses,
   one: getCourse,
@@ -88,4 +94,5 @@ export const dataCourses = {
   oneById: getCourseById,
   countContents: countCourseContents,
   getLessonBySlug,
+  getChapterBySlug,
 };

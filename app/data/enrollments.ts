@@ -39,7 +39,7 @@ const getEnrollmentByUserId = async (userId: string, courseId: string) => {
 };
 
 type AddProgression = {
-  chapterId: string;
+  enrollmentId: number;
   contents_completed: number[];
   is_completed: boolean;
   date_completed?: string;
@@ -48,11 +48,25 @@ type AddProgression = {
 
 const addProgression = async (data: AddProgression) => {
   return await directusClient.request(
-    updateItem('lms_enrollments', data.chapterId, {
+    updateItem('lms_enrollments', data.enrollmentId, {
       contents_completed: data.contents_completed,
       is_completed: data.is_completed,
       date_completed: data.date_completed,
-      percent_complete: data.percent_complete,
+      percent_complete: Number(data.percent_complete.toFixed(2)),
+    })
+  );
+};
+
+type AddCompletedContent = {
+  enrollmentId: number;
+  contentId: number;
+};
+
+const addCompletedContent = async (data: AddCompletedContent) => {
+  return await directusClient.request(
+    createItem('lms_enrollments_lms_chapters_contents', {
+      lms_chapters_contents_id: data.contentId,
+      lms_enrollments_id: data.enrollmentId,
     })
   );
 };
@@ -61,4 +75,5 @@ export const dataEnrollment = {
   enrollCourse,
   oneByUserId: getEnrollmentByUserId,
   addProgression,
+  addCompletedContent,
 };

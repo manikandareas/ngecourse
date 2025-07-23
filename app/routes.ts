@@ -20,13 +20,13 @@ export default [
       '/courses/:slug/:chapterSlug/lessons/:lessonSlug',
       'routes/courses/lesson-detail.tsx'
     ),
+    // Courses quiz routes
+    // Temporary solution, next will be separated from layout
+    route(
+      '/courses/:slug/:chapterSlug/quizzes/:quizSlug',
+      'routes/courses/quiz.tsx'
+    ),
   ]),
-
-  // Courses quiz routes
-  route(
-    '/courses/:slug/:chapterSlug/quizzes/:quizSlug',
-    'routes/courses/quiz.tsx'
-  ),
 
   //   Auth routes
   route('sign-in/*', 'routes/sign-in.tsx'),
