@@ -1,14 +1,16 @@
 import { Menu, X } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
+import type {
+  GetCourseContentsQueryResult,
+  GetEnrollmentQueryResult,
+} from 'sanity.types';
 import { Button } from '~/components/ui/button';
-import type { CourseWithContents } from '~/data/courses';
-import type { LmsEnrollments } from '~/types/directus';
 import { CourseNavigation } from './course-navigation';
 
 interface LearningLayoutProps {
-  course: CourseWithContents;
-  enrollment: LmsEnrollments | null;
+  course: GetCourseContentsQueryResult;
+  enrollment: GetEnrollmentQueryResult | null;
   children: ReactNode;
 }
 
@@ -77,7 +79,7 @@ export function LearningLayout({
               <Menu className="h-5 w-5" />
               <span className="sr-only">Open navigation menu</span>
             </Button>
-            <h1 className="truncate font-semibold text-lg">{course.title}</h1>
+            <h1 className="truncate font-semibold text-lg">{course?.title}</h1>
             <div className="w-9" /> {/* Spacer for centering */}
           </div>
         </div>

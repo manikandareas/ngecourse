@@ -1,5 +1,7 @@
-import type { CourseWithContents } from '~/data/courses';
-import type { LmsEnrollments } from '~/types/directus';
+import type {
+  GetCourseContentsQueryResult,
+  GetEnrollmentQueryResult,
+} from 'sanity.types';
 
 export type ContentProgressionState = 'completed' | 'unlocked' | 'locked';
 
@@ -12,26 +14,31 @@ export interface ContentWithProgression {
 /**
  * Extract all content IDs from course chapters in sequential order
  */
-function extractContentIds(course: CourseWithContents): string[] {
-  return course.chapters.flatMap(chapter => 
-    chapter.contents.map(content => content.id.toString())
+function extractContentIds(course: GetCourseContentsQueryResult): string[] {
+  if (!Array.isArray(course?.chapters)) {
+    return [];
+  }
+
+  return course.chapters.flatMap(
+    (chapter) =>
+      chapter.contents?.map((content) => content._id.toString()) || []
   );
 }
 
 /**
  * Extract completed content IDs from enrollment data
  */
-function extractCompletedContentIds(enrollment: LmsEnrollments | null): Set<string> {
-  if (!enrollment?.contents_completed?.length) {
+function extractCompletedContentIds(
+  enrollment: GetEnrollmentQueryResult | null
+): Set<string> {
+  if (!enrollment?.contentsCompleted?.length) {
     return new Set();
   }
 
-  const completedIds = enrollment.contents_completed
-    .map(item => {
-      if (typeof item === 'object' && item.lms_chapters_contents_id) {
-        return typeof item.lms_chapters_contents_id === 'object'
-          ? item.lms_chapters_contents_id.id?.toString()
-          : item.lms_chapters_contents_id.toString();
+  const completedIds = enrollment.contentsCompleted
+    .map((item) => {
+      if (typeof item === 'object' && item._id) {
+        return item._id.toString();
       }
       return null;
     })
@@ -47,8 +54,12 @@ function findCurrentProgressionIndex(
   contentIds: string[],
   completedIds: Set<string>
 ): number {
-  const firstIncompleteIndex = contentIds.findIndex(id => !completedIds.has(id));
-  return firstIncompleteIndex === -1 ? contentIds.length - 1 : firstIncompleteIndex;
+  const firstIncompleteIndex = contentIds.findIndex(
+    (id) => !completedIds.has(id)
+  );
+  return firstIncompleteIndex === -1
+    ? contentIds.length - 1
+    : firstIncompleteIndex;
 }
 
 /**
@@ -61,15 +72,15 @@ function determineContentState(
   completedIds: Set<string>
 ): { state: ContentProgressionState; isCurrentContent: boolean } {
   const isCompleted = completedIds.has(contentId);
-  
+
   if (index < currentIndex || isCompleted) {
     return { state: 'completed', isCurrentContent: false };
   }
-  
+
   if (index === currentIndex) {
     return { state: 'unlocked', isCurrentContent: true };
   }
-  
+
   return { state: 'locked', isCurrentContent: false };
 }
 
@@ -82,8 +93,8 @@ function determineContentState(
  * - Future contents (n+1 and above) are marked as 'locked'
  */
 export function getContentProgression(
-  course: CourseWithContents,
-  enrollment: LmsEnrollments | null
+  course: GetCourseContentsQueryResult,
+  enrollment: GetEnrollmentQueryResult | null
 ): ContentWithProgression[] {
   const allContentIds = extractContentIds(course);
   const completedContentIds = extractCompletedContentIds(enrollment);

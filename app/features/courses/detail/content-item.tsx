@@ -1,12 +1,12 @@
 import { BookOpen, CheckCircle2, Clock, HelpCircle, Lock } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router';
+import type { Lesson, Quiz } from 'sanity.types';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
-import type { LmsChaptersContents } from '~/types/directus';
 import type { ContentWithProgression } from '~/utils/content-progression';
 
 interface ContentItemProps {
-  content: LmsChaptersContents;
+  content: Lesson | Quiz;
   contentState: ContentWithProgression | undefined;
   chapterSlug: string;
 }
@@ -21,7 +21,7 @@ export function ContentItem({
   contentState,
   chapterSlug,
 }: ContentItemProps) {
-  const isLesson = content.collection === 'lms_lessons';
+  const isLesson = content._type === 'lesson';
   const isCompleted = contentState?.state === 'completed';
   const isLocked = contentState?.state === 'locked';
   const isCurrent = contentState?.isCurrentContent;
@@ -112,7 +112,7 @@ export function ContentItem({
 
         <div className="flex-1">
           <div className="flex items-center space-x-2">
-            <span className={titleClass}>{content.item.title}</span>
+            <span className={titleClass}>{content.title}</span>
             <Badge className={badgeClass} variant="outline">
               {isLesson ? 'Lesson' : 'Quiz'}
             </Badge>
@@ -149,14 +149,14 @@ export function ContentItem({
           }
           if (isLesson) {
             navigate(
-              `/courses/${slug}/${chapterSlug}/lessons/${content.item.slug}`
+              `/courses/${slug}/${chapterSlug}/lessons/${content.slug?.current}`
             );
             return;
           }
 
           if (!isLesson) {
             navigate(
-              `/courses/${slug}/${chapterSlug}/quizzes/${content.item.slug}`
+              `/courses/${slug}/${chapterSlug}/quizzes/${content.slug?.current}`
             );
           }
         }}

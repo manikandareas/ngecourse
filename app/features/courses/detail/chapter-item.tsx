@@ -1,13 +1,13 @@
 import { CheckCircle2, ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
+import type { GetChapterBySlugQueryResult, Lesson, Quiz } from 'sanity.types';
 import { Badge } from '~/components/ui/badge';
 import { Progress } from '~/components/ui/progress';
-import type { Chapter } from '~/data/courses';
 import type { ContentWithProgression } from '~/utils/content-progression';
 import { ContentItem } from './content-item';
 
 interface ChapterItemProps {
-  chapter: Chapter;
+  chapter: GetChapterBySlugQueryResult;
   isLast: boolean;
   chapterNumber: number;
   contentProgression: ContentWithProgression[];
@@ -43,17 +43,17 @@ export function ChapterItem({
   };
 
   // Calculate chapter progress
-  const chapterContentIds = chapter.contents.map((content) =>
-    content.id.toString()
+  const chapterContentIds = chapter?.contents?.map((content) =>
+    content._id.toString()
   );
   const chapterProgression = contentProgression.filter((item) =>
-    chapterContentIds.includes(item.id)
+    chapterContentIds?.includes(item.id)
   );
 
   const completedItems = chapterProgression.filter(
     (item) => item.state === 'completed'
   ).length;
-  const totalItems = chapter.contents.length;
+  const totalItems = chapter?.contents?.length ?? 0;
   const progressPercentage =
     totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
   const isCompleted = completedItems === totalItems && totalItems > 0;
@@ -66,7 +66,7 @@ export function ChapterItem({
       <div className="relative z-10 flex">
         <div className="mr-6 flex flex-col items-center">
           <button
-            aria-label={`Chapter ${chapterNumber}: ${chapter.title}`}
+            aria-label={`Chapter ${chapterNumber}: ${chapter?.title}`}
             className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border-2 font-bold text-white shadow-lg transition-all duration-300 ${nodeStyles}`}
             onClick={handleToggle}
             onMouseEnter={() => setIsHovered(true)}
@@ -96,7 +96,7 @@ export function ChapterItem({
               <div className="flex-1">
                 <div className="mb-2 flex items-center space-x-3">
                   <h3 className="font-semibold text-gray-900 text-lg">
-                    {chapter.title}
+                    {chapter?.title}
                   </h3>
                   <div className="flex items-center space-x-2">
                     <Badge className="text-xs" variant="secondary">
@@ -113,7 +113,7 @@ export function ChapterItem({
                   </div>
                 </div>
 
-                {chapter.description && (
+                {chapter?.description && (
                   <p className="mb-3 text-gray-600 text-sm">
                     {chapter.description}
                   </p>
@@ -145,17 +145,17 @@ export function ChapterItem({
           {/* Chapter Contents */}
           {isExpanded && (
             <div className="mt-4 space-y-2">
-              {chapter.contents.map((content) => {
+              {chapter?.contents?.map((content) => {
                 const contentState = contentProgression.find(
-                  (item) => item.id === content.id.toString()
+                  (item) => item.id === content._id.toString()
                 );
 
                 return (
                   <ContentItem
-                    chapterSlug={chapter.slug as string}
-                    content={content}
+                    chapterSlug={chapter.slug?.current as string}
+                    content={content as Lesson | Quiz}
                     contentState={contentState}
-                    key={content.id}
+                    key={content._id}
                   />
                 );
               })}

@@ -6,13 +6,23 @@ import { MarkdownRenderer } from '~/features/courses/detail/chapters/markdown-re
 import { getCurrentSession } from '~/root';
 import type { Route } from './+types/lesson-detail';
 
+export function meta({ data }: Route.MetaArgs) {
+  return [
+    { title: `NgeCourse | ${data?.title}` },
+    {
+      name: 'description',
+      content: data?.content || 'Lesson detail page of NgeCourse!',
+    },
+  ];
+}
+
 export async function loader(args: Route.LoaderArgs) {
   const currentSession = await getCurrentSession(args);
   if (!currentSession) {
     throw new Response('Unauthorized', { status: 401 });
   }
 
-  return dataCourses.getLessonBySlug(args.params.lessonSlug);
+  return await dataCourses.getLessonBySlug(args.params.lessonSlug);
 }
 
 export default function LessonDetailPage(props: Route.ComponentProps) {

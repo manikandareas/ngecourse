@@ -14,15 +14,19 @@ export async function action(args: Route.ActionArgs) {
   const formData = await args.request.formData();
 
   const courseId = formData.get('courseId') as string;
-  const chapterId = formData.get('chapterId') as string;
   const contentId = formData.get('contentId') as string;
   const nextPath = formData.get('nextPath') as string;
 
-  const response = await usecaseEnrollments.addProgression({
-    userId: currentSession.id,
+  console.log({
     courseId,
-    chapterId,
-    contentId: +contentId,
+    contentId,
+    nextPath,
+  });
+
+  const response = await usecaseEnrollments.addProgression({
+    userId: currentSession._id,
+    courseId,
+    contentId,
     nextPath,
   });
 

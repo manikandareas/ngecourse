@@ -1,10 +1,12 @@
 import { useMemo } from 'react';
-import type { CourseWithContents } from '~/data/courses';
-import type { LmsEnrollments } from '~/types/directus';
-import { 
-  calculateCourseProgress, 
+import type {
+  GetCourseContentsQueryResult,
+  GetEnrollmentQueryResult,
+} from 'sanity.types';
+import {
+  type ContentWithProgression,
+  calculateCourseProgress,
   getContentProgression,
-  type ContentWithProgression 
 } from '~/utils/content-progression';
 
 interface UseContentProgressionReturn {
@@ -25,8 +27,8 @@ interface UseContentProgressionReturn {
  * Provides computed values and helper functions for content progression
  */
 export function useContentProgression(
-  course: CourseWithContents,
-  enrollment: LmsEnrollments | null
+  course: GetCourseContentsQueryResult,
+  enrollment: GetEnrollmentQueryResult | null
 ): UseContentProgressionReturn {
   const contentProgression = useMemo(
     () => getContentProgression(course, enrollment),
@@ -39,25 +41,24 @@ export function useContentProgression(
   );
 
   const getContentState = useMemo(
-    () => (contentId: string) => 
-      contentProgression.find(item => item.id === contentId),
+    () => (contentId: string) =>
+      contentProgression.find((item) => item.id === contentId),
     [contentProgression]
   );
 
   const isContentCompleted = useMemo(
-    () => (contentId: string) => 
+    () => (contentId: string) =>
       getContentState(contentId)?.state === 'completed',
     [getContentState]
   );
 
   const isContentLocked = useMemo(
-    () => (contentId: string) => 
-      getContentState(contentId)?.state === 'locked',
+    () => (contentId: string) => getContentState(contentId)?.state === 'locked',
     [getContentState]
   );
 
   const isContentCurrent = useMemo(
-    () => (contentId: string) => 
+    () => (contentId: string) =>
       getContentState(contentId)?.isCurrentContent === true,
     [getContentState]
   );

@@ -23,8 +23,8 @@ export async function loader(args: Route.LoaderArgs) {
     throw new Response('Course Not Found', { status: 404 });
   }
   const enrollment = await dataEnrollment.oneByUserId(
-    currentSession?.id || '',
-    courseWithContents.id
+    currentSession?._id || '',
+    courseWithContents._id
   );
 
   return {
@@ -74,13 +74,15 @@ export default function CoursesLayout(args: Route.ComponentProps) {
 
     const formData = new FormData();
 
-    formData.append('courseId', course.id);
+    formData.append('courseId', course._id);
     formData.append('chapterId', currentItem?.chapterId as string);
     formData.append('contentId', currentItem?.contentId?.toString() as string);
 
+    console.log('before  submit', currentItem?.contentId);
+
     if (nextItem) {
       const nextPath =
-        `/courses/${course.slug}/${nextItem.chapterSlug}` +
+        `/courses/${course.slug?.current}/${nextItem.chapterSlug}` +
         (nextItem.contentSlug ? `/lessons/${nextItem.contentSlug}` : '');
 
       formData.append('nextPath', nextPath);
@@ -88,7 +90,7 @@ export default function CoursesLayout(args: Route.ComponentProps) {
 
     await fethcher.submit(formData, {
       method: 'POST',
-      action: `/courses/${course.slug}/${currentItem?.chapterSlug}`,
+      action: `/courses/${course.slug?.current}/${currentItem?.chapterSlug}`,
     });
   };
 

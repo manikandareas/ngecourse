@@ -1,14 +1,16 @@
 import { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import type { CourseWithContents } from '~/data/courses';
-import type { LmsEnrollments } from '~/types/directus';
+import type {
+  GetCourseContentsQueryResult,
+  GetEnrollmentQueryResult,
+} from 'sanity.types';
 import { useContentProgression } from './use-content-progression';
 
 interface SequentialNavigationItem {
   type: 'chapter' | 'lesson' | 'quiz';
   chapterId: string;
   chapterSlug: string;
-  contentId?: number;
+  contentId?: string;
   contentSlug?: string;
   path: string;
   title: string;
@@ -30,8 +32,8 @@ interface UseSequentialNavigationReturn {
 }
 
 export function useSequentialNavigation(
-  course: CourseWithContents,
-  enrollment: LmsEnrollments | null
+  course: GetCourseContentsQueryResult,
+  enrollment: GetEnrollmentQueryResult | null
 ): UseSequentialNavigationReturn {
   const params = useParams();
   const navigate = useNavigate();
@@ -45,43 +47,43 @@ export function useSequentialNavigation(
   const navigationItems = useMemo((): SequentialNavigationItem[] => {
     const items: SequentialNavigationItem[] = [];
 
-    for (const chapter of course.chapters) {
+    for (const chapter of course?.chapters || []) {
       // Add chapter item
       items.push({
         type: 'chapter',
-        chapterId: chapter.id,
-        chapterSlug: chapter.slug,
-        path: `/courses/${course.slug}/${chapter.slug}`,
-        title: chapter.title,
+        chapterId: chapter._id,
+        chapterSlug: chapter.slug?.current as string,
+        path: `/courses/${course?.slug?.current}/${chapter.slug?.current}`,
+        title: chapter?.title as string,
         isCompleted: false, // Chapters don't have completion state
         isLocked: false, // Chapters are never locked
         isCurrent:
-          params.chapterSlug === chapter.slug &&
+          params.chapterSlug === chapter.slug?.current &&
           !params.lessonSlug &&
           !params.quizSlug,
       });
 
       // Add chapter contents (lessons and quizzes)
-      for (const content of chapter.contents) {
-        const contentId = content.id.toString();
-        const isLesson = content.collection === 'lms_lessons';
+      for (const content of chapter.contents || []) {
+        const contentId = content._id;
+        const isLesson = content._type === 'lesson';
         const contentPath = isLesson
-          ? `/courses/${course.slug}/${chapter.slug}/lessons/${content.item.slug}`
-          : `/courses/${course.slug}/${chapter.slug}/quizzes/${content.item.slug}`;
+          ? `/courses/${course?.slug?.current}/${chapter.slug?.current}/lessons/${content.slug?.current}`
+          : `/courses/${course?.slug?.current}/${chapter.slug?.current}/quizzes/${content.slug?.current}`;
 
         items.push({
           type: isLesson ? 'lesson' : 'quiz',
-          chapterId: chapter.id,
-          chapterSlug: chapter.slug,
-          contentId: content.id,
-          contentSlug: content.item.slug,
+          chapterId: chapter._id,
+          chapterSlug: chapter.slug?.current as string,
+          contentId: content._id as string,
+          contentSlug: content.slug?.current as string,
           path: contentPath,
-          title: content.item.title,
+          title: content.title as string,
           isCompleted: isContentCompleted(contentId),
           isLocked: isContentLocked(contentId),
           isCurrent: isLesson
-            ? params.lessonSlug === content.item.slug
-            : params.quizSlug === content.item.slug,
+            ? params.lessonSlug === content.slug?.current
+            : params.quizSlug === content.slug?.current,
         });
       }
     }

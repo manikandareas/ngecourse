@@ -1,68 +1,62 @@
-import { createUser, login, readUsers } from '@directus/sdk';
-import { directusAuthclient, directusClient } from '~/lib/directus-client';
+import { defineQuery } from 'groq';
+import { client } from '~/lib/sanity-client';
 
 interface CreateUser {
-  first_name: string;
-  last_name: string;
+  username: string;
+  firstname: string;
+  lastname: string;
   email: string;
-  password: string;
-  avatarUrl: string;
   clerkId: string;
+  onboardingStatus?: 'not_started' | 'completed';
 }
 
 const create = async (user: CreateUser) => {
-  return await directusClient.request(
-    createUser({
-      first_name: user.first_name,
-      last_name: user.last_name,
-      //   avatar: user.avatarUrl,
-      email: user.email,
-      password: user.password,
-      clerk_id: user.clerkId,
-    })
-  );
-};
-
-const userLogin = async (user: { email: string; password: string }) => {
-  return await directusAuthclient.request(
-    login({
-      email: user.email,
-      password: user.password,
-    })
-  );
+  return await client.create({
+    _type: 'user',
+    username: user.username,
+    firstname: user.firstname,
+    lastname: user.lastname,
+    email: user.email,
+    clerkId: user.clerkId,
+    onboardingStatus: user.onboardingStatus || 'not_started'
+  });
 };
 
 const findOneByEmail = async (email: string) => {
-  return await directusClient
-    .request(
-      readUsers({
-        filter: {
-          email: {
-            _eq: email,
-          },
-        },
-      })
-    )
-    .then((res) => (res.length > 0 ? res[0] : null));
+  const findByEmailQuery = defineQuery(`
+    *[_type == "user" && email == $email][0]
+  `);
+  
+  return await client.fetch(findByEmailQuery, { email });
 };
 
 const findOneByClerkId = async (clerkId: string) => {
-  return await directusClient
-    .request(
-      readUsers({
-        filter: {
-          clerk_id: {
-            _eq: clerkId,
-          },
-        },
-      })
-    )
-    .then((res) => (res.length > 0 ? res[0] : null));
+  const findByClerkIdQuery = defineQuery(`
+    *[_type == "user" && clerkId == $clerkId][0]
+  `);
+  
+  return await client.fetch(findByClerkIdQuery, { clerkId });
+};
+
+const findOneByUsername = async (username: string) => {
+  const findByUsernameQuery = defineQuery(`
+    *[_type == "user" && username == $username][0]
+  `);
+  
+  return await client.fetch(findByUsernameQuery, { username });
+};
+
+const updateOnboardingStatus = async (userId: string, status: 'not_started' | 'completed') => {
+  return await client
+    .patch(userId)
+    .set({ onboardingStatus: status })
+    .commit();
 };
 
 export const dataUser = {
   createOne: create,
-  login: userLogin,
   findOneByEmail,
   findOneByClerkId,
+  findOneByUsername,
+  updateOnboardingStatus,
 };
