@@ -41,7 +41,7 @@ export default function CoursesPage(props: Route.ComponentProps) {
             >
               {(resolvedCourses) =>
                 resolvedCourses.map((course) => (
-                  <CourseCard key={course.id} {...toCourseCard(course)} />
+                  <CourseCard key={course._id} {...toCourseCard(course)} />
                 ))
               }
             </Await>

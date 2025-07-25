@@ -7,6 +7,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { useFetcher } from 'react-router';
+import type { Topic } from 'sanity.types';
 import { Button } from '~/components/ui/button';
 import {
   Dialog,
@@ -19,7 +20,6 @@ import {
 } from '~/components/ui/dialog';
 import { Separator } from '~/components/ui/separator';
 import type { action } from '~/routes/courses/detail';
-import type { LmsTopics } from '~/types/directus';
 import { CourseBadge } from './hero-section';
 
 interface IEnrollDialogProps {
@@ -27,8 +27,8 @@ interface IEnrollDialogProps {
   title: string;
   description: string;
   image: string;
-  topics: LmsTopics[];
-  difficulty: string;
+  topics: Topic[];
+  difficulty: 'advanced' | 'beginner' | 'intermediate' | null;
   duration?: string;
   lessonsCount?: number;
   slug?: string;
@@ -72,7 +72,7 @@ const EnrollDialog = ({
               Enroll in {title}
             </DialogTitle>
             <div className="flex items-center gap-2">
-              <CourseBadge difficulty={difficulty} />
+              <CourseBadge difficulty={difficulty || 'beginner'} />
               <span className="text-muted-foreground text-sm">
                 {difficulty} Level
               </span>

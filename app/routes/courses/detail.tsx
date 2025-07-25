@@ -1,11 +1,10 @@
+import type { Enrollment } from 'sanity.types';
 import { dataCourses } from '~/data/courses';
 import { dataEnrollment } from '~/data/enrollments';
 import { CourseInfo } from '~/features/courses/detail/course-info';
-import {
-  HeroSection,
-  toHeroSection,
-} from '~/features/courses/detail/hero-section';
+import { HeroSection } from '~/features/courses/detail/hero-section';
 import { PathSection } from '~/features/courses/detail/path-section';
+import { extractYoutubeId } from '~/lib/utils';
 import { getCurrentSession } from '~/root';
 import { usecaseEnrollments } from '~/usecase/enrollments';
 import type { Route } from './+types/detail';
@@ -28,9 +27,10 @@ export async function loader(args: Route.LoaderArgs) {
   if (!courseWithContents) {
     throw new Response('Course Not Found', { status: 404 });
   }
+
   const enrollment = await dataEnrollment.oneByUserId(
-    currentSession?.id || '',
-    courseWithContents.id
+    currentSession?._id || '',
+    courseWithContents._id
   );
   console.log(enrollment);
   return {
@@ -41,14 +41,14 @@ export async function loader(args: Route.LoaderArgs) {
 
 export async function action(args: Route.ActionArgs) {
   const currentSession = await getCurrentSession(args);
-
+  console.log(currentSession);
   if (!currentSession) {
     return new Response('Unauthorized', { status: 401 });
   }
 
   const response = await usecaseEnrollments.enroll(
     args.params.slug,
-    currentSession.id
+    currentSession._id
   );
 
   if (!response) {
@@ -62,7 +62,8 @@ export default function CourseDetailPage(props: Route.ComponentProps) {
   return (
     <div className="relative mx-auto w-full max-w-6xl px-6 py-20 xl:px-0">
       <HeroSection
-        {...toHeroSection(props.loaderData.course, props.loaderData.enrollment)}
+        course={props.loaderData.course}
+        enrollment={props.loaderData.enrollment as Enrollment | null}
       />
 
       {/* Main Content */}
@@ -75,10 +76,15 @@ export default function CourseDetailPage(props: Route.ComponentProps) {
         <aside className="w-full flex-shrink-0 md:w-80 lg:sticky lg:top-28 lg:h-screen lg:w-96">
           <div className="slide-in-from-right-4 animate-in space-y-6 duration-500">
             <div className="fade-in-50 animate-in delay-100 duration-700">
-              <CourseInfo.Trailer
-                trailerUrl="https://www.youtube.com/embed/fP4h-_UpYRc?si=qmPnaTzH4iaagiYr"
-                youtubeId="fP4h-_UpYRc"
-              />
+              {props.loaderData.course.trailer && (
+                <CourseInfo.Trailer
+                  trailerUrl={props.loaderData.course.trailer}
+                  youtubeId={
+                    extractYoutubeId(props.loaderData.course.trailer) ??
+                    'Ke90Tje7VS0'
+                  }
+                />
+              )}
             </div>
             <div className="fade-in-50 animate-in delay-300 duration-700">
               <CourseInfo.HelpCard />

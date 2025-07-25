@@ -6,7 +6,8 @@
     "build": "react-router build",
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
-    "typecheck": "react-router typegen && tsc"
+    "typecheck": "react-router typegen && tsc",
+    "typegen": "sanity typegen generate"
   },
   "dependencies": {
     "@clerk/react-router": "^1.8.2",
@@ -21,10 +22,13 @@
     "@radix-ui/react-slot": "^1.2.3",
     "@react-router/node": "^7.5.3",
     "@react-router/serve": "^7.5.3",
+    "@sanity/client": "^7.8.1",
+    "@sanity/image-url": "^1.1.0",
     "@tabler/icons-react": "^3.34.0",
     "axios": "^1.10.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "groq": "^4.1.1",
     "isbot": "^5.1.27",
     "lucide-react": "^0.525.0",
     "motion": "^12.23.6",

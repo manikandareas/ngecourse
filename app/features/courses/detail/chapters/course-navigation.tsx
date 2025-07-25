@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/style/noNestedTernary: <explanation> */
 import {
   BookOpen,
   CheckCircle2,
@@ -10,21 +11,22 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
+import type {
+  GetChapterBySlugQueryResult,
+  GetCourseContentsQueryResult,
+  GetEnrollmentQueryResult,
+  Lesson,
+  Quiz,
+} from 'sanity.types';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { Progress } from '~/components/ui/progress';
-import type { CourseWithContents } from '~/data/courses';
 import { useContentProgression } from '~/hooks/use-content-progression';
 import { cn } from '~/lib/utils';
-import type {
-  LmsChapters,
-  LmsChaptersContents,
-  LmsEnrollments,
-} from '~/types/directus';
 
 interface CourseNavigationProps {
-  course: CourseWithContents;
-  enrollment: LmsEnrollments | null;
+  course: GetCourseContentsQueryResult;
+  enrollment: GetEnrollmentQueryResult | null;
   className?: string;
 }
 
@@ -52,19 +54,19 @@ export function CourseNavigation({
     const currentChapterSlug = params.chapterSlug;
     if (currentChapterSlug) {
       // Find the chapter that matches the current URL
-      const currentChapter = course.chapters.find(
-        (chapter) => chapter.slug === currentChapterSlug
+      const currentChapter = course?.chapters?.find(
+        (chapter) => chapter.slug?.current === currentChapterSlug
       );
 
       if (currentChapter) {
         setExpandedChapters((prev) => {
           const newExpanded = new Set(prev);
-          newExpanded.add(currentChapter.id);
+          newExpanded.add(currentChapter._id);
           return newExpanded;
         });
       }
     }
-  }, [params.chapterSlug, course.chapters]);
+  }, [params.chapterSlug, course?.chapters]);
 
   const toggleChapter = (chapterId: string) => {
     const newExpanded = new Set(expandedChapters);
@@ -78,29 +80,29 @@ export function CourseNavigation({
 
   // Check if content is currently active
   const isContentActive = (
-    chapter: LmsChapters,
-    content: LmsChaptersContents
+    chapter: GetChapterBySlugQueryResult,
+    content: Lesson | Quiz
   ) => {
     return (
-      params.chapterSlug === chapter.slug &&
-      (params.lessonSlug === content.item.slug ||
-        params.quizSlug === content.item.slug)
+      params.chapterSlug === chapter?.slug?.current &&
+      (params.lessonSlug === content.slug?.current ||
+        params.quizSlug === content.slug?.current)
     );
   };
 
   // Calculate chapter progress
-  const getChapterProgress = (chapter: LmsChapters) => {
-    const chapterContentIds = chapter.contents.map((content) =>
-      content.id.toString()
+  const getChapterProgress = (chapter: GetChapterBySlugQueryResult) => {
+    const chapterContentIds = chapter?.contents?.map((content) =>
+      content._id.toString()
     );
     const chapterProgression = contentProgression.filter((item) =>
-      chapterContentIds.includes(item.id)
+      chapterContentIds?.includes(item.id)
     );
 
-    const completedItems = chapterProgression.filter(
+    const completedItems = chapterProgression?.filter(
       (item) => item.state === 'completed'
     ).length;
-    const totalItems = chapter.contents.length;
+    const totalItems = chapter?.contents?.length || 0;
     const progressPercentage =
       totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
 
@@ -109,13 +111,13 @@ export function CourseNavigation({
 
   // Generate content navigation path
   const getContentPath = (
-    chapter: LmsChapters,
-    content: LmsChaptersContents
+    chapter: GetChapterBySlugQueryResult,
+    content: Lesson | Quiz
   ) => {
-    const isLesson = content.collection === 'lms_lessons';
+    const isLesson = content._type === 'lesson';
     return isLesson
-      ? `/courses/${course.slug}/${chapter.slug}/lessons/${content.item.slug}`
-      : `/courses/${course.slug}/${chapter.slug}/quizzes/${content.item.slug}`;
+      ? `/courses/${course?.slug?.current}/${chapter?.slug?.current}/lessons/${content.slug?.current}`
+      : `/courses/${course?.slug?.current}/${chapter?.slug?.current}/quizzes/${content.slug?.current}`;
   };
 
   return (
@@ -135,7 +137,7 @@ export function CourseNavigation({
           </div>
           <div className="min-w-0 flex-1">
             <h1 className="font-bold text-lg text-primary-foreground leading-tight sm:text-xl ">
-              {course.title}
+              {course?.title}
             </h1>
             <div className="mt-3 space-y-2">
               <div className="flex items-center gap-2 text-primary-foreground text-sm">
@@ -165,20 +167,20 @@ export function CourseNavigation({
       {/* Navigation Content */}
       <div className="flex-1 overflow-y-auto p-3 sm:p-4">
         <nav className="space-y-1">
-          {course.chapters.map((chapter, chapterIndex) => {
-            const isExpanded = expandedChapters.has(chapter.id);
+          {course?.chapters?.map((chapter, chapterIndex) => {
+            const isExpanded = expandedChapters.has(chapter._id);
             const { completedItems, totalItems, progressPercentage } =
-              getChapterProgress(chapter);
+              getChapterProgress(chapter as GetChapterBySlugQueryResult);
             const isChapterCompleted =
               completedItems === totalItems && totalItems > 0;
 
             return (
-              <div className="group" key={chapter.id}>
+              <div className="group" key={chapter._id}>
                 {/* Chapter Header */}
                 <div className="flex items-center gap-2 rounded-lg p-2 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800">
                   <Button
                     className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    onClick={() => toggleChapter(chapter.id)}
+                    onClick={() => toggleChapter(chapter._id)}
                     size="sm"
                     variant="ghost"
                   >
@@ -230,21 +232,24 @@ export function CourseNavigation({
                 {/* Chapter Content */}
                 {isExpanded && (
                   <div className="mt-2 ml-10 space-y-1">
-                    {chapter.contents.map((content) => {
+                    {chapter?.contents?.map((content) => {
                       const isContentItemActive = isContentActive(
-                        chapter,
-                        content
+                        chapter as GetChapterBySlugQueryResult,
+                        content as Lesson | Quiz
                       );
-                      const contentPath = getContentPath(chapter, content);
-                      const contentId = content.id.toString();
+                      const contentPath = getContentPath(
+                        chapter as GetChapterBySlugQueryResult,
+                        content as Lesson | Quiz
+                      );
+                      const contentId = content._id.toString();
 
                       const isCompleted = isContentCompleted(contentId);
                       const isLocked = isContentLocked(contentId);
                       const isCurrent = isContentCurrent(contentId);
-                      const isLesson = content.collection === 'lms_lessons';
+                      const isLesson = content._type === 'lesson';
 
                       return (
-                        <div className="group/content" key={content.id}>
+                        <div className="group/content" key={content._id}>
                           {isLocked ? (
                             <div
                               className={cn(
@@ -258,7 +263,7 @@ export function CourseNavigation({
                               </div>
                               <div className="min-w-0 flex-1">
                                 <p className="font-medium text-gray-500 text-sm dark:text-gray-400">
-                                  {content.item.title}
+                                  {content.title}
                                 </p>
                                 <p className="text-gray-400 text-xs dark:text-gray-500">
                                   Complete previous content to unlock
@@ -343,7 +348,7 @@ export function CourseNavigation({
                                         : 'text-gray-900 dark:text-white'
                                     )}
                                   >
-                                    {content.item.title}
+                                    {content.title}
                                   </p>
                                   {isCurrent && (
                                     <Badge

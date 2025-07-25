@@ -1,5 +1,6 @@
 import { Link } from 'react-router';
-import type { LmsCourses } from '~/types/directus';
+import type { GetCoursesQueryResult } from 'sanity.types';
+import { urlFor } from '~/lib/sanity-client';
 
 export const CourseCard = ({
   title,
@@ -29,12 +30,12 @@ export const CourseCard = ({
   );
 };
 
-export const toCourseCard = (course: LmsCourses) => {
-  const imageUrl = `${import.meta.env.VITE_BACKEND_URL}/assets/${course.thumbnail}?access_token=${import.meta.env.VITE_BACKEND_KEY}`;
+export const toCourseCard = (course: GetCoursesQueryResult[number]) => {
+  const imageUrl = course.thumbnail ? urlFor(course.thumbnail)?.url() : '';
   return {
     title: course.title || 'Course Title',
     description: course.description || 'Course Description',
-    image: imageUrl,
+    image: imageUrl ?? '',
     slug: course.slug || 'course-slug',
   };
 };

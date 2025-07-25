@@ -1,18 +1,21 @@
+import type {
+  GetChapterBySlugQueryResult,
+  GetCourseContentsQueryResult,
+  GetEnrollmentQueryResult,
+} from 'sanity.types';
 import { Badge } from '~/components/ui/badge';
 import { Card } from '~/components/ui/card';
 import { Progress } from '~/components/ui/progress';
-import type { CourseWithContents } from '~/data/courses';
 import { useContentProgression } from '~/hooks/use-content-progression';
 import { cn } from '~/lib/utils';
-import type { LmsEnrollments } from '~/types/directus';
 import { ChapterItem } from './chapter-item';
 
 export function PathSection({
   course,
   enrollment,
 }: {
-  course: CourseWithContents;
-  enrollment: LmsEnrollments | null;
+  course: GetCourseContentsQueryResult;
+  enrollment: GetEnrollmentQueryResult | null;
 }) {
   const { contentProgression, courseProgress } = useContentProgression(
     course,
@@ -28,15 +31,17 @@ export function PathSection({
           <div className="flex items-center justify-between">
             <div>
               <h2 className="font-bold text-2xl text-gray-900">
-                {course.title}
+                {course?.title}
               </h2>
-              <p className="mt-1 text-gray-600">{course.description}</p>
+              <p className="mt-1 text-gray-600">{course?.description}</p>
             </div>
             <div className="flex items-center space-x-2">
               <Badge className="bg-blue-100 text-blue-800" variant="secondary">
-                {course.difficulty || 'Beginner'}
+                {course?.difficulty || 'Beginner'}
               </Badge>
-              <Badge variant="outline">{course.chapters.length} Chapters</Badge>
+              <Badge variant="outline">
+                {course?.chapters?.length || 0} Chapters
+              </Badge>
             </div>
           </div>
 
@@ -72,13 +77,17 @@ export function PathSection({
           />
 
           <div className="space-y-4">
-            {course.chapters.map((chapter, index) => (
+            {course?.chapters?.map((chapter, index) => (
               <ChapterItem
-                chapter={chapter}
+                chapter={chapter as GetChapterBySlugQueryResult}
                 chapterNumber={index + 1}
                 contentProgression={contentProgression}
-                isLast={index === course.chapters.length - 1}
-                key={chapter.id}
+                isLast={
+                  Array.isArray(course?.chapters)
+                    ? index === course?.chapters.length - 1
+                    : false
+                }
+                key={chapter._id}
               />
             ))}
           </div>

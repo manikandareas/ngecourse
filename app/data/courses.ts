@@ -1,90 +1,116 @@
-import { readItem, readItems } from '@directus/sdk';
-import type { AxiosResponse } from 'axios';
-import { directusClient, directusClientAxios } from '~/lib/directus-client';
-import type {
-  LmsChapters,
-  LmsChaptersContents,
-  LmsCourses,
-  LmsCoursesLmsTopics,
-  LmsLessons,
-  LmsQuizzes,
-} from '~/types/directus';
+import { defineQuery } from 'groq';
+import { client } from '~/lib/sanity-client';
 
 const getCourses = async () => {
-  return await directusClient.request(readItems('lms_courses', {}));
+  const getCoursesQuery = defineQuery(`*[_type == "course"]{
+    ...,
+    "slug": slug.current,
+    }`);
+  return await client.fetch(getCoursesQuery);
 };
 
 const getCourse = async (slug: string) => {
-  return await directusClient
-    .request(readItems('lms_courses', { filter: { slug: { _eq: slug } } }))
-    .then((res) => (res.length > 0 ? res[0] : null));
+  const getCourseQuery = defineQuery(
+    `*[_type == "course" && slug.current == $slug][0]{
+    ...,
+    "slug": slug->,
+    }`
+  );
+  return await client.fetch(getCourseQuery, { slug });
 };
 
 const getCourseById = async (id: string) => {
-  return await directusClient.request(readItem('lms_courses', id));
-};
-
-export type CourseWithContents = LmsCourses & {
-  chapters: Chapter[];
-  topics: LmsCoursesLmsTopics[];
-};
-
-export type Chapter = LmsChapters & {
-  contents: ChapterContent[];
-};
-
-export type ChapterContent = LmsChaptersContents & {
-  item: LmsLessons | LmsQuizzes;
+  const getCourseByIdQuery = defineQuery(
+    '*[_type == "course" && _id == $id][0]'
+  );
+  return await client.fetch(getCourseByIdQuery, { id });
 };
 
 const getCourseContents = async (slug: string) => {
-  return await directusClientAxios
-    .get<AxiosResponse<CourseWithContents[]>>('/items/lms_courses', {
-      params: {
-        'filter[slug][_eq]': slug,
-        fields: [
-          '*',
-          'topics.*.*',
-          'chapters.*',
-          'chapters.contents.*',
-          'chapters.contents.item.*',
-        ],
+  const getCourseContentsQuery = defineQuery(`
+    *[_type == "course" && slug.current == $slug][0]{
+      _id,
+      _type,
+      _createdAt,
+      _updatedAt,
+      title,
+      slug,
+      description,
+      price,
+      level,
+      thumbnail,
+      trailer,
+      difficulty,
+      "chapters": chapters[]->{
+        _id,
+        _type,
+        _createdAt,
+        _updatedAt,
+        title,
+        slug,
+        description,
+        "contents": contents[]->{
+          _id,
+          _type,
+          _createdAt,
+          _updatedAt,
+          title,
+          slug,
+          _type == "lesson" => {
+            content
+          },
+          _type == "quiz" => {
+            description,
+            questions
+          }
+        }
       },
-    })
-    .then((res) =>
-      res.data.data.length > 0 ? (res.data.data[0] as CourseWithContents) : null
-    );
+      "topics": topics[]->{
+        _id,
+        _type,
+        _createdAt,
+        _updatedAt,
+        title,
+        slug,
+        description,
+        icon,
+        color
+      }
+    }
+  `);
+  return await client.fetch(getCourseContentsQuery, { slug });
 };
 
 const countCourseContents = async (id: string) => {
-  const contents = await directusClientAxios
-    .get<AxiosResponse<CourseWithContents[]>>('/items/lms_courses', {
-      params: {
-        'filter[id][_eq]': id,
-        fields: ['chapters.*', 'chapters.contents.*'],
-      },
-    })
-    .then((res) =>
-      res.data.data.length > 0 ? (res.data.data[0] as CourseWithContents) : null
-    );
-  return (
-    contents?.chapters?.reduce(
-      (total, chapter) => total + chapter.contents.length,
-      0
-    ) || 0
-  );
+  const countQuery = defineQuery(`
+    count(*[_type == "course" && _id == $id][0].chapters[]->contents[])
+  `);
+
+  const result = await client.fetch(countQuery, { id });
+  return result || 0;
 };
 
 const getLessonBySlug = async (slug: string) => {
-  return await directusClient
-    .request(readItems('lms_lessons', { filter: { slug: { _eq: slug } } }))
-    .then((res) => (res.length > 0 ? res[0] : null));
+  const getLessonBySlugQuery = defineQuery(
+    `*[_type == "lesson" && slug.current == $slug][0]`
+  );
+  return await client.fetch(getLessonBySlugQuery, { slug });
 };
 
 const getChapterBySlug = async (slug: string) => {
-  return await directusClient
-    .request(readItems('lms_chapters', { filter: { slug: { _eq: slug } } }))
-    .then((res) => (res.length > 0 ? res[0] : null));
+  const getChapterBySlugQuery =
+    defineQuery(`*[_type == "chapter" && slug.current == $slug][0]{
+    ...,
+      "contents": contents[]->{
+          _id,
+          _type,
+          _createdAt,
+          _updatedAt,
+          title,
+          slug,
+        }
+    }`);
+  return await client.fetch(getChapterBySlugQuery, { slug });
 };
 
 export const dataCourses = {

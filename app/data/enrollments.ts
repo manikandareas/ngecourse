@@ -1,10 +1,5 @@
-import { createItem, updateItem } from '@directus/sdk';
-import type { AxiosResponse } from 'axios';
-import { directusClient, directusClientAxios } from '~/lib/directus-client';
-import type {
-  LmsEnrollments,
-  LmsEnrollmentsLmsChaptersContents,
-} from '~/types/directus';
+import { defineQuery } from 'groq';
+import { client } from '~/lib/sanity-client';
 
 type EnrollCourse = {
   courseId: string;
@@ -12,68 +7,77 @@ type EnrollCourse = {
 };
 
 const enrollCourse = async (data: EnrollCourse) => {
-  return await directusClient.request(
-    createItem('lms_enrollments', {
-      course: data.courseId,
-      user_enrolled: data.userId,
-    })
-  );
-};
-
-type UserEnrollment = LmsEnrollments & {
-  contents_completed: LmsEnrollmentsLmsChaptersContents[];
+  return await client.create({
+    _type: 'enrollment',
+    userEnrolled: [
+      {
+        _type: 'reference',
+        _ref: data.userId,
+      },
+    ],
+    course: [
+      {
+        _type: 'reference',
+        _ref: data.courseId,
+      },
+    ],
+    contentsCompleted: [],
+    percentComplete: 0,
+  });
 };
 
 const getEnrollmentByUserId = async (userId: string, courseId: string) => {
-  return await directusClientAxios
-    .get<AxiosResponse<UserEnrollment[]>>('/items/lms_enrollments', {
-      params: {
-        'filter[user_enrolled][_eq]': userId,
-        'filter[course][_eq]': courseId,
-        fields: ['*', 'contents_completed.*'],
+  const getEnrollmentQuery = defineQuery(`
+    *[_type == "enrollment" && 
+      userEnrolled[0]._ref == $userId && 
+      course[0]._ref == $courseId][0]{
+      _id,
+      _type,
+      _createdAt,
+      _updatedAt,
+      "userEnrolled": userEnrolled[0]->,
+      "course": course[0]->,
+      "contentsCompleted": contentsCompleted[]->{
+        _id,
+        _type,
+        _createdAt,
+        _updatedAt,
+        title,
+        slug,
       },
-    })
-    .then((res) =>
-      res.data.data.length > 0 ? (res.data.data[0] as UserEnrollment) : null
-    );
+      dateCompleted,
+      percentComplete
+    }
+  `);
+
+  return await client.fetch(getEnrollmentQuery, { userId, courseId });
 };
 
 type AddProgression = {
-  enrollmentId: number;
-  contents_completed: number[];
-  is_completed: boolean;
-  date_completed?: string;
-  percent_complete: number;
+  enrollmentId: string;
+  contentsCompleted: string[];
+  dateCompleted?: string;
+  percentComplete: number;
 };
 
 const addProgression = async (data: AddProgression) => {
-  return await directusClient.request(
-    updateItem('lms_enrollments', data.enrollmentId, {
-      contents_completed: data.contents_completed,
-      is_completed: data.is_completed,
-      date_completed: data.date_completed,
-      percent_complete: Number(data.percent_complete.toFixed(2)),
-    })
-  );
-};
+  const contentsCompletedRefs = data.contentsCompleted.map((id) => ({
+    _type: 'reference' as const,
+    _ref: id,
+  }));
 
-type AddCompletedContent = {
-  enrollmentId: number;
-  contentId: number;
-};
-
-const addCompletedContent = async (data: AddCompletedContent) => {
-  return await directusClient.request(
-    createItem('lms_enrollments_lms_chapters_contents', {
-      lms_chapters_contents_id: data.contentId,
-      lms_enrollments_id: data.enrollmentId,
+  return await client
+    .patch(data.enrollmentId)
+    .set({
+      contentsCompleted: contentsCompletedRefs,
+      dateCompleted: data.dateCompleted,
+      percentComplete: Number(data.percentComplete.toFixed(2)),
     })
-  );
+    .commit();
 };
 
 export const dataEnrollment = {
   enrollCourse,
   oneByUserId: getEnrollmentByUserId,
   addProgression,
-  addCompletedContent,
 };

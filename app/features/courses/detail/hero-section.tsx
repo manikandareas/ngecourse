@@ -1,43 +1,39 @@
 import { ArrowRightIcon, Share2Icon } from 'lucide-react';
+import type {
+  Course,
+  Enrollment,
+  GetCourseContentsQueryResult,
+  Topic,
+} from 'sanity.types';
 import { Button } from '~/components/ui/3d-button';
 import { Badge } from '~/components/ui/badge';
-import { toFileUrl } from '~/data/utils';
+import { urlFor } from '~/lib/sanity-client';
 import { cn } from '~/lib/utils';
-import type {
-  LmsCourses,
-  LmsCoursesLmsTopics,
-  LmsEnrollments,
-  LmsTopics,
-} from '~/types/directus';
 import EnrollDialog from './enroll-dialog';
 
-interface IHeroSection {
-  difficulty: string;
-  title: string;
-  description: string;
-  topics: LmsTopics[];
-  image: string;
-  id: string;
-  slug: string;
-
-  enrollment: LmsEnrollments | null;
-}
+type IHeroSection = {
+  course: GetCourseContentsQueryResult;
+  enrollment: Enrollment | null;
+};
 
 export function HeroSection(props: IHeroSection) {
+  const thumbnailUrl = props.course?.thumbnail
+    ? urlFor(props.course?.thumbnail)?.url()
+    : '';
   return (
     <div>
       <div className="mb-8 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center sm:gap-0">
         <div className="space-y-2">
-          <CourseBadge difficulty={props.difficulty} />
-          <h1 className="font-bold text-4xl">{props.title}</h1>
+          <CourseBadge difficulty={props.course?.difficulty || 'beginner'} />
+          <h1 className="font-bold text-4xl">{props.course?.title}</h1>
           <p className="max-w-2xl text-pretty text-muted-foreground text-sm">
-            {props.description}
+            {props.course?.description}
           </p>
           <div className="flex flex-wrap gap-2">
-            {props.topics.map((topic) => (
+            {props.course?.topics?.map((topic) => (
               <Badge
                 className="capitalize"
-                key={topic.id}
+                key={topic._id}
                 variant={'secondary'}
               >
                 {topic.title}
@@ -55,20 +51,35 @@ export function HeroSection(props: IHeroSection) {
               <ArrowRightIcon className="ml-2 size-4 transition-transform group-hover:translate-x-1" />
             </Button>
           ) : (
-            <EnrollDialog {...props} />
+            <EnrollDialog
+              description={props.course?.description || 'Course Description'}
+              difficulty={props.course?.difficulty || 'beginner'}
+              duration={'10 hours'}
+              id={props.course?._id || ''}
+              image={thumbnailUrl || ''}
+              lessonsCount={props.course?.chapters?.length || 15}
+              slug={props.course?.slug?.current || ''}
+              title={props.course?.title || 'Course Title'}
+              topics={(props.course?.topics as Topic[]) || []}
+            />
           )}
         </div>
       </div>
       <img
-        alt={props.title}
+        alt={props.course?.title || 'Thumbnail'}
         className="mx-auto mb-8 h-[22rem] w-full rounded-md object-cover"
-        src={props.image}
+        src={thumbnailUrl}
       />
     </div>
   );
 }
 
-export function CourseBadge(props: { difficulty: string }) {
+export function CourseBadge(props: {
+  difficulty: 'advanced' | 'beginner' | 'intermediate' | null;
+}) {
+  if (!props.difficulty) {
+    return null;
+  }
   return (
     <Badge
       className={cn('capitalize', {
@@ -83,20 +94,18 @@ export function CourseBadge(props: { difficulty: string }) {
 }
 
 export const toHeroSection = (
-  course: LmsCourses,
-  enrollment: LmsEnrollments | null
+  course: Course,
+  enrollment: Enrollment | null
 ) => {
-  const imageUrl = toFileUrl((course.thumbnail as string) || '');
+  const imageUrl = course.thumbnail ? urlFor(course.thumbnail)?.url() : '';
   return {
-    topics: course.topics.map(
-      (topic: LmsCoursesLmsTopics) => topic.lms_topics_id as LmsTopics
-    ),
+    topics: course.topics,
     difficulty: course.difficulty || 'beginner',
     title: course.title || 'Course Title',
     description: course.description || 'Course Description',
     image: imageUrl,
-    id: course.id,
-    slug: course.slug as string,
+    id: course._id,
+    slug: course.slug?.current,
     enrollment,
   };
 };
