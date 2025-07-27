@@ -178,6 +178,12 @@ export type User = {
   email?: string;
   clerkId?: string;
   onboardingStatus?: "not_started" | "completed";
+  learningGoals?: Array<string>;
+  studyReason?: string;
+  studyPlan?: string;
+  level?: "beginner" | "intermediate" | "advanced";
+  studyStreak?: number;
+  streakStartDate?: number;
 };
 
 export type Color = {
@@ -606,6 +612,12 @@ export type GetEnrollmentQueryResult = {
     email?: string;
     clerkId?: string;
     onboardingStatus?: "completed" | "not_started";
+    learningGoals?: Array<string>;
+    studyReason?: string;
+    studyPlan?: string;
+    level?: "advanced" | "beginner" | "intermediate";
+    studyStreak?: number;
+    streakStartDate?: number;
   } | null;
   course: {
     _id: string;
@@ -679,6 +691,12 @@ export type FindByEmailQueryResult = {
   email?: string;
   clerkId?: string;
   onboardingStatus?: "completed" | "not_started";
+  learningGoals?: Array<string>;
+  studyReason?: string;
+  studyPlan?: string;
+  level?: "advanced" | "beginner" | "intermediate";
+  studyStreak?: number;
+  streakStartDate?: number;
 } | null;
 // Variable: findByClerkIdQuery
 // Query: *[_type == "user" && clerkId == $clerkId][0]
@@ -694,6 +712,12 @@ export type FindByClerkIdQueryResult = {
   email?: string;
   clerkId?: string;
   onboardingStatus?: "completed" | "not_started";
+  learningGoals?: Array<string>;
+  studyReason?: string;
+  studyPlan?: string;
+  level?: "advanced" | "beginner" | "intermediate";
+  studyStreak?: number;
+  streakStartDate?: number;
 } | null;
 // Variable: findByUsernameQuery
 // Query: *[_type == "user" && username == $username][0]
@@ -709,6 +733,12 @@ export type FindByUsernameQueryResult = {
   email?: string;
   clerkId?: string;
   onboardingStatus?: "completed" | "not_started";
+  learningGoals?: Array<string>;
+  studyReason?: string;
+  studyPlan?: string;
+  level?: "advanced" | "beginner" | "intermediate";
+  studyStreak?: number;
+  streakStartDate?: number;
 } | null;
 
 // Query TypeMap
