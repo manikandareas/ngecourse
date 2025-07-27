@@ -3,6 +3,7 @@ import type {
   Course,
   Enrollment,
   GetCourseContentsQueryResult,
+  GetEnrollmentQueryResult,
   Topic,
 } from 'sanity.types';
 import { Button } from '~/components/ui/3d-button';
@@ -13,7 +14,7 @@ import EnrollDialog from './enroll-dialog';
 
 type IHeroSection = {
   course: GetCourseContentsQueryResult;
-  enrollment: Enrollment | null;
+  enrollment: GetEnrollmentQueryResult | null;
 };
 
 export function HeroSection(props: IHeroSection) {

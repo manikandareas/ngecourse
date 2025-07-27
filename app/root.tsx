@@ -12,6 +12,7 @@ import {
 import type { Route } from './+types/root';
 import './app.css';
 import { Toaster } from './components/ui/sonner';
+import ReactQueryProvider from './providers/react-query';
 import { usecaseUser } from './usecase/users';
 
 export async function loader(args: Route.LoaderArgs) {
@@ -79,9 +80,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App({ loaderData }: Route.ComponentProps) {
   return (
-    <ClerkProvider loaderData={loaderData}>
-      <Outlet />
-    </ClerkProvider>
+    <ReactQueryProvider>
+      <ClerkProvider loaderData={loaderData}>
+        <Outlet />
+      </ClerkProvider>
+    </ReactQueryProvider>
   );
 }
 

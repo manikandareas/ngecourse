@@ -1,5 +1,4 @@
-import React from 'react';
-import { Await } from 'react-router';
+import { useQuery } from '@tanstack/react-query';
 import { Badge } from '~/components/ui/badge';
 import { dataCourses } from '~/data/courses';
 import { CourseCard, toCourseCard } from '~/features/courses/course-card';
@@ -12,11 +11,31 @@ export function meta() {
   ];
 }
 
-export function loader() {
-  return dataCourses.many();
+export async function loader() {
+  const courses = await dataCourses.many();
+  return { courses };
 }
 
-export default function CoursesPage(props: Route.ComponentProps) {
+export default function CoursesPage({ loaderData }: Route.ComponentProps) {
+  const {
+    data: courses,
+    isPending,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ['courses'],
+    queryFn: dataCourses.many,
+    initialData: loaderData.courses,
+  });
+
+  if (isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    return <div>Could not load courses 😬: {error.message}</div>;
+  }
+
   return (
     <div className="mx-auto w-full max-w-6xl px-6 py-20 xl:px-0">
       <div className="flex flex-col gap-10">
@@ -34,18 +53,9 @@ export default function CoursesPage(props: Route.ComponentProps) {
           </div>
         </div>
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          <React.Suspense fallback={<div>Loading...</div>}>
-            <Await
-              errorElement={<div>Could not load courses 😬</div>}
-              resolve={props.loaderData}
-            >
-              {(resolvedCourses) =>
-                resolvedCourses.map((course) => (
-                  <CourseCard key={course._id} {...toCourseCard(course)} />
-                ))
-              }
-            </Await>
-          </React.Suspense>
+          {courses.map((course) => (
+            <CourseCard key={course._id} {...toCourseCard(course)} />
+          ))}
         </div>
       </div>
     </div>

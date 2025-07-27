@@ -1,5 +1,6 @@
+import { useMutation, useQueries, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { Outlet, useFetcher, useNavigation } from 'react-router';
+import { Outlet, useNavigate, useNavigation } from 'react-router';
 import { Button } from '~/components/ui/3d-button';
 import { dataCourses } from '~/data/courses';
 import { dataEnrollment } from '~/data/enrollments';
@@ -7,8 +8,9 @@ import { LearningLayout } from '~/features/courses/detail/chapters/learning-layo
 import { useSequentialNavigation } from '~/hooks/use-sequential-navigation';
 import { cn } from '~/lib/utils';
 import { getCurrentSession } from '~/root';
+import { usecaseEnrollments } from '~/usecase/enrollments';
+import type { ProgressionInput } from '~/usecase/schemas';
 import type { Route } from './+types/layout';
-import type { action } from './chapter-detail';
 
 export async function loader(args: Route.LoaderArgs) {
   const currentSession = await getCurrentSession(args);
@@ -22,85 +24,142 @@ export async function loader(args: Route.LoaderArgs) {
   if (!courseWithContents) {
     throw new Response('Course Not Found', { status: 404 });
   }
+
   const enrollment = await dataEnrollment.oneByUserId(
     currentSession?._id || '',
     courseWithContents._id
   );
 
+  if (!enrollment) {
+    throw new Response('User not enrolled', { status: 403 });
+  }
+
   return {
     course: courseWithContents,
     enrollment,
+    currentSession,
   };
 }
 
 export default function CoursesLayout(args: Route.ComponentProps) {
-  const { course, enrollment } = args.loaderData;
+  const queryClient = useQueryClient();
   const navigation = useNavigation();
+  const navigate = useNavigate();
+  const [courseQuery, enrollmentQuery] = useQueries({
+    queries: [
+      {
+        queryKey: ['course', args.params.slug],
+        queryFn: () => dataCourses.withContents(args.params.slug),
+        staleTime: 1000 * 60 * 5, // 5 minutes
+        refetchOnWindowFocus: false,
+        initialData: args.loaderData.course,
+      },
+      {
+        queryKey: ['enrollment', args.loaderData.enrollment],
+        queryFn: () =>
+          dataEnrollment.oneByUserId(
+            args.loaderData.currentSession._id || '',
+            args.loaderData.course._id || ''
+          ),
+        staleTime: 1000 * 60 * 5, // 5 minutes
+        refetchOnWindowFocus: false,
+        initialData: args.loaderData.enrollment,
+      },
+    ],
+  });
 
-  const fethcher = useFetcher<typeof action>();
+  const { mutate, isPending } = useMutation({
+    mutationFn: (data: ProgressionInput) => {
+      return usecaseEnrollments.addProgression(data);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['enrollment', args.loaderData.currentSession._id],
+      });
+    },
+    onSuccess: (data) => {
+      if (data.success && data.nextPath) {
+        navigate(data.nextPath);
+      }
+    },
+  });
 
-  const {
-    currentItem,
-    nextItem,
-    canGoPrevious,
-    canGoNext,
-    goToPrevious,
-    goToNext,
-    isCurrentCompleted,
-    isNextLocked,
-  } = useSequentialNavigation(course, enrollment);
+  const sequentialNavigationState = useSequentialNavigation(
+    courseQuery.data,
+    enrollmentQuery.data
+  );
 
   // Check if current content is a lesson/quiz (not chapter) and not completed
   const isCurrentContent =
-    currentItem && currentItem.type !== 'chapter' && !isCurrentCompleted;
+    sequentialNavigationState.currentItem &&
+    sequentialNavigationState.currentItem.type !== 'chapter' &&
+    !sequentialNavigationState.isCurrentCompleted;
 
-  const shouldShowComplete = isCurrentContent && currentItem.contentId;
+  const shouldShowComplete =
+    isCurrentContent && sequentialNavigationState.currentItem?.contentId;
+
+  if (courseQuery.isLoading || enrollmentQuery.isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!(courseQuery.data && enrollmentQuery.data)) {
+    return <div>Loading...</div>;
+  }
 
   const handlePrevious = () => {
-    if (canGoPrevious && navigation.state === 'idle') {
-      goToPrevious();
+    if (
+      sequentialNavigationState.canGoPrevious &&
+      navigation.state === 'idle'
+    ) {
+      sequentialNavigationState.goToPrevious();
     }
   };
 
-  const handleNext = async () => {
-    if (!nextItem || navigation.state !== 'idle') {
+  const handleNext = () => {
+    if (!sequentialNavigationState.nextItem || navigation.state !== 'idle') {
+      console.warn('No next item or navigation is not idle');
       return;
     }
-
-    if (canGoNext || !isNextLocked) {
-      goToNext();
+    if (
+      sequentialNavigationState.isCurrentCompleted &&
+      sequentialNavigationState.canGoNext
+    ) {
+      console.log('Navigating to next item:', sequentialNavigationState);
+      sequentialNavigationState.goToNext();
       return;
     }
+    if (!courseQuery.data) {
+      return;
+    }
+    let nextPath = '';
 
-    const formData = new FormData();
-
-    formData.append('courseId', course._id);
-    formData.append('chapterId', currentItem?.chapterId as string);
-    formData.append('contentId', currentItem?.contentId?.toString() as string);
-
-    console.log('before  submit', currentItem?.contentId);
-
-    if (nextItem) {
-      const nextPath =
-        `/courses/${course.slug?.current}/${nextItem.chapterSlug}` +
-        (nextItem.contentSlug ? `/lessons/${nextItem.contentSlug}` : '');
-
-      formData.append('nextPath', nextPath);
+    if (sequentialNavigationState.nextItem) {
+      nextPath =
+        `/courses/${courseQuery.data.slug?.current}/${sequentialNavigationState.nextItem.chapterSlug}` +
+        (sequentialNavigationState.nextItem.contentSlug
+          ? `/lessons/${sequentialNavigationState.nextItem.contentSlug}`
+          : '');
     }
 
-    await fethcher.submit(formData, {
-      method: 'POST',
-      action: `/courses/${course.slug?.current}/${currentItem?.chapterSlug}`,
+    mutate({
+      userId: args.loaderData.currentSession._id,
+      courseId: courseQuery.data._id,
+      contentId:
+        sequentialNavigationState.currentItem?.contentId?.toString() || '',
+      nextPath,
     });
   };
 
   return (
     <div className="relative min-h-screen">
-      <LearningLayout course={course} enrollment={enrollment}>
+      <LearningLayout
+        course={courseQuery.data}
+        enrollment={enrollmentQuery.data}
+      >
         <Outlet />
 
         <div className="flex items-center justify-between border-t pt-6 sm:pt-6">
-          {canGoPrevious ? (
+          {sequentialNavigationState.canGoPrevious ? (
             <Button
               disabled={navigation.state !== 'idle'}
               onClick={handlePrevious}
@@ -115,17 +174,15 @@ export default function CoursesLayout(args: Route.ComponentProps) {
 
           {shouldShowComplete ? (
             <Button
-              className={cn(!nextItem && 'hidden')}
-              disabled={
-                navigation.state !== 'idle' || fethcher.state !== 'idle'
-              }
+              className={cn(!sequentialNavigationState.nextItem && 'hidden')}
+              disabled={navigation.state !== 'idle' || isPending}
               onClick={handleNext}
             >
               Complete and Next <ArrowRight />
             </Button>
           ) : (
             <Button
-              className={cn(!nextItem && 'hidden')}
+              className={cn(!sequentialNavigationState.nextItem && 'hidden')}
               disabled={navigation.state !== 'idle'}
               onClick={handleNext}
             >
