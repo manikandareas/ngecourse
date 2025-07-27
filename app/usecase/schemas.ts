@@ -57,9 +57,22 @@ export const addProgressionDataSchema = z.object({
   percentComplete: z.number().min(0).max(100),
 });
 
+/**
+ * Validation schema for save onborading state in data layer
+ */
+export const saveOnboardingSchema = z.object({
+  learningGoals: z
+    .array(z.string())
+    .min(1, 'At least one learning goal is required'),
+  studyReason: z.string().min(1, 'Study reason is required'),
+  studyPlan: z.string().min(1, 'Study plan is required'),
+  level: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
+});
+
 // Export types for use in other files
 export type EnrollmentInput = z.infer<typeof enrollmentSchema>;
 export type ProgressionInput = z.infer<typeof progressionSchema>;
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 export type EnrollCourseDataInput = z.infer<typeof enrollCourseDataSchema>;
 export type AddProgressionDataInput = z.infer<typeof addProgressionDataSchema>;
+export type SaveOnboardingInput = z.infer<typeof saveOnboardingSchema>;

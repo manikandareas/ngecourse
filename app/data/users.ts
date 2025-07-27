@@ -1,4 +1,5 @@
 import { defineQuery } from 'groq';
+import type { User } from 'sanity.types';
 import { client } from '~/lib/sanity-client';
 
 interface CreateUser {
@@ -86,8 +87,34 @@ const updateOnboardingStatus = async (
   }
 };
 
+export type UpdateUserInput = Pick<
+  User,
+  | 'username'
+  | 'firstname'
+  | 'lastname'
+  | 'onboardingStatus'
+  | 'email'
+  | 'learningGoals'
+  | 'level'
+  | 'streakStartDate'
+  | 'studyPlan'
+  | 'studyReason'
+  | 'studyStreak'
+>;
+
+const updateUser = async (userId: string, data: Partial<UpdateUserInput>) => {
+  try {
+    return await client.patch(userId).set(data).commit();
+  } catch (error) {
+    throw new Error(
+      `Failed to update user: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+};
+
 export const dataUser = {
   createOne: create,
+  updateOne: updateUser,
   findOneByEmail,
   findOneByClerkId,
   findOneByUsername,
