@@ -1,3 +1,4 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowRightIcon, Share2Icon } from 'lucide-react';
 import type {
   Course,
@@ -6,21 +7,68 @@ import type {
   GetEnrollmentQueryResult,
   Topic,
 } from 'sanity.types';
+import { toast } from 'sonner';
 import { Button } from '~/components/ui/3d-button';
 import { Badge } from '~/components/ui/badge';
 import { urlFor } from '~/lib/sanity-client';
 import { cn } from '~/lib/utils';
+import { usecaseEnrollments } from '~/usecase/enrollments';
 import EnrollDialog from './enroll-dialog';
 
 type IHeroSection = {
+  userId?: string;
   course: GetCourseContentsQueryResult;
   enrollment: GetEnrollmentQueryResult | null;
 };
 
 export function HeroSection(props: IHeroSection) {
+  const queryClient = useQueryClient();
   const thumbnailUrl = props.course?.thumbnail
     ? urlFor(props.course?.thumbnail)?.url()
     : '';
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: ({
+      courseSlug,
+      userId,
+    }: {
+      courseSlug: string;
+      userId: string;
+    }) => usecaseEnrollments.enroll(courseSlug, userId),
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['enrollment', props.userId],
+      });
+    },
+    onError: (error) => {
+      console.error('Enrollment failed:', error);
+      toast.error(
+        `Enrollment failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    },
+    onSuccess: (data) => {
+      if (data.success) {
+        document.getElementById('dialog-close')?.click();
+        toast.success('Successfully enrolled in the course!');
+        return;
+      }
+
+      toast.error(`Enrollment failed: ${data.error?.message}`);
+    },
+  });
+
+  const handleEnroll = () => {
+    if (!(props.course?.slug?.current && props.userId)) {
+      toast.error('Course slug or user ID is missing.', {
+        description: 'You need to log in to enroll in a course.',
+      });
+      return;
+    }
+    mutate({
+      courseSlug: props.course.slug.current,
+      userId: props.userId,
+    });
+  };
   return (
     <div>
       <div className="mb-8 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center sm:gap-0">
@@ -58,7 +106,9 @@ export function HeroSection(props: IHeroSection) {
               duration={'10 hours'}
               id={props.course?._id || ''}
               image={thumbnailUrl || ''}
+              isLoading={isPending}
               lessonsCount={props.course?.chapters?.length || 15}
+              onEnroll={handleEnroll}
               slug={props.course?.slug?.current || ''}
               title={props.course?.title || 'Course Title'}
               topics={(props.course?.topics as Topic[]) || []}

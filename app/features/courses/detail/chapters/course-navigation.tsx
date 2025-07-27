@@ -1,4 +1,4 @@
-/** biome-ignore-all lint/style/noNestedTernary: <explanation> */
+/** biome-ignore-all lint/style/noNestedTernary: false positive*/
 import {
   BookOpen,
   CheckCircle2,

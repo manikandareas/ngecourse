@@ -92,6 +92,7 @@ export default function CourseDetailPage(props: Route.ComponentProps) {
       <HeroSection
         course={courseQuery.data}
         enrollment={enrollmentQuery.data}
+        userId={props.loaderData.currentSession?._id}
       />
 
       {/* Main Content */}
@@ -112,9 +113,6 @@ export default function CourseDetailPage(props: Route.ComponentProps) {
                   }
                 />
               )}
-            </div>
-            <div className="fade-in-50 animate-in delay-300 duration-700">
-              <CourseInfo.HelpCard />
             </div>
           </div>
         </aside>
