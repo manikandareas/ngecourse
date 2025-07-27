@@ -11,50 +11,46 @@
  * https://www.sanity.io/docs/sanity-typegen
  * ---------------------------------------------------------------------------------
  */
-/** biome-ignore-all lint/correctness/noInvalidUseBeforeDeclaration: false positive */
 
 // Source: schema.json
 export type Enrollment = {
   _id: string;
-  _type: 'enrollment';
+  _type: "enrollment";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
   userEnrolled?: Array<{
     _ref: string;
-    _type: 'reference';
+    _type: "reference";
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: 'user';
+    [internalGroqTypeReferenceTo]?: "user";
   }>;
   course?: Array<{
     _ref: string;
-    _type: 'reference';
+    _type: "reference";
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: 'course';
+    [internalGroqTypeReferenceTo]?: "course";
   }>;
-  contentsCompleted?: Array<
-    | {
-        _ref: string;
-        _type: 'reference';
-        _weak?: boolean;
-        [internalGroqTypeReferenceTo]?: 'lesson';
-      }
-    | {
-        _ref: string;
-        _type: 'reference';
-        _weak?: boolean;
-        [internalGroqTypeReferenceTo]?: 'quiz';
-      }
-  >;
+  contentsCompleted?: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "lesson";
+  } | {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "quiz";
+  }>;
   dateCompleted?: string;
   percentComplete?: number;
 };
 
 export type Quiz = {
   _id: string;
-  _type: 'quiz';
+  _type: "quiz";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -63,17 +59,17 @@ export type Quiz = {
   description?: string;
   questions?: Array<{
     question?: string;
-    options?: string[];
+    options?: Array<string>;
     correctOptionIndex?: number;
     explanation?: string;
-    _type: 'question';
+    _type: "question";
     _key: string;
   }>;
 };
 
 export type Lesson = {
   _id: string;
-  _type: 'lesson';
+  _type: "lesson";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -81,17 +77,17 @@ export type Lesson = {
   slug?: Slug;
   chapter?: Array<{
     _ref: string;
-    _type: 'reference';
+    _type: "reference";
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: 'chapter';
+    [internalGroqTypeReferenceTo]?: "chapter";
   }>;
   content?: string;
 };
 
 export type Chapter = {
   _id: string;
-  _type: 'chapter';
+  _type: "chapter";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -99,70 +95,67 @@ export type Chapter = {
   slug?: Slug;
   course?: Array<{
     _ref: string;
-    _type: 'reference';
+    _type: "reference";
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: 'course';
+    [internalGroqTypeReferenceTo]?: "course";
   }>;
   description?: string;
-  contents?: Array<
-    | {
-        _ref: string;
-        _type: 'reference';
-        _weak?: boolean;
-        [internalGroqTypeReferenceTo]?: 'lesson';
-      }
-    | {
-        _ref: string;
-        _type: 'reference';
-        _weak?: boolean;
-        [internalGroqTypeReferenceTo]?: 'quiz';
-      }
-  >;
+  contents?: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "lesson";
+  } | {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "quiz";
+  }>;
 };
 
 export type Course = {
   _id: string;
-  _type: 'course';
+  _type: "course";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
   title?: string;
   slug?: Slug;
   description?: string;
-  difficulty?: 'beginner' | 'intermediate' | 'advanced';
+  difficulty?: "beginner" | "intermediate" | "advanced";
   thumbnail?: {
     asset?: {
       _ref: string;
-      _type: 'reference';
+      _type: "reference";
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: 'image';
+    _type: "image";
   };
   trailer?: string;
   topics?: Array<{
     _ref: string;
-    _type: 'reference';
+    _type: "reference";
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: 'topic';
+    [internalGroqTypeReferenceTo]?: "topic";
   }>;
   chapters?: Array<{
     _ref: string;
-    _type: 'reference';
+    _type: "reference";
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: 'chapter';
+    [internalGroqTypeReferenceTo]?: "chapter";
   }>;
 };
 
 export type Topic = {
   _id: string;
-  _type: 'topic';
+  _type: "topic";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -175,7 +168,7 @@ export type Topic = {
 
 export type User = {
   _id: string;
-  _type: 'user';
+  _type: "user";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -184,11 +177,11 @@ export type User = {
   lastname?: string;
   email?: string;
   clerkId?: string;
-  onboardingStatus?: 'not_started' | 'completed';
+  onboardingStatus?: "not_started" | "completed";
 };
 
 export type Color = {
-  _type: 'color';
+  _type: "color";
   hex?: string;
   alpha?: number;
   hsl?: HslaColor;
@@ -197,7 +190,7 @@ export type Color = {
 };
 
 export type RgbaColor = {
-  _type: 'rgbaColor';
+  _type: "rgbaColor";
   r?: number;
   g?: number;
   b?: number;
@@ -205,7 +198,7 @@ export type RgbaColor = {
 };
 
 export type HsvaColor = {
-  _type: 'hsvaColor';
+  _type: "hsvaColor";
   h?: number;
   s?: number;
   v?: number;
@@ -213,7 +206,7 @@ export type HsvaColor = {
 };
 
 export type HslaColor = {
-  _type: 'hslaColor';
+  _type: "hslaColor";
   h?: number;
   s?: number;
   l?: number;
@@ -223,7 +216,7 @@ export type HslaColor = {
 export type Markdown = string;
 
 export type SanityImagePaletteSwatch = {
-  _type: 'sanity.imagePaletteSwatch';
+  _type: "sanity.imagePaletteSwatch";
   background?: string;
   foreground?: string;
   population?: number;
@@ -231,7 +224,7 @@ export type SanityImagePaletteSwatch = {
 };
 
 export type SanityImagePalette = {
-  _type: 'sanity.imagePalette';
+  _type: "sanity.imagePalette";
   darkMuted?: SanityImagePaletteSwatch;
   lightVibrant?: SanityImagePaletteSwatch;
   darkVibrant?: SanityImagePaletteSwatch;
@@ -242,14 +235,14 @@ export type SanityImagePalette = {
 };
 
 export type SanityImageDimensions = {
-  _type: 'sanity.imageDimensions';
+  _type: "sanity.imageDimensions";
   height?: number;
   width?: number;
   aspectRatio?: number;
 };
 
 export type SanityImageHotspot = {
-  _type: 'sanity.imageHotspot';
+  _type: "sanity.imageHotspot";
   x?: number;
   y?: number;
   height?: number;
@@ -257,7 +250,7 @@ export type SanityImageHotspot = {
 };
 
 export type SanityImageCrop = {
-  _type: 'sanity.imageCrop';
+  _type: "sanity.imageCrop";
   top?: number;
   bottom?: number;
   left?: number;
@@ -266,7 +259,7 @@ export type SanityImageCrop = {
 
 export type SanityFileAsset = {
   _id: string;
-  _type: 'sanity.fileAsset';
+  _type: "sanity.fileAsset";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -288,7 +281,7 @@ export type SanityFileAsset = {
 
 export type SanityImageAsset = {
   _id: string;
-  _type: 'sanity.imageAsset';
+  _type: "sanity.imageAsset";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -310,7 +303,7 @@ export type SanityImageAsset = {
 };
 
 export type SanityImageMetadata = {
-  _type: 'sanity.imageMetadata';
+  _type: "sanity.imageMetadata";
   location?: Geopoint;
   dimensions?: SanityImageDimensions;
   palette?: SanityImagePalette;
@@ -321,176 +314,153 @@ export type SanityImageMetadata = {
 };
 
 export type Geopoint = {
-  _type: 'geopoint';
+  _type: "geopoint";
   lat?: number;
   lng?: number;
   alt?: number;
 };
 
 export type Slug = {
-  _type: 'slug';
+  _type: "slug";
   current?: string;
   source?: string;
 };
 
 export type SanityAssetSourceData = {
-  _type: 'sanity.assetSourceData';
+  _type: "sanity.assetSourceData";
   name?: string;
   id?: string;
   url?: string;
 };
 
-export type AllSanitySchemaTypes =
-  | Enrollment
-  | Quiz
-  | Lesson
-  | Chapter
-  | Course
-  | Topic
-  | User
-  | Color
-  | RgbaColor
-  | HsvaColor
-  | HslaColor
-  | Markdown
-  | SanityImagePaletteSwatch
-  | SanityImagePalette
-  | SanityImageDimensions
-  | SanityImageHotspot
-  | SanityImageCrop
-  | SanityFileAsset
-  | SanityImageAsset
-  | SanityImageMetadata
-  | Geopoint
-  | Slug
-  | SanityAssetSourceData;
+export type AllSanitySchemaTypes = Enrollment | Quiz | Lesson | Chapter | Course | Topic | User | Color | RgbaColor | HsvaColor | HslaColor | Markdown | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./app/data/courses.ts
 // Variable: getCoursesQuery
 // Query: *[_type == "course"]{    ...,    "slug": slug.current,    }
 export type GetCoursesQueryResult = Array<{
   _id: string;
-  _type: 'course';
+  _type: "course";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
   title?: string;
   slug: string | null;
   description?: string;
-  difficulty?: 'advanced' | 'beginner' | 'intermediate';
+  difficulty?: "advanced" | "beginner" | "intermediate";
   thumbnail?: {
     asset?: {
       _ref: string;
-      _type: 'reference';
+      _type: "reference";
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: 'image';
+    _type: "image";
   };
   trailer?: string;
   topics?: Array<{
     _ref: string;
-    _type: 'reference';
+    _type: "reference";
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: 'topic';
+    [internalGroqTypeReferenceTo]?: "topic";
   }>;
   chapters?: Array<{
     _ref: string;
-    _type: 'reference';
+    _type: "reference";
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: 'chapter';
+    [internalGroqTypeReferenceTo]?: "chapter";
   }>;
 }>;
 // Variable: getCourseQuery
-// Query: *[_type == "course" && slug.current == $slug][0]{    ...,    "slug": slug->,    }
+// Query: *[_type == "course" && slug.current == $slug][0]{    ...,    "slug": slug.current,    }
 export type GetCourseQueryResult = {
   _id: string;
-  _type: 'course';
+  _type: "course";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
   title?: string;
-  slug: null;
+  slug: string | null;
   description?: string;
-  difficulty?: 'advanced' | 'beginner' | 'intermediate';
+  difficulty?: "advanced" | "beginner" | "intermediate";
   thumbnail?: {
     asset?: {
       _ref: string;
-      _type: 'reference';
+      _type: "reference";
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: 'image';
+    _type: "image";
   };
   trailer?: string;
   topics?: Array<{
     _ref: string;
-    _type: 'reference';
+    _type: "reference";
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: 'topic';
+    [internalGroqTypeReferenceTo]?: "topic";
   }>;
   chapters?: Array<{
     _ref: string;
-    _type: 'reference';
+    _type: "reference";
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: 'chapter';
+    [internalGroqTypeReferenceTo]?: "chapter";
   }>;
 } | null;
 // Variable: getCourseByIdQuery
 // Query: *[_type == "course" && _id == $id][0]
 export type GetCourseByIdQueryResult = {
   _id: string;
-  _type: 'course';
+  _type: "course";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
   title?: string;
   slug?: Slug;
   description?: string;
-  difficulty?: 'advanced' | 'beginner' | 'intermediate';
+  difficulty?: "advanced" | "beginner" | "intermediate";
   thumbnail?: {
     asset?: {
       _ref: string;
-      _type: 'reference';
+      _type: "reference";
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: 'image';
+    _type: "image";
   };
   trailer?: string;
   topics?: Array<{
     _ref: string;
-    _type: 'reference';
+    _type: "reference";
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: 'topic';
+    [internalGroqTypeReferenceTo]?: "topic";
   }>;
   chapters?: Array<{
     _ref: string;
-    _type: 'reference';
+    _type: "reference";
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: 'chapter';
+    [internalGroqTypeReferenceTo]?: "chapter";
   }>;
 } | null;
 // Variable: getCourseContentsQuery
 // Query: *[_type == "course" && slug.current == $slug][0]{      _id,      _type,      _createdAt,      _updatedAt,      title,      slug,      description,      price,      level,      thumbnail,      trailer,      difficulty,      "chapters": chapters[]->{        _id,        _type,        _createdAt,        _updatedAt,        title,        slug,        description,        "contents": contents[]->{          _id,          _type,          _createdAt,          _updatedAt,          title,          slug,          _type == "lesson" => {            content          },          _type == "quiz" => {            description,            questions          }        }      },      "topics": topics[]->{        _id,        _type,        _createdAt,        _updatedAt,        title,        slug,        description,        icon,        color      }    }
 export type GetCourseContentsQueryResult = {
   _id: string;
-  _type: 'course';
+  _type: "course";
   _createdAt: string;
   _updatedAt: string;
   title: string | null;
@@ -501,57 +471,54 @@ export type GetCourseContentsQueryResult = {
   thumbnail: {
     asset?: {
       _ref: string;
-      _type: 'reference';
+      _type: "reference";
       _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
     };
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: 'image';
+    _type: "image";
   } | null;
   trailer: string | null;
-  difficulty: 'advanced' | 'beginner' | 'intermediate' | null;
+  difficulty: "advanced" | "beginner" | "intermediate" | null;
   chapters: Array<{
     _id: string;
-    _type: 'chapter';
+    _type: "chapter";
     _createdAt: string;
     _updatedAt: string;
     title: string | null;
     slug: Slug | null;
     description: string | null;
-    contents: Array<
-      | {
-          _id: string;
-          _type: 'lesson';
-          _createdAt: string;
-          _updatedAt: string;
-          title: string | null;
-          slug: Slug | null;
-          content: string | null;
-        }
-      | {
-          _id: string;
-          _type: 'quiz';
-          _createdAt: string;
-          _updatedAt: string;
-          title: string | null;
-          slug: Slug | null;
-          description: string | null;
-          questions: Array<{
-            question?: string;
-            options?: string[];
-            correctOptionIndex?: number;
-            explanation?: string;
-            _type: 'question';
-            _key: string;
-          }> | null;
-        }
-    > | null;
+    contents: Array<{
+      _id: string;
+      _type: "lesson";
+      _createdAt: string;
+      _updatedAt: string;
+      title: string | null;
+      slug: Slug | null;
+      content: string | null;
+    } | {
+      _id: string;
+      _type: "quiz";
+      _createdAt: string;
+      _updatedAt: string;
+      title: string | null;
+      slug: Slug | null;
+      description: string | null;
+      questions: Array<{
+        question?: string;
+        options?: Array<string>;
+        correctOptionIndex?: number;
+        explanation?: string;
+        _type: "question";
+        _key: string;
+      }> | null;
+    }> | null;
   }> | null;
   topics: Array<{
     _id: string;
-    _type: 'topic';
+    _type: "topic";
     _createdAt: string;
     _updatedAt: string;
     title: string | null;
@@ -568,7 +535,7 @@ export type CountQueryResult = number | null;
 // Query: *[_type == "lesson" && slug.current == $slug][0]
 export type GetLessonBySlugQueryResult = {
   _id: string;
-  _type: 'lesson';
+  _type: "lesson";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -576,10 +543,10 @@ export type GetLessonBySlugQueryResult = {
   slug?: Slug;
   chapter?: Array<{
     _ref: string;
-    _type: 'reference';
+    _type: "reference";
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: 'chapter';
+    [internalGroqTypeReferenceTo]?: "chapter";
   }>;
   content?: string;
 } | null;
@@ -587,7 +554,7 @@ export type GetLessonBySlugQueryResult = {
 // Query: *[_type == "chapter" && slug.current == $slug][0]{    ...,      "contents": contents[]->{          _id,          _type,          _createdAt,          _updatedAt,          title,          slug,        }    }
 export type GetChapterBySlugQueryResult = {
   _id: string;
-  _type: 'chapter';
+  _type: "chapter";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -595,43 +562,41 @@ export type GetChapterBySlugQueryResult = {
   slug?: Slug;
   course?: Array<{
     _ref: string;
-    _type: 'reference';
+    _type: "reference";
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: 'course';
+    [internalGroqTypeReferenceTo]?: "course";
   }>;
   description?: string;
-  contents: Array<
-    | {
-        _id: string;
-        _type: 'lesson';
-        _createdAt: string;
-        _updatedAt: string;
-        title: string | null;
-        slug: Slug | null;
-      }
-    | {
-        _id: string;
-        _type: 'quiz';
-        _createdAt: string;
-        _updatedAt: string;
-        title: string | null;
-        slug: Slug | null;
-      }
-  > | null;
+  contents: Array<{
+    _id: string;
+    _type: "lesson";
+    _createdAt: string;
+    _updatedAt: string;
+    title: string | null;
+    slug: Slug | null;
+  } | {
+    _id: string;
+    _type: "quiz";
+    _createdAt: string;
+    _updatedAt: string;
+    title: string | null;
+    slug: Slug | null;
+  }> | null;
 } | null;
 
 // Source: ./app/data/enrollments.ts
 // Variable: getEnrollmentQuery
-// Query: *[_type == "enrollment" &&       userEnrolled[0]._ref == $userId &&       course[0]._ref == $courseId][0]{      _id,      _type,      _createdAt,      _updatedAt,      "userEnrolled": userEnrolled[0]->,      "course": course[0]->,      "contentsCompleted": contentsCompleted[]->{        _id,        _type,        _createdAt,        _updatedAt,        title,        slug,      },      dateCompleted,      percentComplete    }
+// Query: *[_type == "enrollment" &&      userEnrolled[0]._ref == $userId &&      course[0]._ref == $courseId][0]{      _id,      _type,      _rev,      _createdAt,      _updatedAt,      "userEnrolled": userEnrolled[0]->,      "course": course[0]->,      "contentsCompleted": contentsCompleted[]->{        _id,        _type,        _createdAt,        _updatedAt,        title,        slug,      },      dateCompleted,      percentComplete    }
 export type GetEnrollmentQueryResult = {
   _id: string;
-  _type: 'enrollment';
+  _type: "enrollment";
+  _rev: string;
   _createdAt: string;
   _updatedAt: string;
   userEnrolled: {
     _id: string;
-    _type: 'user';
+    _type: "user";
     _createdAt: string;
     _updatedAt: string;
     _rev: string;
@@ -640,64 +605,61 @@ export type GetEnrollmentQueryResult = {
     lastname?: string;
     email?: string;
     clerkId?: string;
-    onboardingStatus?: 'completed' | 'not_started';
+    onboardingStatus?: "completed" | "not_started";
   } | null;
   course: {
     _id: string;
-    _type: 'course';
+    _type: "course";
     _createdAt: string;
     _updatedAt: string;
     _rev: string;
     title?: string;
     slug?: Slug;
     description?: string;
-    difficulty?: 'advanced' | 'beginner' | 'intermediate';
+    difficulty?: "advanced" | "beginner" | "intermediate";
     thumbnail?: {
       asset?: {
         _ref: string;
-        _type: 'reference';
+        _type: "reference";
         _weak?: boolean;
-        [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
       };
       media?: unknown;
       hotspot?: SanityImageHotspot;
       crop?: SanityImageCrop;
-      _type: 'image';
+      _type: "image";
     };
     trailer?: string;
     topics?: Array<{
       _ref: string;
-      _type: 'reference';
+      _type: "reference";
       _weak?: boolean;
       _key: string;
-      [internalGroqTypeReferenceTo]?: 'topic';
+      [internalGroqTypeReferenceTo]?: "topic";
     }>;
     chapters?: Array<{
       _ref: string;
-      _type: 'reference';
+      _type: "reference";
       _weak?: boolean;
       _key: string;
-      [internalGroqTypeReferenceTo]?: 'chapter';
+      [internalGroqTypeReferenceTo]?: "chapter";
     }>;
   } | null;
-  contentsCompleted: Array<
-    | {
-        _id: string;
-        _type: 'lesson';
-        _createdAt: string;
-        _updatedAt: string;
-        title: string | null;
-        slug: Slug | null;
-      }
-    | {
-        _id: string;
-        _type: 'quiz';
-        _createdAt: string;
-        _updatedAt: string;
-        title: string | null;
-        slug: Slug | null;
-      }
-  > | null;
+  contentsCompleted: Array<{
+    _id: string;
+    _type: "lesson";
+    _createdAt: string;
+    _updatedAt: string;
+    title: string | null;
+    slug: Slug | null;
+  } | {
+    _id: string;
+    _type: "quiz";
+    _createdAt: string;
+    _updatedAt: string;
+    title: string | null;
+    slug: Slug | null;
+  }> | null;
   dateCompleted: string | null;
   percentComplete: number | null;
 } | null;
@@ -707,7 +669,7 @@ export type GetEnrollmentQueryResult = {
 // Query: *[_type == "user" && email == $email][0]
 export type FindByEmailQueryResult = {
   _id: string;
-  _type: 'user';
+  _type: "user";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -716,13 +678,13 @@ export type FindByEmailQueryResult = {
   lastname?: string;
   email?: string;
   clerkId?: string;
-  onboardingStatus?: 'completed' | 'not_started';
+  onboardingStatus?: "completed" | "not_started";
 } | null;
 // Variable: findByClerkIdQuery
 // Query: *[_type == "user" && clerkId == $clerkId][0]
 export type FindByClerkIdQueryResult = {
   _id: string;
-  _type: 'user';
+  _type: "user";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -731,13 +693,13 @@ export type FindByClerkIdQueryResult = {
   lastname?: string;
   email?: string;
   clerkId?: string;
-  onboardingStatus?: 'completed' | 'not_started';
+  onboardingStatus?: "completed" | "not_started";
 } | null;
 // Variable: findByUsernameQuery
 // Query: *[_type == "user" && username == $username][0]
 export type FindByUsernameQueryResult = {
   _id: string;
-  _type: 'user';
+  _type: "user";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -746,23 +708,23 @@ export type FindByUsernameQueryResult = {
   lastname?: string;
   email?: string;
   clerkId?: string;
-  onboardingStatus?: 'completed' | 'not_started';
+  onboardingStatus?: "completed" | "not_started";
 } | null;
 
 // Query TypeMap
-import '@sanity/client';
-declare module '@sanity/client' {
+import "@sanity/client";
+declare module "@sanity/client" {
   interface SanityQueries {
-    '*[_type == "course"]{\n    ...,\n    "slug": slug.current,\n    }': GetCoursesQueryResult;
-    '*[_type == "course" && slug.current == $slug][0]{\n    ...,\n    "slug": slug->,\n    }': GetCourseQueryResult;
-    '*[_type == "course" && _id == $id][0]': GetCourseByIdQueryResult;
-    '\n    *[_type == "course" && slug.current == $slug][0]{\n      _id,\n      _type,\n      _createdAt,\n      _updatedAt,\n      title,\n      slug,\n      description,\n      price,\n      level,\n      thumbnail,\n      trailer,\n      difficulty,\n      "chapters": chapters[]->{\n        _id,\n        _type,\n        _createdAt,\n        _updatedAt,\n        title,\n        slug,\n        description,\n        "contents": contents[]->{\n          _id,\n          _type,\n          _createdAt,\n          _updatedAt,\n          title,\n          slug,\n          _type == "lesson" => {\n            content\n          },\n          _type == "quiz" => {\n            description,\n            questions\n          }\n        }\n      },\n      "topics": topics[]->{\n        _id,\n        _type,\n        _createdAt,\n        _updatedAt,\n        title,\n        slug,\n        description,\n        icon,\n        color\n      }\n    }\n  ': GetCourseContentsQueryResult;
-    '\n    count(*[_type == "course" && _id == $id][0].chapters[]->contents[])\n  ': CountQueryResult;
-    '*[_type == "lesson" && slug.current == $slug][0]': GetLessonBySlugQueryResult;
-    '*[_type == "chapter" && slug.current == $slug][0]{\n    ...,\n      "contents": contents[]->{\n          _id,\n          _type,\n          _createdAt,\n          _updatedAt,\n          title,\n          slug,\n        }\n    }': GetChapterBySlugQueryResult;
-    '\n    *[_type == "enrollment" && \n      userEnrolled[0]._ref == $userId && \n      course[0]._ref == $courseId][0]{\n      _id,\n      _type,\n      _createdAt,\n      _updatedAt,\n      "userEnrolled": userEnrolled[0]->,\n      "course": course[0]->,\n      "contentsCompleted": contentsCompleted[]->{\n        _id,\n        _type,\n        _createdAt,\n        _updatedAt,\n        title,\n        slug,\n      },\n      dateCompleted,\n      percentComplete\n    }\n  ': GetEnrollmentQueryResult;
-    '\n    *[_type == "user" && email == $email][0]\n  ': FindByEmailQueryResult;
-    '\n    *[_type == "user" && clerkId == $clerkId][0]\n  ': FindByClerkIdQueryResult;
-    '\n    *[_type == "user" && username == $username][0]\n  ': FindByUsernameQueryResult;
+    "*[_type == \"course\"]{\n    ...,\n    \"slug\": slug.current,\n    }": GetCoursesQueryResult;
+    "*[_type == \"course\" && slug.current == $slug][0]{\n    ...,\n    \"slug\": slug.current,\n    }": GetCourseQueryResult;
+    "*[_type == \"course\" && _id == $id][0]": GetCourseByIdQueryResult;
+    "\n    *[_type == \"course\" && slug.current == $slug][0]{\n      _id,\n      _type,\n      _createdAt,\n      _updatedAt,\n      title,\n      slug,\n      description,\n      price,\n      level,\n      thumbnail,\n      trailer,\n      difficulty,\n      \"chapters\": chapters[]->{\n        _id,\n        _type,\n        _createdAt,\n        _updatedAt,\n        title,\n        slug,\n        description,\n        \"contents\": contents[]->{\n          _id,\n          _type,\n          _createdAt,\n          _updatedAt,\n          title,\n          slug,\n          _type == \"lesson\" => {\n            content\n          },\n          _type == \"quiz\" => {\n            description,\n            questions\n          }\n        }\n      },\n      \"topics\": topics[]->{\n        _id,\n        _type,\n        _createdAt,\n        _updatedAt,\n        title,\n        slug,\n        description,\n        icon,\n        color\n      }\n    }\n  ": GetCourseContentsQueryResult;
+    "\n    count(*[_type == \"course\" && _id == $id][0].chapters[]->contents[])\n  ": CountQueryResult;
+    "*[_type == \"lesson\" && slug.current == $slug][0]": GetLessonBySlugQueryResult;
+    "*[_type == \"chapter\" && slug.current == $slug][0]{\n    ...,\n      \"contents\": contents[]->{\n          _id,\n          _type,\n          _createdAt,\n          _updatedAt,\n          title,\n          slug,\n        }\n    }": GetChapterBySlugQueryResult;
+    "\n    *[_type == \"enrollment\" &&\n      userEnrolled[0]._ref == $userId &&\n      course[0]._ref == $courseId][0]{\n      _id,\n      _type,\n      _rev,\n      _createdAt,\n      _updatedAt,\n      \"userEnrolled\": userEnrolled[0]->,\n      \"course\": course[0]->,\n      \"contentsCompleted\": contentsCompleted[]->{\n        _id,\n        _type,\n        _createdAt,\n        _updatedAt,\n        title,\n        slug,\n      },\n      dateCompleted,\n      percentComplete\n    }\n  ": GetEnrollmentQueryResult;
+    "\n    *[_type == \"user\" && email == $email][0]\n  ": FindByEmailQueryResult;
+    "\n    *[_type == \"user\" && clerkId == $clerkId][0]\n  ": FindByClerkIdQueryResult;
+    "\n    *[_type == \"user\" && username == $username][0]\n  ": FindByUsernameQueryResult;
   }
 }

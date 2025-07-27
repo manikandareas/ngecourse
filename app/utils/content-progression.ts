@@ -19,10 +19,14 @@ function extractContentIds(course: GetCourseContentsQueryResult): string[] {
     return [];
   }
 
-  return course.chapters.flatMap(
-    (chapter) =>
-      chapter.contents?.map((content) => content._id.toString()) || []
-  );
+  return course.chapters.flatMap((chapter) => {
+    if (!(chapter?.contents && Array.isArray(chapter.contents))) {
+      return [];
+    }
+    return chapter.contents
+      .filter((content) => content?._id)
+      .map((content) => content._id);
+  });
 }
 
 /**
@@ -37,8 +41,8 @@ function extractCompletedContentIds(
 
   const completedIds = enrollment.contentsCompleted
     .map((item) => {
-      if (typeof item === 'object' && item._id) {
-        return item._id.toString();
+      if (typeof item === 'object' && item?._id) {
+        return typeof item._id === 'string' ? item._id : String(item._id);
       }
       return null;
     })

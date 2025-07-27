@@ -6,24 +6,42 @@ const getCourses = async () => {
     ...,
     "slug": slug.current,
     }`);
-  return await client.fetch(getCoursesQuery);
+  try {
+    return await client.fetch(getCoursesQuery);
+  } catch (error) {
+    throw new Error(
+      `Failed to fetch courses: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
 };
 
 const getCourse = async (slug: string) => {
   const getCourseQuery = defineQuery(
     `*[_type == "course" && slug.current == $slug][0]{
     ...,
-    "slug": slug->,
+    "slug": slug.current,
     }`
   );
-  return await client.fetch(getCourseQuery, { slug });
+  try {
+    return await client.fetch(getCourseQuery, { slug });
+  } catch (error) {
+    throw new Error(
+      `Failed to fetch course: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
 };
 
 const getCourseById = async (id: string) => {
   const getCourseByIdQuery = defineQuery(
     '*[_type == "course" && _id == $id][0]'
   );
-  return await client.fetch(getCourseByIdQuery, { id });
+  try {
+    return await client.fetch(getCourseByIdQuery, { id });
+  } catch (error) {
+    throw new Error(
+      `Failed to fetch course by ID: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
 };
 
 const getCourseContents = async (slug: string) => {
@@ -78,7 +96,13 @@ const getCourseContents = async (slug: string) => {
       }
     }
   `);
-  return await client.fetch(getCourseContentsQuery, { slug });
+  try {
+    return await client.fetch(getCourseContentsQuery, { slug });
+  } catch (error) {
+    throw new Error(
+      `Failed to fetch course contents: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
 };
 
 const countCourseContents = async (id: string) => {
@@ -86,15 +110,27 @@ const countCourseContents = async (id: string) => {
     count(*[_type == "course" && _id == $id][0].chapters[]->contents[])
   `);
 
-  const result = await client.fetch(countQuery, { id });
-  return result || 0;
+  try {
+    const result = await client.fetch(countQuery, { id });
+    return result || 0;
+  } catch (error) {
+    throw new Error(
+      `Failed to count course contents: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
 };
 
 const getLessonBySlug = async (slug: string) => {
   const getLessonBySlugQuery = defineQuery(
     `*[_type == "lesson" && slug.current == $slug][0]`
   );
-  return await client.fetch(getLessonBySlugQuery, { slug });
+  try {
+    return await client.fetch(getLessonBySlugQuery, { slug });
+  } catch (error) {
+    throw new Error(
+      `Failed to fetch lesson: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
 };
 
 const getChapterBySlug = async (slug: string) => {
@@ -110,7 +146,13 @@ const getChapterBySlug = async (slug: string) => {
           slug,
         }
     }`);
-  return await client.fetch(getChapterBySlugQuery, { slug });
+  try {
+    return await client.fetch(getChapterBySlugQuery, { slug });
+  } catch (error) {
+    throw new Error(
+      `Failed to fetch chapter: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
 };
 
 export const dataCourses = {

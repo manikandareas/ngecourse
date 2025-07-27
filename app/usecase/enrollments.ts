@@ -3,18 +3,26 @@ import { dataEnrollment } from '~/data/enrollments';
 import {
   createEnrollmentError,
   createProgressionError,
+  createValidationError,
   ERROR_CODES,
   UsecaseError,
 } from './errors';
-
-type AddProgressionParams = {
-  contentId: string; // Changed to string for Sanity IDs
-  courseId: string;
-  userId: string;
-  nextPath?: string;
-};
+import {
+  enrollmentSchema,
+  type ProgressionInput,
+  progressionSchema,
+} from './schemas';
 
 const enroll = async (courseSlug: string, userId: string) => {
+  // Validate input
+  const validationResult = enrollmentSchema.safeParse({ courseSlug, userId });
+  if (!validationResult.success) {
+    throw createValidationError(
+      `Invalid input: ${validationResult.error.issues.map((issue) => issue.message).join(', ')}`,
+      'VALIDATION_ERROR'
+    );
+  }
+
   try {
     // Get course by slug
     const course = await dataCourses.one(courseSlug);
@@ -67,7 +75,16 @@ const enroll = async (courseSlug: string, userId: string) => {
   }
 };
 
-const addProgression = async (params: AddProgressionParams) => {
+const addProgression = async (params: ProgressionInput) => {
+  // Validate input
+  const validationResult = progressionSchema.safeParse(params);
+  if (!validationResult.success) {
+    throw createValidationError(
+      `Invalid input: ${validationResult.error.issues.map((issue) => issue.message).join(', ')}`,
+      'VALIDATION_ERROR'
+    );
+  }
+
   const { userId, courseId, contentId, nextPath } = params;
 
   try {
