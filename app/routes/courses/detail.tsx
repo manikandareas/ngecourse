@@ -1,4 +1,4 @@
-import type { Enrollment } from 'sanity.types';
+import { useQueries } from '@tanstack/react-query';
 import { dataCourses } from '~/data/courses';
 import { dataEnrollment } from '~/data/enrollments';
 import { CourseInfo } from '~/features/courses/detail/course-info';
@@ -32,16 +32,17 @@ export async function loader(args: Route.LoaderArgs) {
     currentSession?._id || '',
     courseWithContents._id
   );
-  console.log(enrollment);
+
   return {
     course: courseWithContents,
     enrollment,
+    currentSession,
   };
 }
 
 export async function action(args: Route.ActionArgs) {
   const currentSession = await getCurrentSession(args);
-  console.log(currentSession);
+
   if (!currentSession) {
     return new Response('Unauthorized', { status: 401 });
   }
@@ -59,29 +60,55 @@ export async function action(args: Route.ActionArgs) {
 }
 
 export default function CourseDetailPage(props: Route.ComponentProps) {
+  const [courseQuery, enrollmentQuery] = useQueries({
+    queries: [
+      {
+        queryKey: ['course', props.params.slug],
+        queryFn: () => dataCourses.withContents(props.params.slug),
+        initialData: props.loaderData.course,
+      },
+      {
+        queryKey: ['enrollment', props.loaderData.enrollment?._id || ''],
+        queryFn: () =>
+          dataEnrollment.oneByUserId(
+            props.loaderData.currentSession?._id || '',
+            props.loaderData.course._id || ''
+          ),
+        initialData: props.loaderData.enrollment,
+      },
+    ],
+  });
+
+  if (courseQuery.isLoading || enrollmentQuery.isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!courseQuery.data) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="relative mx-auto w-full max-w-6xl px-6 py-20 xl:px-0">
       <HeroSection
-        course={props.loaderData.course}
-        enrollment={props.loaderData.enrollment as Enrollment | null}
+        course={courseQuery.data}
+        enrollment={enrollmentQuery.data}
       />
 
       {/* Main Content */}
       <main className="relative mx-auto flex w-full max-w-6xl flex-col gap-8 py-8 md:flex-row">
         <PathSection
-          course={props.loaderData.course}
-          enrollment={props.loaderData.enrollment}
+          course={courseQuery.data}
+          enrollment={enrollmentQuery.data}
         />
         {/* Sidebar */}
         <aside className="w-full flex-shrink-0 md:w-80 lg:sticky lg:top-28 lg:h-screen lg:w-96">
           <div className="slide-in-from-right-4 animate-in space-y-6 duration-500">
             <div className="fade-in-50 animate-in delay-100 duration-700">
-              {props.loaderData.course.trailer && (
+              {courseQuery.data.trailer && (
                 <CourseInfo.Trailer
-                  trailerUrl={props.loaderData.course.trailer}
+                  trailerUrl={courseQuery.data.trailer}
                   youtubeId={
-                    extractYoutubeId(props.loaderData.course.trailer) ??
-                    'Ke90Tje7VS0'
+                    extractYoutubeId(courseQuery.data.trailer) ?? 'Ke90Tje7VS0'
                   }
                 />
               )}
