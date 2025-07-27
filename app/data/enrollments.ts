@@ -7,32 +7,48 @@ type EnrollCourse = {
 };
 
 const enrollCourse = async (data: EnrollCourse) => {
-  return await client.create({
-    _type: 'enrollment',
-    userEnrolled: [
-      {
-        _type: 'reference',
-        _ref: data.userId,
-      },
-    ],
-    course: [
-      {
-        _type: 'reference',
-        _ref: data.courseId,
-      },
-    ],
-    contentsCompleted: [],
-    percentComplete: 0,
-  });
+  try {
+    // Check for existing enrollment first to prevent race condition
+    const existingEnrollment = await getEnrollmentByUserId(
+      data.userId,
+      data.courseId
+    );
+    if (existingEnrollment) {
+      throw new Error('User already enrolled in this course');
+    }
+
+    return await client.create({
+      _type: 'enrollment',
+      userEnrolled: [
+        {
+          _type: 'reference',
+          _ref: data.userId,
+        },
+      ],
+      course: [
+        {
+          _type: 'reference',
+          _ref: data.courseId,
+        },
+      ],
+      contentsCompleted: [],
+      percentComplete: 0,
+    });
+  } catch (error) {
+    throw new Error(
+      `Failed to enroll course: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
 };
 
 const getEnrollmentByUserId = async (userId: string, courseId: string) => {
   const getEnrollmentQuery = defineQuery(`
-    *[_type == "enrollment" && 
-      userEnrolled[0]._ref == $userId && 
+    *[_type == "enrollment" &&
+      userEnrolled[0]._ref == $userId &&
       course[0]._ref == $courseId][0]{
       _id,
       _type,
+      _rev,
       _createdAt,
       _updatedAt,
       "userEnrolled": userEnrolled[0]->,
@@ -50,7 +66,13 @@ const getEnrollmentByUserId = async (userId: string, courseId: string) => {
     }
   `);
 
-  return await client.fetch(getEnrollmentQuery, { userId, courseId });
+  try {
+    return await client.fetch(getEnrollmentQuery, { userId, courseId });
+  } catch (error) {
+    throw new Error(
+      `Failed to fetch enrollment: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
 };
 
 type AddProgression = {
@@ -58,6 +80,7 @@ type AddProgression = {
   contentsCompleted: string[];
   dateCompleted?: string;
   percentComplete: number;
+  _rev?: string;
 };
 
 const addProgression = async (data: AddProgression) => {
@@ -66,14 +89,26 @@ const addProgression = async (data: AddProgression) => {
     _ref: id,
   }));
 
-  return await client
-    .patch(data.enrollmentId)
-    .set({
-      contentsCompleted: contentsCompletedRefs,
-      dateCompleted: data.dateCompleted,
-      percentComplete: Number(data.percentComplete.toFixed(2)),
-    })
-    .commit();
+  try {
+    const patchBuilder = client.patch(data.enrollmentId);
+
+    // Use optimistic locking if revision is provided
+    if ('_rev' in data && data._rev) {
+      patchBuilder.ifRevisionId(data._rev);
+    }
+
+    return await patchBuilder
+      .set({
+        contentsCompleted: contentsCompletedRefs,
+        dateCompleted: data.dateCompleted,
+        percentComplete: Number(data.percentComplete.toFixed(2)),
+      })
+      .commit();
+  } catch (error) {
+    throw new Error(
+      `Failed to update progression: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
 };
 
 export const dataEnrollment = {

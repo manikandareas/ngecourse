@@ -49,16 +49,24 @@ export function useSequentialNavigation(
 
     for (const chapter of course?.chapters || []) {
       // Add chapter item
+      const chapterSlug = chapter.slug?.current;
+      const courseSlug = course?.slug?.current;
+      const chapterTitle = chapter?.title;
+
+      if (!(chapterSlug && courseSlug && chapterTitle)) {
+        continue; // Skip invalid chapters
+      }
+
       items.push({
         type: 'chapter',
         chapterId: chapter._id,
-        chapterSlug: chapter.slug?.current as string,
-        path: `/courses/${course?.slug?.current}/${chapter.slug?.current}`,
-        title: chapter?.title as string,
+        chapterSlug,
+        path: `/courses/${courseSlug}/${chapterSlug}`,
+        title: chapterTitle,
         isCompleted: false, // Chapters don't have completion state
         isLocked: false, // Chapters are never locked
         isCurrent:
-          params.chapterSlug === chapter.slug?.current &&
+          params.chapterSlug === chapterSlug &&
           !params.lessonSlug &&
           !params.quizSlug,
       });
@@ -66,24 +74,39 @@ export function useSequentialNavigation(
       // Add chapter contents (lessons and quizzes)
       for (const content of chapter.contents || []) {
         const contentId = content._id;
+        const contentSlug = content.slug?.current;
+        const contentTitle = content.title;
         const isLesson = content._type === 'lesson';
+
+        if (
+          !(
+            contentId &&
+            contentSlug &&
+            contentTitle &&
+            chapterSlug &&
+            courseSlug
+          )
+        ) {
+          continue; // Skip invalid content
+        }
+
         const contentPath = isLesson
-          ? `/courses/${course?.slug?.current}/${chapter.slug?.current}/lessons/${content.slug?.current}`
-          : `/courses/${course?.slug?.current}/${chapter.slug?.current}/quizzes/${content.slug?.current}`;
+          ? `/courses/${courseSlug}/${chapterSlug}/lessons/${contentSlug}`
+          : `/courses/${courseSlug}/${chapterSlug}/quizzes/${contentSlug}`;
 
         items.push({
           type: isLesson ? 'lesson' : 'quiz',
           chapterId: chapter._id,
-          chapterSlug: chapter.slug?.current as string,
-          contentId: content._id as string,
-          contentSlug: content.slug?.current as string,
+          chapterSlug,
+          contentId,
+          contentSlug,
           path: contentPath,
-          title: content.title as string,
+          title: contentTitle,
           isCompleted: isContentCompleted(contentId),
           isLocked: isContentLocked(contentId),
           isCurrent: isLesson
-            ? params.lessonSlug === content.slug?.current
-            : params.quizSlug === content.slug?.current,
+            ? params.lessonSlug === contentSlug
+            : params.quizSlug === contentSlug,
         });
       }
     }
