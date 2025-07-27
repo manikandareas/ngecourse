@@ -6,11 +6,11 @@ import {
   InfinityIcon,
   Loader2,
 } from 'lucide-react';
-import { useFetcher } from 'react-router';
 import type { Topic } from 'sanity.types';
 import { Button } from '~/components/ui/button';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -19,7 +19,6 @@ import {
   DialogTrigger,
 } from '~/components/ui/dialog';
 import { Separator } from '~/components/ui/separator';
-import type { action } from '~/routes/courses/detail';
 import { CourseBadge } from './hero-section';
 
 interface IEnrollDialogProps {
@@ -32,6 +31,8 @@ interface IEnrollDialogProps {
   duration?: string;
   lessonsCount?: number;
   slug?: string;
+  onEnroll: () => void;
+  isLoading?: boolean;
 }
 
 interface CourseFeatureProps {
@@ -54,11 +55,12 @@ const EnrollDialog = ({
   topics,
   duration = '10 hours',
   lessonsCount = 15,
-  slug,
+  onEnroll,
+  isLoading = false,
 }: IEnrollDialogProps) => {
-  const fetcher = useFetcher<typeof action>();
   return (
     <Dialog>
+      <DialogClose className="sr-only" id="dialog-close" />
       <DialogTrigger asChild>
         <Button className="group" size="lg" type="button">
           Start Learning Now
@@ -104,22 +106,21 @@ const EnrollDialog = ({
         </DialogHeader>
 
         <DialogFooter className="border-t px-6 py-4">
-          <fetcher.Form action={`/courses/${slug}`} method="POST">
-            <Button
-              className="w-full bg-primary transition-colors hover:bg-primary/90"
-              disabled={fetcher.state !== 'idle'}
-              size="lg"
-              type="submit"
-            >
-              {fetcher.state === 'idle' ? (
-                'Enroll Now - Free'
-              ) : (
-                <>
-                  Processing enrollment <Loader2 className="animate-spin" />
-                </>
-              )}
-            </Button>
-          </fetcher.Form>
+          <Button
+            className="w-full bg-primary transition-colors hover:bg-primary/90"
+            disabled={isLoading}
+            onClick={onEnroll}
+            size="lg"
+            type="button"
+          >
+            {isLoading ? (
+              <>
+                Processing enrollment <Loader2 className="animate-spin" />
+              </>
+            ) : (
+              'Enroll Now - Free'
+            )}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
