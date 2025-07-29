@@ -2,15 +2,15 @@ import { Menu, X } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import type {
-  GetCourseContentsQueryResult,
-  GetEnrollmentQueryResult,
+  CourseContentsQueryResult,
+  EnrollmentQueryResult,
 } from 'sanity.types';
 import { Button } from '~/components/ui/button';
-import { CourseNavigation } from './course-navigation';
+import { CourseNavigation } from '../../components/chapter-navigation';
 
 interface LearningLayoutProps {
-  course: GetCourseContentsQueryResult;
-  enrollment: GetEnrollmentQueryResult | null;
+  course: CourseContentsQueryResult;
+  enrollment: EnrollmentQueryResult | null;
   children: ReactNode;
 }
 

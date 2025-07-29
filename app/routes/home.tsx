@@ -13,7 +13,7 @@ export function meta() {
 
 export default function Home() {
   return (
-    <div className="mx-auto w-full max-w-6xl px-6 py-20 sm:px-0">
+    <div className="mx-auto w-full max-w-6xl px-6 py-20 xl:px-0">
       <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-2">
         <div className="flex flex-col gap-4">
           {/* <Badge variant="outline">We&apos;re live!</Badge> */}

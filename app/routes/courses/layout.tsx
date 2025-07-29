@@ -2,14 +2,15 @@ import { useMutation, useQueries, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Outlet, useNavigate, useNavigation } from 'react-router';
 import { Button } from '~/components/ui/3d-button';
-import { dataCourses } from '~/data/courses';
-import { dataEnrollment } from '~/data/enrollments';
+import { dataCourses } from '~/features/courses/data';
 import { LearningLayout } from '~/features/courses/detail/chapters/learning-layout';
-import { useSequentialNavigation } from '~/hooks/use-sequential-navigation';
+import { useSequentialNavigation } from '~/features/courses/hooks/sequential-navigation';
+import { dataEnrollment } from '~/features/enrollments/data';
+import { enrollmentQueryOption } from '~/features/enrollments/hooks/get-enrollment';
+import { usecaseEnrollments } from '~/features/enrollments/usecase';
+import type { ProgressionInput } from '~/features/shared/schemas';
 import { cn } from '~/lib/utils';
 import { getCurrentSession } from '~/root';
-import { usecaseEnrollments } from '~/usecase/enrollments';
-import type { ProgressionInput } from '~/usecase/schemas';
 import type { Route } from './+types/layout';
 
 export async function loader(args: Route.LoaderArgs) {
@@ -72,11 +73,13 @@ export default function CoursesLayout(args: Route.ComponentProps) {
     mutationFn: (data: ProgressionInput) => {
       return usecaseEnrollments.addProgression(data);
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['enrollment', args.loaderData.currentSession._id],
-      });
-    },
+    onSettled: () =>
+      queryClient.invalidateQueries(
+        enrollmentQueryOption(
+          args.loaderData.currentSession._id,
+          args.loaderData.course._id
+        )
+      ),
     onSuccess: (data) => {
       if (data.success && data.nextPath) {
         navigate(data.nextPath);

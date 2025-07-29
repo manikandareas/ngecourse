@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { type Control, useForm } from 'react-hook-form';
@@ -17,15 +16,21 @@ import {
 import { Input } from '~/components/ui/input';
 import { Progress } from '~/components/ui/progress';
 import { ToggleGroup, ToggleGroupItem } from '~/components/ui/toggle-group';
+import type { SaveOnboardingInput } from '~/features/shared/schemas';
+import { usecaseUser } from '~/features/users/usecase';
 import { cn } from '~/lib/utils';
 import { getCurrentSession } from '~/root';
-import type { SaveOnboardingInput } from '~/usecase/schemas';
-import { usecaseUser } from '~/usecase/users';
 import type { Route } from './+types/onboarding';
+
+export function meta() {
+  return [
+    { title: 'Genii | Onboarding' },
+    { name: 'description', content: 'Welcome to Genii!' },
+  ];
+}
 
 export async function loader(args: Route.LoaderArgs) {
   const currentSession = await getCurrentSession(args);
-
   if (!currentSession) {
     throw new Response('Unauthorized', { status: 401 });
   }
@@ -34,7 +39,13 @@ export async function loader(args: Route.LoaderArgs) {
     return redirect('/');
   }
 
-  return { session: currentSession };
+  const token = await currentSession.getToken();
+
+  if (!token) {
+    throw new Response('Unauthorized', { status: 401 });
+  }
+
+  return { session: currentSession, token };
 }
 
 const formSchema = z.object({
@@ -83,9 +94,11 @@ export default function LearningGoalsPage(props: Route.ComponentProps) {
     }: {
       userId: string;
       data: SaveOnboardingInput;
-    }) => usecaseUser.saveOnboarding(userId, data),
-    onSuccess: () => {
-      navigate('/');
+    }) => usecaseUser.saveOnboarding(userId, props.loaderData.token, data),
+    onSuccess: (data) => {
+      if (data.success) {
+        navigate('/');
+      }
     },
   });
 
