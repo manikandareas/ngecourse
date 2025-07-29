@@ -1,0 +1,146 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { ArrowRightIcon, Share2Icon } from 'lucide-react';
+import type {
+  Course,
+  CourseContentsQueryResult,
+  Enrollment,
+  EnrollmentQueryResult,
+  Topic,
+} from 'sanity.types';
+import { toast } from 'sonner';
+import { Button } from '~/components/ui/3d-button';
+import { Badge } from '~/components/ui/badge';
+import { enrollmentQueryOption } from '~/features/enrollments/hooks/get-enrollment';
+import { usecaseEnrollments } from '~/features/enrollments/usecase';
+import { urlFor } from '~/lib/sanity-client';
+import { CourseBadge } from './course-badge';
+import EnrollDialog from './detail-enroll-dialog';
+
+type IDetailHero = {
+  userId?: string;
+  course: CourseContentsQueryResult;
+  enrollment: EnrollmentQueryResult | null;
+};
+
+export function DetailHero(props: IDetailHero) {
+  const queryClient = useQueryClient();
+  const thumbnailUrl = props.course?.thumbnail
+    ? urlFor(props.course?.thumbnail)?.url()
+    : '';
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: ({
+      courseSlug,
+      userId,
+    }: {
+      courseSlug: string;
+      userId: string;
+    }) => usecaseEnrollments.enroll(courseSlug, userId),
+    onSettled: () => {
+      queryClient.invalidateQueries(
+        enrollmentQueryOption(
+          props.userId as string,
+          props.course?._id as string
+        )
+      );
+    },
+    onError: (error) => {
+      toast.error(
+        `Enrollment failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    },
+    onSuccess: (data) => {
+      if (data.success) {
+        document.getElementById('dialog-close')?.click();
+        toast.success('Successfully enrolled in the course!');
+        return;
+      }
+
+      toast.error(`Enrollment failed: ${data.error?.message}`);
+    },
+  });
+
+  const handleEnroll = () => {
+    if (!(props.course?.slug?.current && props.userId)) {
+      toast.error('Course slug or user ID is missing.', {
+        description: 'You need to log in to enroll in a course.',
+      });
+      return;
+    }
+    mutate({
+      courseSlug: props.course.slug.current,
+      userId: props.userId,
+    });
+  };
+  return (
+    <div>
+      <div className="mb-8 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center sm:gap-0">
+        <div className="space-y-2">
+          <CourseBadge difficulty={props.course?.difficulty || 'beginner'} />
+          <h1 className="font-bold text-4xl">{props.course?.title}</h1>
+          <p className="max-w-2xl text-pretty text-muted-foreground text-sm">
+            {props.course?.description}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {props.course?.topics?.map((topic) => (
+              <Badge
+                className="capitalize"
+                key={topic._id}
+                variant={'secondary'}
+              >
+                {topic.title}
+              </Badge>
+            ))}
+          </div>
+        </div>
+        <div className="flex items-center gap-2.5">
+          <Button size={'icon'} variant={'outline'}>
+            <Share2Icon />
+          </Button>
+          {props.enrollment ? (
+            <Button className="group">
+              Continue Learning
+              <ArrowRightIcon className="ml-2 size-4 transition-transform group-hover:translate-x-1" />
+            </Button>
+          ) : (
+            <EnrollDialog
+              description={props.course?.description || 'Course Description'}
+              difficulty={props.course?.difficulty || 'beginner'}
+              duration={'10 hours'}
+              id={props.course?._id || ''}
+              image={thumbnailUrl || ''}
+              isLoading={isPending}
+              lessonsCount={props.course?.chapters?.length || 15}
+              onEnroll={handleEnroll}
+              slug={props.course?.slug?.current || ''}
+              title={props.course?.title || 'Course Title'}
+              topics={(props.course?.topics as Topic[]) || []}
+            />
+          )}
+        </div>
+      </div>
+      <img
+        alt={props.course?.title || 'Thumbnail'}
+        className="mx-auto mb-8 h-[22rem] w-full rounded-md object-cover"
+        src={thumbnailUrl}
+      />
+    </div>
+  );
+}
+
+export const toHeroSection = (
+  course: Course,
+  enrollment: Enrollment | null
+) => {
+  const imageUrl = course.thumbnail ? urlFor(course.thumbnail)?.url() : '';
+  return {
+    topics: course.topics,
+    difficulty: course.difficulty || 'beginner',
+    title: course.title || 'Course Title',
+    description: course.description || 'Course Description',
+    image: imageUrl,
+    id: course._id,
+    slug: course.slug?.current,
+    enrollment,
+  };
+};

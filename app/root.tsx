@@ -12,15 +12,15 @@ import {
 import type { Route } from './+types/root';
 import './app.css';
 import { Toaster } from './components/ui/sonner';
-import ReactQueryProvider from './providers/react-query';
-import { usecaseUser } from './usecase/users';
+import { usecaseUser } from './features/users/usecase';
+import ReactQueryProvider from './lib/react-query';
 
 export async function loader(args: Route.LoaderArgs) {
   return await rootAuthLoader(args);
 }
 
 export async function getCurrentSession(args: LoaderFunctionArgs) {
-  const { isAuthenticated, userId } = await getAuth(args);
+  const { isAuthenticated, userId, ...rest } = await getAuth(args);
 
   if (!isAuthenticated) {
     return null;
@@ -35,6 +35,7 @@ export async function getCurrentSession(args: LoaderFunctionArgs) {
   return {
     ...currentSession,
     clerkId: userId,
+    ...rest,
   };
 }
 

@@ -1,8 +1,14 @@
-import { useQuery } from '@tanstack/react-query';
+import { useAtom } from 'jotai';
 import { Badge } from '~/components/ui/badge';
-import { dataCourses } from '~/data/courses';
-import { CourseCard, toCourseCard } from '~/features/courses/course-card';
-import type { Route } from './+types';
+import {
+  CourseCard,
+  toCourseCard,
+} from '~/features/courses/components/course-card';
+import {
+  coursesAtom,
+  coursesQueryOption,
+} from '~/features/courses/hooks/get-courses';
+import { makeQueryClient } from '~/lib/react-query';
 
 export function meta() {
   return [
@@ -11,22 +17,16 @@ export function meta() {
   ];
 }
 
-export async function loader() {
-  const courses = await dataCourses.many();
-  return { courses };
+export async function clientLoader() {
+  const queryClient = makeQueryClient();
+  return (
+    queryClient.getQueryData(coursesQueryOption.queryKey) ??
+    (await queryClient.fetchQuery(coursesQueryOption))
+  );
 }
 
-export default function CoursesPage({ loaderData }: Route.ComponentProps) {
-  const {
-    data: courses,
-    isPending,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ['courses'],
-    queryFn: dataCourses.many,
-    initialData: loaderData.courses,
-  });
+export default function CoursesPage() {
+  const [{ data: courses, isPending, isError, error }] = useAtom(coursesAtom);
 
   if (isPending) {
     return <div>Loading...</div>;

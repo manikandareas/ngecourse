@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { BookOpen, FileText, PlayCircle } from 'lucide-react';
 import { Badge } from '~/components/ui/badge';
-import { dataCourses } from '~/data/courses';
+import { dataCourses } from '~/features/courses/data';
 import { getCurrentSession } from '~/root';
 import type { Route } from './+types/chapter-detail';
 

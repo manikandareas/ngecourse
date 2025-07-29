@@ -30,3 +30,44 @@ export const extractYoutubeId = (url: string) => {
 
   return null;
 };
+
+export function generateCourseRecommendationPrompt(formData: {
+  learningGoals: string[];
+  studyReason: string;
+  studyPlan: string;
+  level: 'beginner' | 'intermediate' | 'advanced';
+}): string {
+  // Map study reason values to descriptive text
+  const studyReasonMap: Record<string, string> = {
+    'career-switch': 'switching to a tech career',
+    'skill-upgrade': 'upgrading current tech skills',
+    certification: 'obtaining professional certification',
+    freelancing: 'working on freelancing and side projects',
+    entrepreneurship: 'tech entrepreneurship',
+    'personal-projects': 'building personal projects',
+  };
+
+  // Map study plan values to descriptive text
+  const studyPlanMap: Record<string, string> = {
+    intensive: 'intensive full-time learning schedule',
+    structured: 'structured learning with regular weekly sessions',
+    'project-based': 'project-based learning through hands-on building',
+    flexible: 'flexible learning that adapts to their schedule',
+  };
+
+  // Map level values to descriptive text
+  const levelMap: Record<string, string> = {
+    beginner: 'beginner level with little to no prior knowledge',
+    intermediate: 'intermediate level with some basic understanding',
+    advanced: 'advanced level with existing experience and knowledge',
+  };
+
+  // Generate the prompt
+  const prompt = `Recommend courses for someone interested in learning ${formData.learningGoals.join(', ')}.
+They are ${studyReasonMap[formData.studyReason] || formData.studyReason}.
+They prefer a ${studyPlanMap[formData.studyPlan] || formData.studyPlan} approach.
+Their current knowledge level is ${levelMap[formData.level] || formData.level}.
+Suggest relevant courses that match these learning preferences and goals.`;
+
+  return prompt;
+}

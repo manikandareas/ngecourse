@@ -32,6 +32,7 @@ export default [
   route('sign-in/*', 'routes/sign-in.tsx'),
   route('sign-up/*', 'routes/sign-up.tsx'),
   route('/onboarding', 'routes/onboarding.tsx'),
+  route('/recommendation', 'routes/recommendation.tsx'),
 
   // Webhooks routes
   route('api/webhooks', 'routes/api/webhooks.ts'),

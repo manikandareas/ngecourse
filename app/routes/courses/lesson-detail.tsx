@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Clock, PlayCircle } from 'lucide-react';
-import { dataCourses } from '~/data/courses';
-import { MarkdownRenderer } from '~/features/courses/detail/chapters/markdown-renderer';
+import { MarkdownRenderer } from '~/components/ui/markdown-renderer';
+import { dataCourses } from '~/features/courses/data';
 import { getCurrentSession } from '~/root';
 import type { Route } from './+types/lesson-detail';
 

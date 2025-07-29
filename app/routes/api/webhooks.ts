@@ -1,5 +1,5 @@
 import { verifyWebhook } from '@clerk/react-router/webhooks';
-import { usecaseUser } from '~/usecase/users';
+import { usecaseUser } from '~/features/users/usecase';
 import type { Route } from './+types/webhooks';
 
 export const action = async ({ request }: Route.ActionArgs) => {
