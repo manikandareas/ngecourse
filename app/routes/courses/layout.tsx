@@ -1,9 +1,14 @@
 import { useMutation, useQueries, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Outlet, useNavigate, useNavigation } from 'react-router';
+import type {
+  CourseContentsQueryResult,
+  EnrollmentQueryResult,
+} from 'sanity.types';
 import { Button } from '~/components/ui/3d-button';
 import { dataCourses } from '~/features/courses/data';
 import { LearningLayout } from '~/features/courses/detail/chapters/learning-layout';
+import { courseQueryOption } from '~/features/courses/hooks/get-course';
 import { useSequentialNavigation } from '~/features/courses/hooks/sequential-navigation';
 import { dataEnrollment } from '~/features/enrollments/data';
 import { enrollmentQueryOption } from '~/features/enrollments/hooks/get-enrollment';
@@ -48,24 +53,11 @@ export default function CoursesLayout(args: Route.ComponentProps) {
   const navigate = useNavigate();
   const [courseQuery, enrollmentQuery] = useQueries({
     queries: [
-      {
-        queryKey: ['course', args.params.slug],
-        queryFn: () => dataCourses.withContents(args.params.slug),
-        staleTime: 1000 * 60 * 5, // 5 minutes
-        refetchOnWindowFocus: false,
-        initialData: args.loaderData.course,
-      },
-      {
-        queryKey: ['enrollment', args.loaderData.enrollment],
-        queryFn: () =>
-          dataEnrollment.oneByUserId(
-            args.loaderData.currentSession._id || '',
-            args.loaderData.course._id || ''
-          ),
-        staleTime: 1000 * 60 * 5, // 5 minutes
-        refetchOnWindowFocus: false,
-        initialData: args.loaderData.enrollment,
-      },
+      courseQueryOption(args.params.slug, args.loaderData.course),
+      enrollmentQueryOption(
+        args.loaderData.currentSession._id,
+        args.params.slug
+      ),
     ],
   });
 
@@ -77,7 +69,7 @@ export default function CoursesLayout(args: Route.ComponentProps) {
       queryClient.invalidateQueries(
         enrollmentQueryOption(
           args.loaderData.currentSession._id,
-          args.loaderData.course._id
+          args.params.slug
         )
       ),
     onSuccess: (data) => {
@@ -88,8 +80,8 @@ export default function CoursesLayout(args: Route.ComponentProps) {
   });
 
   const sequentialNavigationState = useSequentialNavigation(
-    courseQuery.data,
-    enrollmentQuery.data
+    courseQuery.data as CourseContentsQueryResult,
+    enrollmentQuery.data as EnrollmentQueryResult
   );
 
   // Check if current content is a lesson/quiz (not chapter) and not completed

@@ -40,7 +40,7 @@ export function DetailHero(props: IDetailHero) {
       queryClient.invalidateQueries(
         enrollmentQueryOption(
           props.userId as string,
-          props.course?._id as string
+          props.course?.slug?.current as string
         )
       );
     },
@@ -115,7 +115,12 @@ export function DetailHero(props: IDetailHero) {
               slug={props.course?.slug?.current || ''}
               title={props.course?.title || 'Course Title'}
               topics={(props.course?.topics as Topic[]) || []}
-            />
+            >
+              <Button className="group" size="lg" type="button">
+                Start Learning Now
+                <ArrowRightIcon className="ml-2 size-4 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </EnrollDialog>
           )}
         </div>
       </div>

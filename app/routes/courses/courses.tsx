@@ -12,8 +12,8 @@ import { makeQueryClient } from '~/lib/react-query';
 
 export function meta() {
   return [
-    { title: 'NgeCourse | Courses' },
-    { name: 'description', content: 'Courses page of NgeCourse!' },
+    { title: 'Genii | Courses' },
+    { name: 'description', content: 'Courses page of Genii!' },
   ];
 }
 

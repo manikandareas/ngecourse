@@ -9,14 +9,14 @@ import { dataEnrollment } from '~/features/enrollments/data';
 import { enrollmentQueryOption } from '~/features/enrollments/hooks/get-enrollment';
 import { extractYoutubeId } from '~/lib/utils';
 import { getCurrentSession } from '~/root';
-import type { Route } from './+types/detail';
+import type { Route } from './+types/course';
 
 export function meta({ data }: Route.MetaArgs) {
   return [
-    { title: `NgeCourse | ${data?.course?.title}` },
+    { title: `Genii | ${data?.course?.title}` },
     {
       name: 'description',
-      content: data?.course?.description || 'Course detail page of NgeCourse!',
+      content: data?.course?.description || 'Course detail page of Genii!',
     },
   ];
 }
@@ -48,7 +48,7 @@ export default function CourseDetailPage(props: Route.ComponentProps) {
       courseQueryOption(props.params.slug),
       enrollmentQueryOption(
         props.loaderData.currentSession?._id || '',
-        props.loaderData.course._id
+        props.params.slug
       ),
     ],
   });
