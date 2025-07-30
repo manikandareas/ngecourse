@@ -6,8 +6,8 @@ import { cn } from '~/lib/utils';
 
 export function meta() {
   return [
-    { title: 'NgeCourse' },
-    { name: 'description', content: 'Welcome to NgeCourse!' },
+    { title: 'Genii' },
+    { name: 'description', content: 'Welcome to Genii!' },
   ];
 }
 

@@ -1,11 +1,4 @@
-import {
-  ArrowRightIcon,
-  Award,
-  BookOpen,
-  Clock,
-  InfinityIcon,
-  Loader2,
-} from 'lucide-react';
+import { Award, BookOpen, Clock, InfinityIcon, Loader2 } from 'lucide-react';
 import type { Topic } from 'sanity.types';
 import { Button } from '~/components/ui/button';
 import {
@@ -33,6 +26,7 @@ interface IDetailEnrollDialogProps {
   slug?: string;
   onEnroll: () => void;
   isLoading?: boolean;
+  children: React.ReactNode;
 }
 
 interface CourseFeatureProps {
@@ -57,16 +51,12 @@ const DetailEnrollDialog = ({
   lessonsCount = 15,
   onEnroll,
   isLoading = false,
+  children,
 }: IDetailEnrollDialogProps) => {
   return (
     <Dialog>
       <DialogClose className="sr-only" id="dialog-close" />
-      <DialogTrigger asChild>
-        <Button className="group" size="lg" type="button">
-          Start Learning Now
-          <ArrowRightIcon className="ml-2 size-4 transition-transform group-hover:translate-x-1" />
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[42rem]">
         <DialogHeader className="space-y-4">
           <div className="space-y-2">

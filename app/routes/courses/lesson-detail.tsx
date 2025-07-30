@@ -7,10 +7,10 @@ import type { Route } from './+types/lesson-detail';
 
 export function meta({ data }: Route.MetaArgs) {
   return [
-    { title: `NgeCourse | ${data?.lesson.title}` },
+    { title: `Genii | ${data?.lesson.title}` },
     {
       name: 'description',
-      content: data?.lesson.content || 'Lesson detail page of NgeCourse!',
+      content: data?.lesson.content || 'Lesson detail page of Genii!',
     },
   ];
 }

@@ -7,10 +7,10 @@ import type { Route } from './+types/chapter-detail';
 
 export function meta({ data }: Route.MetaArgs) {
   return [
-    { title: `NgeCourse | ${data?.chapter.title}` },
+    { title: `Genii | ${data?.chapter.title}` },
     {
       name: 'description',
-      content: data?.chapter.description || 'Chapter detail page of NgeCourse!',
+      content: data?.chapter.description || 'Chapter detail page of Genii!',
     },
   ];
 }

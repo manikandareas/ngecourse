@@ -97,7 +97,7 @@ export default function LearningGoalsPage(props: Route.ComponentProps) {
     }) => usecaseUser.saveOnboarding(userId, props.loaderData.token, data),
     onSuccess: (data) => {
       if (data.success) {
-        navigate('/');
+        navigate('/recommendation');
       }
     },
   });

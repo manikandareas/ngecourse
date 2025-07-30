@@ -9,8 +9,8 @@ export default [
   // Root routes
   layout('routes/layout.tsx', [
     index('routes/home.tsx'),
-    route('/courses', 'routes/courses/index.tsx'),
-    route('/courses/:slug', 'routes/courses/detail.tsx'),
+    route('/courses', 'routes/courses/courses.tsx'),
+    route('/courses/:slug', 'routes/courses/course.tsx'),
   ]),
 
   // Courses routes
