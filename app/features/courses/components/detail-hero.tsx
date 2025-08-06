@@ -72,6 +72,8 @@ export function DetailHero(props: IDetailHero) {
       userId: props.userId,
     });
   };
+
+  console.log(props.enrollment);
   return (
     <div>
       <div className="mb-8 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center sm:gap-0">

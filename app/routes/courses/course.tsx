@@ -32,8 +32,10 @@ export async function loader(args: Route.LoaderArgs) {
 
   const enrollment = await dataEnrollment.oneByUserId(
     currentSession?._id || '',
-    courseWithContents._id
+    courseWithContents.slug?.current || ''
   );
+
+  console.log({ enrollment });
 
   return {
     course: courseWithContents,
@@ -60,6 +62,8 @@ export default function CourseDetailPage(props: Route.ComponentProps) {
   if (!courseQuery.data) {
     return <div>Loading...</div>;
   }
+
+  console.log({ enrollmentQuery });
 
   return (
     <div className="relative mx-auto w-full max-w-6xl px-6 py-20 xl:px-0">
