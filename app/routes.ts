@@ -34,6 +34,8 @@ export default [
   route('/onboarding', 'routes/onboarding.tsx'),
   route('/recommendation', 'routes/recommendation.tsx'),
 
+  route('/test', 'routes/test.tsx'),
+
   // Webhooks routes
   route('api/webhooks', 'routes/api/webhooks.ts'),
 ] satisfies RouteConfig;

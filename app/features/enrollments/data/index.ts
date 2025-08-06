@@ -41,11 +41,11 @@ const enrollCourse = async (data: EnrollCourse) => {
   }
 };
 
-const getEnrollmentByUserId = async (userId: string, courseId: string) => {
+const getEnrollmentByUserId = async (userId: string, courseSlug: string) => {
   const enrollmentQuery = defineQuery(`
     *[_type == "enrollment" &&
       userEnrolled[0]._ref == $userId &&
-      course[0]._ref == $courseId][0]{
+      course[0]->.slug.current == $courseSlug][0]{
       _id,
       _type,
       _rev,
@@ -67,7 +67,7 @@ const getEnrollmentByUserId = async (userId: string, courseId: string) => {
   `);
 
   try {
-    return await client.fetch(enrollmentQuery, { userId, courseId });
+    return await client.fetch(enrollmentQuery, { userId, courseSlug });
   } catch (error) {
     throw new Error(
       `Failed to fetch enrollment: ${error instanceof Error ? error.message : 'Unknown error'}`

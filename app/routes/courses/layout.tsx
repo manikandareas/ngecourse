@@ -33,7 +33,7 @@ export async function loader(args: Route.LoaderArgs) {
 
   const enrollment = await dataEnrollment.oneByUserId(
     currentSession?._id || '',
-    courseWithContents._id
+    courseWithContents.slug?.current || ''
   );
 
   if (!enrollment) {
