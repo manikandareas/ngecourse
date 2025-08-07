@@ -33,7 +33,7 @@ const enroll = async (courseSlug: string, userId: string) => {
     // Check if user is already enrolled
     const existingEnrollment = await dataEnrollment.oneByUserId(
       userId,
-      course._id
+      course.slug as string
     );
     if (existingEnrollment) {
       throw createEnrollmentError(
@@ -85,11 +85,11 @@ const addProgression = async (params: ProgressionInput) => {
     );
   }
 
-  const { userId, courseId, contentId, nextPath } = params;
+  const { userId, contentId, nextPath, courseSlug, courseId } = params;
 
   try {
     // Validate user enrollment
-    const userEnrollment = await dataEnrollment.oneByUserId(userId, courseId);
+    const userEnrollment = await dataEnrollment.oneByUserId(userId, courseSlug);
     if (!userEnrollment) {
       throw createProgressionError(
         'User not enrolled in this course',
