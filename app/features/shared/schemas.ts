@@ -16,6 +16,7 @@ export const progressionSchema = z.object({
   courseId: z.string().min(1, 'Course ID is required'),
   userId: z.string().min(1, 'User ID is required'),
   nextPath: z.string().optional(),
+  courseSlug: z.string().min(1, 'Course slug is required'),
 });
 
 /**

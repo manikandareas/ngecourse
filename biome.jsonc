@@ -6,6 +6,9 @@
       "performance": {
         "noImgElement": "off"
       },
+      "style": {
+        "useBlockStatements": "off"
+      },
       "suspicious": {
         "noConsole": "info"
       },
