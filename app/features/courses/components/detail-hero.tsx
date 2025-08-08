@@ -1,20 +1,17 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowRightIcon, Share2Icon } from 'lucide-react';
 import type {
-  Course,
   CourseContentsQueryResult,
-  Enrollment,
   EnrollmentQueryResult,
-  Topic,
 } from 'sanity.types';
 import { toast } from 'sonner';
-import { Button } from '~/components/ui/3d-button';
 import { Badge } from '~/components/ui/badge';
+import { HeroVideoDialog } from '~/components/ui/hero-video-dialog';
 import { enrollmentQueryOption } from '~/features/enrollments/hooks/get-enrollment';
 import { usecaseEnrollments } from '~/features/enrollments/usecase';
 import { urlFor } from '~/lib/sanity-client';
+import { extractYoutubeId } from '~/lib/utils';
 import { CourseBadge } from './course-badge';
-import EnrollDialog from './detail-enroll-dialog';
+import { DetailCTA } from './detail-cta';
 
 type IDetailHero = {
   userId?: string;
@@ -73,81 +70,41 @@ export function DetailHero(props: IDetailHero) {
     });
   };
 
-  console.log(props.enrollment);
+  if (!props.course) {
+    return null;
+  }
+
   return (
-    <div>
-      <div className="mb-8 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center sm:gap-0">
-        <div className="space-y-2">
-          <CourseBadge difficulty={props.course?.difficulty || 'beginner'} />
-          <h1 className="font-bold text-4xl">{props.course?.title}</h1>
-          <p className="max-w-2xl text-pretty text-muted-foreground text-sm">
-            {props.course?.description}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {props.course?.topics?.map((topic) => (
-              <Badge
-                className="capitalize"
-                key={topic._id}
-                variant={'secondary'}
-              >
-                {topic.title}
-              </Badge>
-            ))}
-          </div>
-        </div>
-        <div className="flex items-center gap-2.5">
-          <Button size={'icon'} variant={'outline'}>
-            <Share2Icon />
-          </Button>
-          {props.enrollment ? (
-            <Button className="group">
-              Continue Learning
-              <ArrowRightIcon className="ml-2 size-4 transition-transform group-hover:translate-x-1" />
-            </Button>
-          ) : (
-            <EnrollDialog
-              description={props.course?.description || 'Course Description'}
-              difficulty={props.course?.difficulty || 'beginner'}
-              duration={'10 hours'}
-              id={props.course?._id || ''}
-              image={thumbnailUrl || ''}
-              isLoading={isPending}
-              lessonsCount={props.course?.chapters?.length || 15}
-              onEnroll={handleEnroll}
-              slug={props.course?.slug?.current || ''}
-              title={props.course?.title || 'Course Title'}
-              topics={(props.course?.topics as Topic[]) || []}
-            >
-              <Button className="group" size="lg" type="button">
-                Start Learning Now
-                <ArrowRightIcon className="ml-2 size-4 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </EnrollDialog>
-          )}
-        </div>
+    <section className="flex flex-col items-center justify-center gap-6">
+      <CourseBadge difficulty={props.course.difficulty} />
+      <h1 className="max-w-lg text-center font-semibold text-4xl xl:max-w-2xl xl:text-5xl">
+        {props.course.title}
+      </h1>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {props.course.topics?.map((topic) => (
+          <Badge className="capitalize" key={topic._id} variant={'secondary'}>
+            {topic.title}
+          </Badge>
+        ))}
       </div>
-      <img
-        alt={props.course?.title || 'Thumbnail'}
-        className="mx-auto mb-8 h-[22rem] w-full rounded-md object-cover"
-        src={thumbnailUrl}
+
+      <p className=" max-w-2xl text-pretty text-center text-base text-muted-foreground leading-relaxed">
+        {props.course.description}
+      </p>
+      <DetailCTA
+        course={props.course}
+        enrollment={props.enrollment}
+        isPending={isPending}
+        onEnroll={handleEnroll}
+        thumbnailUrl={thumbnailUrl || ''}
       />
-    </div>
+      <HeroVideoDialog
+        className="mt-12 rounded-md"
+        videoUrl={props.course.trailer as string}
+        youtubeId={
+          extractYoutubeId(props.course.trailer as string) ?? 'Ke90Tje7VS0'
+        }
+      />
+    </section>
   );
 }
-
-export const toHeroSection = (
-  course: Course,
-  enrollment: Enrollment | null
-) => {
-  const imageUrl = course.thumbnail ? urlFor(course.thumbnail)?.url() : '';
-  return {
-    topics: course.topics,
-    difficulty: course.difficulty || 'beginner',
-    title: course.title || 'Course Title',
-    description: course.description || 'Course Description',
-    image: imageUrl,
-    id: course._id,
-    slug: course.slug?.current,
-    enrollment,
-  };
-};

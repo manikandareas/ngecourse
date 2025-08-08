@@ -1,3 +1,4 @@
+import { SignalHigh, SignalLow, SignalMedium } from 'lucide-react';
 import { Badge } from '~/components/ui/badge';
 import { cn } from '~/lib/utils';
 
@@ -7,6 +8,14 @@ export function CourseBadge(props: {
   if (!props.difficulty) {
     return null;
   }
+
+  const sizeIcon = 14;
+
+  const icon = {
+    beginner: <SignalLow size={sizeIcon} />,
+    intermediate: <SignalMedium size={sizeIcon} />,
+    advanced: <SignalHigh size={sizeIcon} />,
+  };
   return (
     <Badge
       className={cn('capitalize', {
@@ -15,6 +24,7 @@ export function CourseBadge(props: {
         'bg-red-500 text-white': props.difficulty === 'advanced',
       })}
     >
+      {icon[props.difficulty]}
       {props.difficulty.toLowerCase()}
     </Badge>
   );

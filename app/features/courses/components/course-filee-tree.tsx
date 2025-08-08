@@ -129,7 +129,7 @@ function ContentItem({
     return (
       <li className="list-none">
         <button
-          className="flex w-full items-center gap-2 rounded-md py-1.5 pl-6 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-0 dark:hover:bg-gray-800/50"
+          className="flex w-full items-center gap-2 rounded-md py-2 pl-6 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-0 dark:hover:bg-gray-800/50"
           type="button"
         >
           {renderStatusIcon()}
@@ -141,7 +141,7 @@ function ContentItem({
   return (
     <li className="list-none">
       <Link
-        className="flex items-center gap-2 rounded-md py-1.5 pl-6 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
+        className="flex min-h-9 items-center gap-2 rounded-md py-2 pl-6 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
         to={contentPath}
       >
         {renderStatusIcon()}
@@ -175,7 +175,7 @@ function ChapterItem({
 
   return (
     <li className="list-none">
-      <div className="flex items-center gap-1.5 py-1.5">
+      <div className="flex items-center gap-2 py-2">
         <button
           aria-label={isExpanded ? 'Collapse chapter' : 'Expand chapter'}
           className="-m-1 p-1"
@@ -236,11 +236,27 @@ export function CourseFileTree({
   );
 
   const {
-    contentProgression,
-    isContentCompleted,
-    isContentLocked,
-    isContentCurrent,
+    contentProgression: rawContentProgression,
+    isContentCompleted: rawIsContentCompleted,
+    isContentLocked: rawIsContentLocked,
+    isContentCurrent: rawIsContentCurrent,
   } = useContentProgression(course, enrollment);
+
+  // When there is no enrollment, lock all contents and hide progression
+  const isEnrollmentMissing = !enrollment;
+
+  const contentProgression = isEnrollmentMissing
+    ? []
+    : (rawContentProgression as Array<{ id: string; state: string }>);
+
+  const isContentLocked = (id: string) =>
+    isEnrollmentMissing ? true : rawIsContentLocked(id);
+
+  const isContentCompleted = (id: string) =>
+    isEnrollmentMissing ? false : rawIsContentCompleted(id);
+
+  const isContentCurrent = (id: string) =>
+    isEnrollmentMissing ? false : rawIsContentCurrent(id);
 
   // Auto-expand current chapter based on URL params
   useEffect(() => {
@@ -281,12 +297,12 @@ export function CourseFileTree({
         className
       )}
     >
-      <div className="flex-1 overflow-y-auto p-2">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4">
         <nav>
-          <ul className="space-y-0.5">
+          <ul className="space-y-1.5">
             {/* Top-level Course "folder" wrapping all chapters */}
             <li className="list-none">
-              <div className="flex items-center gap-1.5 py-1.5">
+              <div className="flex items-center gap-2 py-2">
                 <ChapterChevron open />
                 <Folder className="size-6 fill-sky-500 text-sky-500" />
                 <span className="truncate text-gray-900 text-sm dark:text-white">

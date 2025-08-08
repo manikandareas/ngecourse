@@ -194,9 +194,9 @@ export default function CoursesLayout(args: Route.ComponentProps) {
     <div className="relative min-h-screen">
       <div className="flex min-h-screen bg-background">
         {/* Desktop Navigation */}
-        <div className="hidden lg:block">
+        {/* <div className="hidden lg:block">
           <CourseFileTree course={course} enrollment={enrollment} />
-        </div>
+        </div> */}
 
         {/* Mobile Navigation Overlay */}
         {isMobileNavOpen && (
