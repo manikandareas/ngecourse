@@ -1,9 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import { Clock, PlayCircle } from 'lucide-react';
 import { MarkdownRenderer } from '~/components/ui/markdown-renderer';
+import { LessonHeader } from '~/features/courses/components/lesson-header';
+import { LessonNavigation } from '~/features/courses/components/lesson-navigation';
 import { dataCourses } from '~/features/courses/data';
+import { dataEnrollment } from '~/features/enrollments/data';
 import { getCurrentSession } from '~/root';
-import type { Route } from './+types/lesson-detail';
+import type { Route } from './+types/lesson';
 
 export function meta({ data }: Route.MetaArgs) {
   return [
@@ -17,17 +19,20 @@ export function meta({ data }: Route.MetaArgs) {
 
 export async function loader(args: Route.LoaderArgs) {
   const currentSession = await getCurrentSession(args);
-
-  if (!currentSession) {
-    throw new Response('Unauthorized', { status: 401 });
-  }
+  if (!currentSession) throw new Response('Unauthorized', { status: 401 });
 
   const lesson = await dataCourses.getLessonBySlug(args.params.lessonSlug);
   if (!lesson) {
     throw new Response('Lesson not found', { status: 404 });
   }
 
-  return { lesson };
+  const enrollment = await dataEnrollment.oneByUserId(
+    currentSession._id || '',
+    args.params.slug
+  );
+  if (!enrollment) throw new Response('User not enrolled', { status: 403 });
+
+  return { lesson, enrollment, currentSession };
 }
 
 export default function LessonDetailPage(props: Route.ComponentProps) {
@@ -51,34 +56,20 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Lesson Header */}
-      <div className="space-y-3 sm:space-y-4">
-        <div className="flex items-center gap-2 text-muted-foreground text-xs sm:text-sm">
-          <PlayCircle className="h-4 w-4" />
-          <span>Lesson</span>
-          <span>•</span>
-          <span className="truncate">{lesson?.title}</span>
-        </div>
-
-        <h1 className="font-bold text-2xl text-foreground leading-tight sm:text-3xl">
-          {lesson?.title}
-        </h1>
-
-        <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-muted-foreground" />
-            <span className="text-muted-foreground text-sm">
-              {/* {readingTime(lesson?.content ?? '').text} */}
-              10 Min
-            </span>
-          </div>
-        </div>
-      </div>
-      {/* Lesson Content */}
-      <div className="border-t pt-4 sm:pt-6">
+    <div className="relative w-full space-y-4 sm:space-y-6">
+      <LessonHeader
+        courseSlug={props.params.slug}
+        title={lesson.title || 'Lesson Title'}
+        userId={props.loaderData.currentSession._id}
+      />
+      <main className="mx-auto max-w-6xl px-6 py-6">
         <MarkdownRenderer content={lesson?.content ?? ''} />
-      </div>
+
+        <LessonNavigation
+          courseSlug={props.params.slug}
+          userId={props.loaderData.currentSession._id}
+        />
+      </main>
     </div>
   );
 }
