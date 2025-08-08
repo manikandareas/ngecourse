@@ -68,7 +68,6 @@ const HeroVideoDialog: React.FC<HeroVideoDialogProps> = ({
     return `${centerX}px ${centerY}px`;
   };
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: handleCloseModal is not used in the effect
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
