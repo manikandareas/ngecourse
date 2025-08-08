@@ -62,7 +62,7 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
         title={lesson.title || 'Lesson Title'}
         userId={props.loaderData.currentSession._id}
       />
-      <main className="mx-auto max-w-6xl px-6 py-6">
+      <main className="mx-auto max-w-5xl px-6 py-6">
         <MarkdownRenderer content={lesson?.content ?? ''} />
 
         <LessonNavigation
