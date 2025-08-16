@@ -7,11 +7,11 @@ import type {
 import { useContentProgression } from './content-progression';
 
 interface SequentialNavigationItem {
-  type: 'chapter' | 'lesson' | 'quiz';
+  type: 'lesson' | 'quiz';
   chapterId: string;
   chapterSlug: string;
-  contentId?: string;
-  contentSlug?: string;
+  contentId: string;
+  contentSlug: string;
   path: string;
   title: string;
   isCompleted: boolean;
@@ -46,47 +46,20 @@ export function useSequentialNavigation(
   // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: false positive
   const navigationItems = useMemo((): SequentialNavigationItem[] => {
     const items: SequentialNavigationItem[] = [];
-
+    const courseSlug = course?.slug?.current;
     for (const chapter of course?.chapters || []) {
-      // Add chapter item
       const chapterSlug = chapter.slug?.current;
-      const courseSlug = course?.slug?.current;
-      const chapterTitle = chapter?.title;
-
-      if (!(chapterSlug && courseSlug && chapterTitle)) {
-        continue; // Skip invalid chapters
+      if (!(courseSlug && chapterSlug)) {
+        continue;
       }
-
-      items.push({
-        type: 'chapter',
-        chapterId: chapter._id,
-        chapterSlug,
-        path: `/courses/${courseSlug}/${chapterSlug}`,
-        title: chapterTitle,
-        isCompleted: false, // Chapters don't have completion state
-        isLocked: false, // Chapters are never locked
-        isCurrent:
-          params.chapterSlug === chapterSlug &&
-          !params.lessonSlug &&
-          !params.quizSlug,
-      });
-
-      // Add chapter contents (lessons and quizzes)
+      // Only add chapter contents (lessons and quizzes)
       for (const content of chapter.contents || []) {
         const contentId = content._id;
         const contentSlug = content.slug?.current;
         const contentTitle = content.title;
         const isLesson = content._type === 'lesson';
 
-        if (
-          !(
-            contentId &&
-            contentSlug &&
-            contentTitle &&
-            chapterSlug &&
-            courseSlug
-          )
-        ) {
+        if (!(contentId && contentSlug && contentTitle)) {
           continue; // Skip invalid content
         }
 
