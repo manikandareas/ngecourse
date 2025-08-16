@@ -175,7 +175,7 @@ export default function RecommendationPage(props: Route.ComponentProps) {
                           | 'intermediate'
                           | 'advanced'
                       }
-                      image={urlFor(course.thumbnail)?.url() as string}
+                      image={urlFor(course.thumbnail ?? '')?.url() as string}
                       isLoading={isPending}
                       onEnroll={() =>
                         handleEnroll(course.slug?.current as string)
