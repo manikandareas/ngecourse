@@ -13,7 +13,7 @@ import type { Route } from './+types/course';
 
 export function meta({ data }: Route.MetaArgs) {
   return [
-    { title: `Genii | ${data?.course?.title}` },
+    { title: `${data?.course?.title} | Genii` },
     {
       name: 'description',
       content: data?.course?.description || 'Course detail page of Genii!',
