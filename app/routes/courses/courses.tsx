@@ -4,6 +4,7 @@ import {
   CourseCard,
   toCourseCard,
 } from '~/features/courses/components/course-card';
+import CourseLoading from '~/features/courses/components/course-loading';
 import {
   coursesAtom,
   coursesQueryOption,
@@ -29,7 +30,7 @@ export default function CoursesPage() {
   const [{ data: courses, isPending, isError, error }] = useAtom(coursesAtom);
 
   if (isPending) {
-    return <div>Loading...</div>;
+    return <CourseLoading />;
   }
 
   if (isError) {

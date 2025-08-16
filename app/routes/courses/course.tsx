@@ -2,6 +2,7 @@ import { useQueries } from '@tanstack/react-query';
 import type { EnrollmentQueryResult } from 'sanity.types';
 import DetailContents from '~/features/courses/components/detail-contents';
 import { DetailHero } from '~/features/courses/components/detail-hero';
+import DetailLoading from '~/features/courses/components/detail-loading';
 import DetailPromo from '~/features/courses/components/detail-promo';
 import { dataCourses } from '~/features/courses/data';
 import { courseQueryOption } from '~/features/courses/hooks/get-course';
@@ -52,12 +53,11 @@ export default function CourseDetailPage(props: Route.ComponentProps) {
     ],
   });
 
-  if (courseQuery.isLoading || enrollmentQuery.isLoading) {
-    return <div>Loading...</div>;
-  }
+  const isLoading =
+    courseQuery.isLoading || enrollmentQuery.isLoading || !courseQuery.data;
 
-  if (!courseQuery.data) {
-    return <div>Loading...</div>;
+  if (isLoading) {
+    return <DetailLoading />;
   }
 
   return (
