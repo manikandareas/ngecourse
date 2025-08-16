@@ -44,7 +44,6 @@ export const LessonNavigation: React.FC<LessonNavigationProps> = ({
     const current = sequentialNavigationState.currentItem;
     return Boolean(
       current &&
-        current.type !== 'chapter' &&
         !sequentialNavigationState.isCurrentCompleted &&
         current.contentId
     );
@@ -65,11 +64,8 @@ export const LessonNavigation: React.FC<LessonNavigationProps> = ({
   });
 
   const buildNextPath = useCallback(() => {
-    if (!sequentialNavigationState.nextItem) return '';
-    const { chapterSlug, contentSlug } = sequentialNavigationState.nextItem;
-    const base = `/courses/${courseSlug}/${chapterSlug}`;
-    return contentSlug ? `${base}/lessons/${contentSlug}` : base;
-  }, [courseSlug, sequentialNavigationState.nextItem]);
+    return sequentialNavigationState.nextItem?.path ?? '';
+  }, [sequentialNavigationState.nextItem]);
 
   const handlePrevious = useCallback(() => {
     if (canPrev && canInteract) sequentialNavigationState.goToPrevious();
