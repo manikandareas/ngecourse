@@ -13,7 +13,7 @@ import { makeQueryClient } from '~/lib/react-query';
 
 export function meta() {
   return [
-    { title: 'Genii | Courses' },
+    { title: 'Courses | Genii' },
     { name: 'description', content: 'Courses page of Genii!' },
   ];
 }

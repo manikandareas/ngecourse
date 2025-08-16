@@ -9,7 +9,7 @@ import type { Route } from './+types/lesson';
 
 export function meta({ data }: Route.MetaArgs) {
   return [
-    { title: `Genii | ${data?.lesson.title}` },
+    { title: `${data?.lesson.title} | Genii` },
     {
       name: 'description',
       content: data?.lesson.content || 'Lesson detail page of Genii!',
