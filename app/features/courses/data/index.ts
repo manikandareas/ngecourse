@@ -5,6 +5,7 @@ const getCourses = async () => {
   const coursesQuery = defineQuery(`*[_type == "course"]{
     ...,
     "slug": slug.current,
+    "topics": topics[]->
     }`);
   try {
     return await client.fetch(coursesQuery);

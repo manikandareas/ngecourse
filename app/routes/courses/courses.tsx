@@ -1,15 +1,12 @@
-import { useAtom } from 'jotai';
-import { Badge } from '~/components/ui/badge';
-import {
-  CourseCard,
-  toCourseCard,
-} from '~/features/courses/components/course-card';
+import { useState } from 'react';
+import { Button } from '~/components/ui/button';
+import { CourseListSection } from '~/features/courses/components/course-list-section';
 import CourseLoading from '~/features/courses/components/course-loading';
-import {
-  coursesAtom,
-  coursesQueryOption,
-} from '~/features/courses/hooks/get-courses';
-import { makeQueryClient } from '~/lib/react-query';
+import { RecommendationSection } from '~/features/courses/components/recommendation-section';
+import { useCourses } from '~/features/courses/hooks/get-courses';
+import { useRecommendation } from '~/features/recommendation/hooks/get-recommendation';
+import { getCurrentSession } from '~/root';
+import type { Route } from './+types/courses';
 
 export function meta() {
   return [
@@ -18,45 +15,64 @@ export function meta() {
   ];
 }
 
-export async function clientLoader() {
-  const queryClient = makeQueryClient();
-  return (
-    queryClient.getQueryData(coursesQueryOption.queryKey) ??
-    (await queryClient.fetchQuery(coursesQueryOption))
-  );
+export async function loader(args: Route.LoaderArgs) {
+  const currentSession = await getCurrentSession(args);
+
+  if (!currentSession) {
+    return { userId: '' };
+  }
+
+  return {
+    userId: currentSession._id,
+  };
 }
 
-export default function CoursesPage() {
-  const [{ data: courses, isPending, isError, error }] = useAtom(coursesAtom);
+export default function CoursesPage(props: Route.ComponentProps) {
+  const { data: courses, isPending, isError, error } = useCourses();
+  const { data: recommendation } = useRecommendation(props.loaderData.userId);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredCourses =
+    courses?.filter(
+      (course) =>
+        course.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        course.description?.toLowerCase().includes(searchQuery.toLowerCase())
+    ) || [];
 
   if (isPending) {
     return <CourseLoading />;
   }
 
   if (isError) {
-    return <div>Could not load courses 😬: {error.message}</div>;
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <div className="space-y-4 text-center">
+          <div className="text-6xl">😬</div>
+          <h2 className="font-semibold text-2xl text-foreground">
+            Oops! Something went wrong
+          </h2>
+          <p className="max-w-md text-muted-foreground">{error.message}</p>
+          <Button onClick={() => window.location.reload()}>Try Again</Button>
+        </div>
+      </div>
+    );
   }
 
+  const handleClearSearch = () => setSearchQuery('');
+
   return (
-    <div className="mx-auto w-full max-w-6xl px-6 py-20 xl:px-0">
-      <div className="flex flex-col gap-10">
-        <div className="flex flex-col items-start gap-4">
-          <div>
-            <Badge>Courses</Badge>
-          </div>
-          <div className="flex flex-col gap-2">
-            <h2 className="max-w-xl text-left font-semibold text-3xl tracking-tighter md:text-5xl">
-              Explore All Courses!
-            </h2>
-            <p className="max-w-xl text-left text-lg text-muted-foreground leading-relaxed tracking-tight lg:max-w-lg">
-              Discover courses and start learning something new today.
-            </p>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {courses.map((course) => (
-            <CourseCard key={course._id} {...toCourseCard(course)} />
-          ))}
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      {/* Main Content */}
+      <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+        <div className="space-y-20">
+          <RecommendationSection recommendation={recommendation} />
+          <CourseListSection
+            courses={courses}
+            filteredCourses={filteredCourses}
+            onClearSearch={handleClearSearch}
+            onSearchChange={setSearchQuery}
+            searchQuery={searchQuery}
+          />
         </div>
       </div>
     </div>

@@ -8,7 +8,8 @@ const getRecommendationForUser = async (userId: string) => {
       "courses": courses[]->{
         _id,
         title,
-        slug,
+        "slug": slug.current,
+        "topics": topics[]->,
         description,
         difficulty,
         thumbnail,

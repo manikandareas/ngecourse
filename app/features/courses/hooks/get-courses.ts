@@ -1,5 +1,4 @@
-import { queryOptions } from '@tanstack/react-query';
-import { atomWithQuery } from 'jotai-tanstack-query';
+import { queryOptions, useQuery } from '@tanstack/react-query';
 import { dataCourses } from '../data';
 
 export const coursesQueryOption = queryOptions({
@@ -7,4 +6,4 @@ export const coursesQueryOption = queryOptions({
   queryFn: () => dataCourses.many(),
 });
 
-export const coursesAtom = atomWithQuery(() => coursesQueryOption);
+export const useCourses = () => useQuery(coursesQueryOption);
