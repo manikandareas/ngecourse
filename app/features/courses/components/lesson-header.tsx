@@ -56,8 +56,6 @@ export const LessonHeader = ({
 
         {/* Right: Actions */}
         <div className="flex w-1/2 items-center justify-end gap-1.5 sm:gap-3">
-          <ThemeSwitcher />
-
           {/* Mobile: icon-only Ask Genii */}
           <div className="sm:hidden">
             <Button
@@ -79,6 +77,7 @@ export const LessonHeader = ({
             </Button>
           </div>
 
+          <ThemeSwitcher />
           <Button
             aria-label="Enter full screen"
             size="icon"
