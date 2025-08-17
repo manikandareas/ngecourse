@@ -42,6 +42,22 @@
   --radius-md: 10px;
   --radius-lg: 12px;
   --radius-xl: 20px;
+
+  /* Shiny Text Animation */
+  --animate-shiny-text: shiny-text 8s infinite;
+
+  /* Keyframes */
+  @keyframes shiny-text {
+    0%,
+    90%,
+    100% {
+      background-position: calc(-100% - var(--shiny-width)) 0;
+    }
+    30%,
+    60% {
+      background-position: calc(100% + var(--shiny-width)) 0;
+    }
+  }
 }
 
 :root {

@@ -1,9 +1,9 @@
-import { Sparkles } from 'lucide-react';
+import { ArrowRightIcon } from 'lucide-react';
 import type {
   CoursesQueryResult,
   RecommendationQueryResult,
 } from 'sanity.types';
-import { Badge } from '~/components/ui/badge';
+import { AnimatedShinyText } from '~/components/ui/animated-shiny-text';
 import { CourseCard } from './course-card';
 
 interface RecommendationSectionProps {
@@ -20,10 +20,12 @@ export function RecommendationSection({
   return (
     <section className="space-y-12">
       <div className="space-y-4 text-center">
-        <Badge className="border-0 bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg">
-          <Sparkles className="mr-1 h-3 w-3" />
-          Curated For You
-        </Badge>
+        <div className="group mx-auto w-fit rounded-full border border-yellow-500 text-base text-yellow-500 transition-all ease-in hover:cursor-pointer hover:bg-yellow-500/10 dark:border-white/5 ">
+          <AnimatedShinyText className="inline-flex items-center justify-center px-4 py-1 text-yellow-500 transition ease-out hover:text-yellow-500/90 hover:duration-300 hover:dark:text-yellow-500">
+            <span>✨ Curated For You</span>
+            <ArrowRightIcon className="ml-1 size-3 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
+          </AnimatedShinyText>
+        </div>
         <h2 className="font-bold text-3xl text-foreground tracking-tight sm:text-4xl">
           Personalized Learning Path
         </h2>
