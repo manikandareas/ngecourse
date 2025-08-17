@@ -366,7 +366,7 @@ export type AllSanitySchemaTypes = Recommendation | Enrollment | Quiz | Lesson |
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./app/features/courses/data/index.ts
 // Variable: coursesQuery
-// Query: *[_type == "course"]{    ...,    "slug": slug.current,    }
+// Query: *[_type == "course"]{    ...,    "slug": slug.current,    "topics": topics[]->    }
 export type CoursesQueryResult = Array<{
   _id: string;
   _type: "course";
@@ -390,13 +390,18 @@ export type CoursesQueryResult = Array<{
     _type: "image";
   };
   trailer?: string;
-  topics?: Array<{
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    _key: string;
-    [internalGroqTypeReferenceTo]?: "topic";
-  }>;
+  topics: Array<{
+    _id: string;
+    _type: "topic";
+    _createdAt: string;
+    _updatedAt: string;
+    _rev: string;
+    title?: string;
+    slug?: Slug;
+    description?: string;
+    icon?: string;
+    color?: Color;
+  }> | null;
   chapters?: Array<{
     _ref: string;
     _type: "reference";
@@ -701,7 +706,7 @@ export type EnrollmentQueryResult = {
 
 // Source: ./app/features/recommendation/data/index.tsx
 // Variable: recommendationQuery
-// Query: *[_type == "recommendation" && createdFor._ref == $userId][0]{      ...,      "courses": courses[]->{        _id,        title,        slug,        description,        difficulty,        thumbnail,        trailer      }    }
+// Query: *[_type == "recommendation" && createdFor._ref == $userId][0]{      ...,      "courses": courses[]->{        _id,        title,        "slug": slug.current,        "topics": topics[]->,        description,        difficulty,        thumbnail,        trailer      }    }
 export type RecommendationQueryResult = {
   _id: string;
   _type: "recommendation";
@@ -719,7 +724,19 @@ export type RecommendationQueryResult = {
   courses: Array<{
     _id: string;
     title: string | null;
-    slug: Slug | null;
+    slug: string | null;
+    topics: Array<{
+      _id: string;
+      _type: "topic";
+      _createdAt: string;
+      _updatedAt: string;
+      _rev: string;
+      title?: string;
+      slug?: Slug;
+      description?: string;
+      icon?: string;
+      color?: Color;
+    }> | null;
     description: string | null;
     difficulty: "advanced" | "beginner" | "intermediate" | null;
     thumbnail: {
@@ -807,7 +824,7 @@ export type FindByUsernameQueryResult = {
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    "*[_type == \"course\"]{\n    ...,\n    \"slug\": slug.current,\n    }": CoursesQueryResult;
+    "*[_type == \"course\"]{\n    ...,\n    \"slug\": slug.current,\n    \"topics\": topics[]->\n    }": CoursesQueryResult;
     "*[_type == \"course\" && slug.current == $slug][0]{\n    ...,\n    \"slug\": slug.current,\n    }": CourseQueryResult;
     "*[_type == \"course\" && _id == $id][0]": CourseByIdQueryResult;
     "\n    *[_type == \"course\" && slug.current == $slug][0]{\n      _id,\n      _type,\n      _createdAt,\n      _updatedAt,\n      title,\n      slug,\n      description,\n      price,\n      level,\n      thumbnail,\n      trailer,\n      difficulty,\n      \"chapters\": chapters[]->{\n        _id,\n        _type,\n        _createdAt,\n        _updatedAt,\n        title,\n        slug,\n        description,\n        \"contents\": contents[]->{\n          _id,\n          _type,\n          _createdAt,\n          _updatedAt,\n          title,\n          slug,\n          _type == \"lesson\" => {\n            content\n          },\n          _type == \"quiz\" => {\n            description,\n            questions\n          }\n        }\n      },\n      \"topics\": topics[]->{\n        _id,\n        _type,\n        _createdAt,\n        _updatedAt,\n        title,\n        slug,\n        description,\n        icon,\n        color\n      }\n    }\n  ": CourseContentsQueryResult;
@@ -815,7 +832,7 @@ declare module "@sanity/client" {
     "*[_type == \"lesson\" && slug.current == $slug][0]": LessonQueryResult;
     "*[_type == \"chapter\" && slug.current == $slug][0]{\n    ...,\n      \"contents\": contents[]->{\n          _id,\n          _type,\n          _createdAt,\n          _updatedAt,\n          title,\n          slug,\n        }\n    }": ChapterQueryResult;
     "\n    *[_type == \"enrollment\" &&\n      userEnrolled[0]._ref == $userId &&\n      course[0]->.slug.current == $courseSlug][0]{\n      _id,\n      _type,\n      _rev,\n      _createdAt,\n      _updatedAt,\n      \"userEnrolled\": userEnrolled[0]->,\n      \"course\": course[0]->,\n      \"contentsCompleted\": contentsCompleted[]->{\n        _id,\n        _type,\n        _createdAt,\n        _updatedAt,\n        title,\n        slug,\n      },\n      dateCompleted,\n      percentComplete\n    }\n  ": EnrollmentQueryResult;
-    "\n    *[_type == \"recommendation\" && createdFor._ref == $userId][0]{\n      ...,\n      \"courses\": courses[]->{\n        _id,\n        title,\n        slug,\n        description,\n        difficulty,\n        thumbnail,\n        trailer\n      }\n    }\n  ": RecommendationQueryResult;
+    "\n    *[_type == \"recommendation\" && createdFor._ref == $userId][0]{\n      ...,\n      \"courses\": courses[]->{\n        _id,\n        title,\n        \"slug\": slug.current,\n        \"topics\": topics[]->,\n        description,\n        difficulty,\n        thumbnail,\n        trailer\n      }\n    }\n  ": RecommendationQueryResult;
     "\n    *[_type == \"user\" && email == $email][0]\n  ": FindByEmailQueryResult;
     "\n    *[_type == \"user\" && clerkId == $clerkId][0]\n  ": FindByClerkIdQueryResult;
     "\n    *[_type == \"user\" && username == $username][0]\n  ": FindByUsernameQueryResult;
