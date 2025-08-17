@@ -27,8 +27,8 @@ export function RecommendationSection({
         <h2 className="font-bold text-3xl text-foreground tracking-tight sm:text-4xl">
           Personalized Learning Path
         </h2>
-        <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-          {recommendation?.reason?.slice(0, 100)}
+        <p className="mx-auto max-w-4xl text-lg text-muted-foreground">
+          {recommendation?.reason}
         </p>
       </div>
 
