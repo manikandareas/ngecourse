@@ -1,6 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
-import { FolderTree, Maximize, Sparkles } from 'lucide-react';
+import { FolderTree, Maximize, MoreVertical, Sparkles } from 'lucide-react';
+import { useNavigation } from 'react-router';
+import { useMediaQuery } from 'usehooks-ts';
 import { Button } from '~/components/ui/3d-button';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '~/components/ui/popover';
+import { Separator } from '~/components/ui/separator';
 import { ThemeSwitcher } from '~/components/ui/theme-switcher';
 import { enrollmentQueryOption } from '~/features/enrollments/hooks/get-enrollment';
 import { courseQueryOption } from '../hooks/get-course';
@@ -10,18 +18,22 @@ interface LessonHeaderProps {
   title: string;
   courseSlug: string;
   userId: string;
+  onChatToggle?: () => void;
+  isChatOpen?: boolean;
 }
 
 export const LessonHeader = ({
   title,
   courseSlug,
   userId,
+  onChatToggle,
+  isChatOpen = false,
 }: LessonHeaderProps) => {
   const { data: course } = useQuery(courseQueryOption(courseSlug));
-
   const { data: enrollment } = useQuery(
     enrollmentQueryOption(userId, courseSlug)
   );
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
 
   if (!(course && enrollment)) {
     return null;
@@ -56,37 +68,84 @@ export const LessonHeader = ({
 
         {/* Right: Actions */}
         <div className="flex w-1/2 items-center justify-end gap-1.5 sm:gap-3">
-          {/* Mobile: icon-only Ask Genii */}
-          <div className="sm:hidden">
-            <Button
-              aria-label="Ask Genii about this lesson"
-              size="icon"
-              type="button"
-              variant={'outline'}
-            >
-              <Sparkles aria-hidden="true" size={16} />
-              <span className="sr-only">Ask Genii</span>
-            </Button>
-          </div>
+          {isDesktop ? (
+            /* Desktop: Individual Buttons */
+            <>
+              <Button
+                onClick={onChatToggle}
+                size="sm"
+                type="button"
+                variant={isChatOpen ? 'ai' : 'outline'}
+              >
+                <Sparkles aria-hidden="true" size={16} />
+                <span className="ml-1">
+                  {isChatOpen ? 'Close Chat' : 'Ask Genii'}
+                </span>
+              </Button>
 
-          {/* Desktop: text Ask Genii */}
-          <div className="hidden sm:block">
-            <Button size="sm" type="button" variant={'ai'}>
-              <Sparkles aria-hidden="true" size={16} />
-              <span className="ml-1">Ask Genii</span>
-            </Button>
-          </div>
+              <ThemeSwitcher />
 
-          <ThemeSwitcher />
-          <Button
-            aria-label="Enter full screen"
-            size="icon"
-            type="button"
-            variant={'outline'}
-          >
-            <Maximize aria-hidden="true" size={16} />
-            <span className="sr-only">Enter full screen</span>
-          </Button>
+              <Button
+                aria-label="Enter full screen"
+                size="icon"
+                type="button"
+                variant="outline"
+              >
+                <Maximize aria-hidden="true" size={16} />
+                <span className="sr-only">Enter full screen</span>
+              </Button>
+            </>
+          ) : (
+            /* Mobile: Dropdown Menu */
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  aria-label="Open menu"
+                  size="icon"
+                  type="button"
+                  variant="outline"
+                >
+                  <MoreVertical aria-hidden="true" size={16} />
+                  <span className="sr-only">Open menu</span>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-48 p-2">
+                <div className="space-y-1">
+                  <Button
+                    className="w-full justify-start"
+                    onClick={onChatToggle}
+                    size="sm"
+                    type="button"
+                    variant={isChatOpen ? 'ai' : 'ghost'}
+                  >
+                    <Sparkles aria-hidden="true" size={16} />
+                    <span className="ml-2">
+                      {isChatOpen ? 'Close Chat' : 'Ask Genii'}
+                    </span>
+                  </Button>
+
+                  <Separator className="my-1" />
+
+                  <div className="flex items-center justify-between px-3 py-2">
+                    <span className="font-medium text-sm">Theme</span>
+                    <ThemeSwitcher />
+                  </div>
+
+                  <Separator className="my-1" />
+
+                  <Button
+                    className="w-full justify-start"
+                    size="sm"
+                    type="button"
+                    variant="ghost"
+                  >
+                    <Maximize aria-hidden="true" size={16} />
+                    <span className="ml-2">Full Screen</span>
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
         </div>
       </div>
     </header>
