@@ -13,6 +13,128 @@
  */
 
 // Source: schema.json
+export type ChatMessage = {
+  _id: string;
+  _type: "chatMessage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  messageId?: string;
+  session?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "chatSession";
+  };
+  role?: "system" | "user" | "assistant";
+  metadata?: {
+    custom?: string;
+  };
+  parts?: Array<{
+    type?: string;
+    text?: string;
+    state?: "streaming" | "done";
+    _type: "textUIPart";
+    _key: string;
+  } | {
+    type?: string;
+    text?: string;
+    state?: "streaming" | "done";
+    providerMetadata?: {
+      data?: string;
+    };
+    _type: "reasoningUIPart";
+    _key: string;
+  } | {
+    type?: string;
+    name?: string;
+    toolCallId?: string;
+    state?: "input-streaming" | "input-available" | "output-available" | "output-error";
+    input?: {
+      data?: string;
+    };
+    output?: {
+      data?: string;
+    };
+    errorText?: string;
+    providerExecuted?: boolean;
+    _type: "toolUIPart";
+    _key: string;
+  } | {
+    type?: string;
+    sourceId?: string;
+    url?: string;
+    title?: string;
+    providerMetadata?: {
+      data?: string;
+    };
+    _type: "sourceUrlUIPart";
+    _key: string;
+  } | {
+    type?: string;
+    sourceId?: string;
+    mediaType?: string;
+    title?: string;
+    filename?: string;
+    providerMetadata?: {
+      data?: string;
+    };
+    _type: "sourceDocumentUIPart";
+    _key: string;
+  } | {
+    type?: string;
+    mediaType?: string;
+    filename?: string;
+    url?: string;
+    _type: "fileUIPart";
+    _key: string;
+  } | {
+    type?: string;
+    name?: string;
+    dataId?: string;
+    data?: {
+      content?: string;
+    };
+    _type: "dataUIPart";
+    _key: string;
+  } | {
+    type?: string;
+    _type: "stepStartUIPart";
+    _key: string;
+  }>;
+};
+
+export type ChatSession = {
+  _id: string;
+  _type: "chatSession";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  users?: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "user";
+  }>;
+  lessons?: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "lesson";
+  }>;
+  sessionId?: string;
+  createdAt?: string;
+  lastActivity?: string;
+  status?: "active" | "inactive" | "ended";
+  metadata?: {
+    userLevel?: string;
+    lessonTitle?: string;
+    totalMessages?: number;
+  };
+};
+
 export type Recommendation = {
   _id: string;
   _type: "recommendation";
@@ -207,6 +329,7 @@ export type User = {
   level?: "beginner" | "intermediate" | "advanced";
   studyStreak?: number;
   streakStartDate?: number;
+  delivery_preference?: string;
 };
 
 export type Color = {
@@ -362,8 +485,97 @@ export type SanityAssetSourceData = {
   url?: string;
 };
 
-export type AllSanitySchemaTypes = Recommendation | Enrollment | Quiz | Lesson | Chapter | Course | Topic | User | Color | RgbaColor | HsvaColor | HslaColor | Markdown | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
+export type AllSanitySchemaTypes = ChatMessage | ChatSession | Recommendation | Enrollment | Quiz | Lesson | Chapter | Course | Topic | User | Color | RgbaColor | HsvaColor | HslaColor | Markdown | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
 export declare const internalGroqTypeReferenceTo: unique symbol;
+// Source: ./app/features/ai-chat/data/index.ts
+// Variable: chatHistoryQuery
+// Query: *[_type == "chatMessage" &&    session._ref in *[_type == "chatSession" &&      $userId in users[]._ref &&      $lessonId in lessons[]._ref &&      status == "active"]._id  ] | order(_createdAt asc) {    _id,    messageId,    role,    parts,    metadata,    session->{      _id,      sessionId,      status    }  }
+export type ChatHistoryQueryResult = Array<{
+  _id: string;
+  messageId: string | null;
+  role: "assistant" | "system" | "user" | null;
+  parts: Array<{
+    type?: string;
+    name?: string;
+    dataId?: string;
+    data?: {
+      content?: string;
+    };
+    _type: "dataUIPart";
+    _key: string;
+  } | {
+    type?: string;
+    mediaType?: string;
+    filename?: string;
+    url?: string;
+    _type: "fileUIPart";
+    _key: string;
+  } | {
+    type?: string;
+    text?: string;
+    state?: "done" | "streaming";
+    providerMetadata?: {
+      data?: string;
+    };
+    _type: "reasoningUIPart";
+    _key: string;
+  } | {
+    type?: string;
+    sourceId?: string;
+    mediaType?: string;
+    title?: string;
+    filename?: string;
+    providerMetadata?: {
+      data?: string;
+    };
+    _type: "sourceDocumentUIPart";
+    _key: string;
+  } | {
+    type?: string;
+    sourceId?: string;
+    url?: string;
+    title?: string;
+    providerMetadata?: {
+      data?: string;
+    };
+    _type: "sourceUrlUIPart";
+    _key: string;
+  } | {
+    type?: string;
+    _type: "stepStartUIPart";
+    _key: string;
+  } | {
+    type?: string;
+    text?: string;
+    state?: "done" | "streaming";
+    _type: "textUIPart";
+    _key: string;
+  } | {
+    type?: string;
+    name?: string;
+    toolCallId?: string;
+    state?: "input-available" | "input-streaming" | "output-available" | "output-error";
+    input?: {
+      data?: string;
+    };
+    output?: {
+      data?: string;
+    };
+    errorText?: string;
+    providerExecuted?: boolean;
+    _type: "toolUIPart";
+    _key: string;
+  }> | null;
+  metadata: {
+    custom?: string;
+  } | null;
+  session: {
+    _id: string;
+    sessionId: string | null;
+    status: "active" | "ended" | "inactive" | null;
+  } | null;
+}>;
+
 // Source: ./app/features/courses/data/index.ts
 // Variable: coursesQuery
 // Query: *[_type == "course"]{    ...,    "slug": slug.current,    "topics": topics[]->    }
@@ -646,6 +858,7 @@ export type EnrollmentQueryResult = {
     level?: "advanced" | "beginner" | "intermediate";
     studyStreak?: number;
     streakStartDate?: number;
+    delivery_preference?: string;
   } | null;
   course: {
     _id: string;
@@ -776,6 +989,7 @@ export type FindByEmailQueryResult = {
   level?: "advanced" | "beginner" | "intermediate";
   studyStreak?: number;
   streakStartDate?: number;
+  delivery_preference?: string;
 } | null;
 // Variable: findByClerkIdQuery
 // Query: *[_type == "user" && clerkId == $clerkId][0]
@@ -797,6 +1011,7 @@ export type FindByClerkIdQueryResult = {
   level?: "advanced" | "beginner" | "intermediate";
   studyStreak?: number;
   streakStartDate?: number;
+  delivery_preference?: string;
 } | null;
 // Variable: findByUsernameQuery
 // Query: *[_type == "user" && username == $username][0]
@@ -818,12 +1033,14 @@ export type FindByUsernameQueryResult = {
   level?: "advanced" | "beginner" | "intermediate";
   studyStreak?: number;
   streakStartDate?: number;
+  delivery_preference?: string;
 } | null;
 
 // Query TypeMap
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
+    "*[_type == \"chatMessage\" &&\n    session._ref in *[_type == \"chatSession\" &&\n      $userId in users[]._ref &&\n      $lessonId in lessons[]._ref &&\n      status == \"active\"]._id\n  ] | order(_createdAt asc) {\n    _id,\n    messageId,\n    role,\n    parts,\n    metadata,\n    session->{\n      _id,\n      sessionId,\n      status\n    }\n  }": ChatHistoryQueryResult;
     "*[_type == \"course\"]{\n    ...,\n    \"slug\": slug.current,\n    \"topics\": topics[]->\n    }": CoursesQueryResult;
     "*[_type == \"course\" && slug.current == $slug][0]{\n    ...,\n    \"slug\": slug.current,\n    }": CourseQueryResult;
     "*[_type == \"course\" && _id == $id][0]": CourseByIdQueryResult;

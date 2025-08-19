@@ -4,7 +4,8 @@
   "linter": {
     "rules": {
       "performance": {
-        "noImgElement": "off"
+        "noImgElement": "off",
+        "useTopLevelRegex": "off"
       },
       "style": {
         "useBlockStatements": "off"
@@ -14,6 +15,9 @@
       },
       "correctness": {
         "useExhaustiveDependencies": "off"
+      },
+      "complexity": {
+        "noExcessiveCognitiveComplexity": "off"
       }
     }
   }

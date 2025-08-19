@@ -177,10 +177,8 @@ export default function RecommendationPage(props: Route.ComponentProps) {
                       }
                       image={urlFor(course.thumbnail ?? '')?.url() as string}
                       isLoading={isPending}
-                      onEnroll={() =>
-                        handleEnroll(course.slug?.current as string)
-                      }
-                      slug={course.slug?.current as string}
+                      onEnroll={() => handleEnroll(course.slug as string)}
+                      slug={course.slug as string}
                       title={course.title as string}
                     />
                   </CarouselItem>
