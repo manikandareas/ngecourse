@@ -75,20 +75,28 @@ export function DetailHero(props: IDetailHero) {
   }
 
   return (
-    <section className="flex flex-col items-center justify-center gap-6">
+    <section className="flex flex-col items-center justify-center gap-8">
       <CourseBadge difficulty={props.course.difficulty} />
-      <h1 className="max-w-lg text-center font-semibold text-4xl xl:max-w-2xl xl:text-5xl">
+      <h1 className="max-w-lg text-center text-5xl md:text-6xl font-light tracking-tight leading-[1.1] xl:max-w-2xl" style={{color: 'var(--text-primary)'}}>
         {props.course.title}
       </h1>
-      <div className="mt-2 flex flex-wrap gap-2">
+      <div className="flex flex-wrap justify-center gap-3">
         {props.course.topics?.map((topic) => (
-          <Badge className="capitalize" key={topic._id} variant={'secondary'}>
+          <Badge 
+            className="capitalize bg-white/5 transition-colors" 
+            key={topic._id} 
+            variant={'secondary'}
+            style={{
+              color: 'var(--text-secondary)',
+              borderColor: 'var(--border)',
+            }}
+          >
             {topic.title}
           </Badge>
         ))}
       </div>
 
-      <p className=" max-w-2xl text-pretty text-center text-base text-muted-foreground leading-relaxed">
+      <p className="max-w-2xl text-pretty text-center text-base/7 leading-relaxed" style={{color: 'var(--text-secondary)'}}>
         {props.course.description}
       </p>
       <DetailCTA
@@ -99,7 +107,7 @@ export function DetailHero(props: IDetailHero) {
         thumbnailUrl={thumbnailUrl || ''}
       />
       <HeroVideoDialog
-        className="mt-12 rounded-md"
+        className="mt-8 rounded-xl border border-hairline overflow-hidden"
         videoUrl={props.course.trailer as string}
         youtubeId={
           extractYoutubeId(props.course.trailer as string) ?? 'Ke90Tje7VS0'
