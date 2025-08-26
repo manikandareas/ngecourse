@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button } from '~/components/ui/button';
+import { PageBackground } from '~/components/ui/page-background';
 import { CourseListSection } from '~/features/courses/components/course-list-section';
 import CourseLoading from '~/features/courses/components/course-loading';
 import { RecommendationSection } from '~/features/courses/components/recommendation-section';
@@ -45,23 +45,33 @@ export default function CoursesPage(props: Route.ComponentProps) {
 
   if (isError) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="space-y-4 text-center">
-          <div className="text-6xl">😬</div>
-          <h2 className="font-semibold text-2xl text-foreground">
-            Oops! Something went wrong
-          </h2>
-          <p className="max-w-md text-muted-foreground">{error.message}</p>
-          <Button onClick={() => window.location.reload()}>Try Again</Button>
+      <PageBackground>
+        <div className="flex min-h-[50vh] items-center justify-center p-6">
+          <div className="glass-card space-y-6 text-center">
+            <div className="text-6xl">😬</div>
+            <h2 className="font-light text-2xl text-text-primary tracking-tight md:text-3xl">
+              Oops! Something went wrong
+            </h2>
+            <p className="max-w-md text-base/7 text-text-secondary">
+              {error.message}
+            </p>
+            <button
+              className="btn-primary"
+              onClick={() => window.location.reload()}
+              type="button"
+            >
+              Try Again
+            </button>
+          </div>
         </div>
-      </div>
+      </PageBackground>
     );
   }
 
   const handleClearSearch = () => setSearchQuery('');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+    <PageBackground>
       {/* Main Content */}
       <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
         <div className="space-y-20">
@@ -75,6 +85,6 @@ export default function CoursesPage(props: Route.ComponentProps) {
           />
         </div>
       </div>
-    </div>
+    </PageBackground>
   );
 }

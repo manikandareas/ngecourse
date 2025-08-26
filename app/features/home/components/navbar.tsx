@@ -1,7 +1,6 @@
 import { SignedIn, SignedOut, UserButton } from '@clerk/react-router';
 import { Ticket } from 'lucide-react';
-import { useState } from 'react';
-import { Button } from '~/components/ui/3d-button';
+import { useEffect, useRef, useState } from 'react';
 import {
   MobileNav,
   MobileNavHeader,
@@ -25,87 +24,154 @@ export function Navbar() {
       link: '/courses',
     },
     {
-      name: 'Threads',
+      name: 'Community',
       link: '/threads',
     },
   ];
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const mobileMenuRef = useRef<HTMLElement>(null);
+  const toggleButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Handle escape key and focus management
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+        toggleButtonRef.current?.focus();
+      }
+    };
+
+    if (isMobileMenuOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      // Focus first focusable element in menu
+      const firstFocusable = mobileMenuRef.current?.querySelector<HTMLElement>(
+        'a, button, [tabindex]:not([tabindex="-1"])'
+      );
+      if (firstFocusable) {
+        firstFocusable.focus();
+      }
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isMobileMenuOpen]);
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+    toggleButtonRef.current?.focus();
+  };
 
   return (
-    <NavbarComp className="mx-auto max-w-6xl">
-      {/* Desktop Navigation */}
-      <NavBody className="py-4">
-        <NavbarLogo />
-        <NavItems items={navItems} />
-        <div className="flex items-center gap-4">
-          <SignedOut>
-            <NavbarButton href="/sign-in" variant="secondary">
-              Login
-            </NavbarButton>
-            <NavbarButton variant="primary">Book a call</NavbarButton>
-          </SignedOut>
-          <SignedIn>
-            <Button size={'sm'} variant={'solid'}>
-              <Ticket />
-              Send Feedback
-            </Button>
-            <UserButton />
-          </SignedIn>
-        </div>
-      </NavBody>
-
-      {/* Mobile Navigation */}
-      <MobileNav>
-        <MobileNavHeader>
+    <NavbarComp className="mx-auto max-w-6xl px-4 py-2">
+        {/* Desktop Navigation */}
+        <NavBody className="py-3">
           <NavbarLogo />
-          <MobileNavToggle
-            isOpen={isMobileMenuOpen}
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          />
-        </MobileNavHeader>
-
-        <MobileNavMenu
-          isOpen={isMobileMenuOpen}
-          onClose={() => setIsMobileMenuOpen(false)}
-        >
-          {navItems.map((item, idx) => (
-            <a
-              className="relative text-neutral-600 dark:text-neutral-300"
-              href={item.link}
-              key={`mobile-link-${idx.toString()}`}
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              <span className="block">{item.name}</span>
-            </a>
-          ))}
-          <div className="flex w-full flex-col gap-4">
+          <NavItems items={navItems} />
+          <div className="flex items-center gap-3">
             <SignedOut>
-              <NavbarButton
-                className="w-full"
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
-              >
-                Login
+              <NavbarButton href="/sign-in" variant="secondary">
+                Sign In
               </NavbarButton>
-              <NavbarButton
-                className="w-full"
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
-              >
-                Book a call
-              </NavbarButton>
+              <NavbarButton variant="primary">Get Started</NavbarButton>
             </SignedOut>
             <SignedIn>
-              <Button size={'xs'} variant={'solid'}>
-                <Ticket />
-                Feedback
-              </Button>
-              <UserButton />
+              <button
+                className="inline-flex items-center gap-2 rounded-full border border-border-hairline bg-white/5 px-4 py-2.5 text-text-secondary transition-all duration-150 hover:border-border-strong hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                type="button"
+              >
+                <Ticket className="size-4" />
+                <span className="hidden sm:inline">Feedback</span>
+              </button>
+              <div className="ml-2">
+                <UserButton
+                  appearance={{
+                    elements: {
+                      avatarBox:
+                        'size-9 rounded-full border border-border-hairline hover:border-border-strong transition-colors duration-150',
+                    },
+                  }}
+                />
+              </div>
             </SignedIn>
           </div>
-        </MobileNavMenu>
-      </MobileNav>
-    </NavbarComp>
+        </NavBody>
+
+        {/* Mobile Navigation */}
+        <MobileNav>
+          <MobileNavHeader>
+            <NavbarLogo />
+            <MobileNavToggle
+              isOpen={isMobileMenuOpen}
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              ref={toggleButtonRef}
+            />
+          </MobileNavHeader>
+
+          <MobileNavMenu
+            isOpen={isMobileMenuOpen}
+            onClose={closeMobileMenu}
+            ref={mobileMenuRef}
+          >
+            <nav
+              aria-label="Mobile navigation"
+              className="flex w-full flex-col gap-4"
+            >
+              {navItems.map((item, idx) => (
+                <a
+                  className="relative rounded-lg px-3 py-2.5 font-medium text-base text-text-secondary transition-all duration-150 hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                  href={item.link}
+                  key={`mobile-link-${idx.toString()}`}
+                  onClick={closeMobileMenu}
+                >
+                  <span className="block">{item.name}</span>
+                </a>
+              ))}
+            </nav>
+
+            <div className="flex w-full flex-col gap-4 border-border-hairline border-t pt-6">
+              <SignedOut>
+                <NavbarButton
+                  className="w-full justify-center"
+                  href="/sign-in"
+                  onClick={closeMobileMenu}
+                  variant="secondary"
+                >
+                  Sign In
+                </NavbarButton>
+                <NavbarButton
+                  className="w-full justify-center"
+                  onClick={closeMobileMenu}
+                  variant="primary"
+                >
+                  Get Started
+                </NavbarButton>
+              </SignedOut>
+              <SignedIn>
+                <button
+                  aria-label="Send feedback"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border-hairline bg-white/5 px-4 py-3 text-text-secondary transition-all duration-150 hover:border-border-strong hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                  onClick={closeMobileMenu}
+                  type="button"
+                >
+                  <Ticket className="size-4" />
+                  Send Feedback
+                </button>
+                <div className="flex justify-center pt-2">
+                  <UserButton
+                    appearance={{
+                      elements: {
+                        avatarBox:
+                          'size-10 rounded-full border border-border-hairline hover:border-border-strong transition-colors duration-150',
+                      },
+                    }}
+                  />
+                </div>
+              </SignedIn>
+            </div>
+          </MobileNavMenu>
+        </MobileNav>
+      </NavbarComp>
   );
 }
