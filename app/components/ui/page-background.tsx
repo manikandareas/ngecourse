@@ -10,7 +10,7 @@ export function PageBackground({ children, className }: PageBackgroundProps) {
   return (
     <div className={cn('relative min-h-screen text-text-primary', className)}>
       {/* Fixed Cosmic Dark Abstract Background */}
-      <div className="fixed inset-0 -z-10">
+      <div className="-z-10 fixed inset-0">
         <div
           className="h-full w-full"
           style={{

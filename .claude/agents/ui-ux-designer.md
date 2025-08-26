@@ -37,14 +37,8 @@ You are a Senior UI/UX Engineer with deep expertise in modern interface design, 
   --shadow-soft:0 12px 36px rgba(0,0,0,.35);
 }
 
-/* Page abstract background */
-.page-abstract{
-  background:
-    radial-gradient(60% 80% at 15% 20%, #5C3BFF 0%, transparent 60%),
-    radial-gradient(50% 70% at 80% 35%, #0EA5E9 0%, transparent 60%),
-    radial-gradient(40% 60% at 60% 85%, #00D4FF 0%, transparent 60%),
-    var(--bg);
-}
+/* Page abstract background - handled by PageBackground component */
+/* Use <PageBackground> from ~/components/ui/page-background instead of manual .page-abstract class */
 
 /* The glassy "material" */
 .tinted-blur{
@@ -119,7 +113,7 @@ export default {
 ## **Design Philosophy & System Requirements**
 
 ### **Visual System Hierarchy:**
-1. **Page Root:** Always use `page-abstract min-h-screen text-text-primary`
+1. **Page Root:** Always use `<PageBackground>` component from `~/components/ui/page-background` which provides the cosmic dark abstract background automatically
 2. **Major Surfaces:** Use `.glass-card` for forms, modals, navbars, panels
 3. **Interactive Elements:** Apply glass utilities (`.glass-input`, `.btn-primary`, etc.)
 4. **Max 3 blurred surfaces** visible per viewport for performance
@@ -203,12 +197,13 @@ export function FormShell({title, description, actions, children}: FormShellProp
 ## **Design Process (Mandatory Steps)**
 
 1. **Requirements Analysis:** Understand functional needs and user context
-2. **System Application:** Apply Cosmic Dark Tinted-Blur tokens and classes
-3. **Component Selection:** Choose appropriate shadcn/ui primitives
-4. **Glass Integration:** Apply glass utilities consistently
-5. **Accessibility Validation:** Ensure WCAG AA compliance
-6. **Responsive Design:** Test across device sizes
-7. **Performance Check:** Verify blur surface limits
+2. **Page Structure:** Wrap content with `<PageBackground>` component for cosmic dark background
+3. **System Application:** Apply Cosmic Dark Tinted-Blur tokens and classes
+4. **Component Selection:** Choose appropriate shadcn/ui primitives
+5. **Glass Integration:** Apply glass utilities consistently
+6. **Accessibility Validation:** Ensure WCAG AA compliance
+7. **Responsive Design:** Test across device sizes
+8. **Performance Check:** Verify blur surface limits
 
 ## **Quality Deliverables**
 
@@ -224,7 +219,7 @@ When providing design guidance, always include:
 ## **Migration Guidelines**
 
 For existing components:
-1. Wrap page with `.page-abstract min-h-screen text-text-primary`
+1. Wrap page content with `<PageBackground>` component from `~/components/ui/page-background`
 2. Convert panels to `.glass-card`
 3. Replace input classes with `.glass-input/.glass-select/.glass-textarea`
 4. Update buttons to `.btn-primary/.btn-ghost`

@@ -1,5 +1,6 @@
 import { useQueries } from '@tanstack/react-query';
 import type { EnrollmentQueryResult } from 'sanity.types';
+import { PageBackground } from '~/components/ui/page-background';
 import DetailContents from '~/features/courses/components/detail-contents';
 import { DetailHero } from '~/features/courses/components/detail-hero';
 import DetailLoading from '~/features/courses/components/detail-loading';
@@ -61,18 +62,20 @@ export default function CourseDetailPage(props: Route.ComponentProps) {
   }
 
   return (
-    <div className="relative mx-auto w-full max-w-6xl space-y-28 px-6 py-20 xl:px-0">
-      <DetailHero
-        course={courseQuery.data}
-        enrollment={enrollmentQuery.data as EnrollmentQueryResult}
-      />
+    <PageBackground>
+      <div className="glass-card relative mx-auto w-full max-w-6xl space-y-24 px-6 py-16 xl:px-0">
+        <DetailHero
+          course={courseQuery.data}
+          enrollment={enrollmentQuery.data as EnrollmentQueryResult}
+        />
 
-      <DetailContents
-        course={courseQuery.data}
-        enrollment={enrollmentQuery.data ?? null}
-      />
+        <DetailContents
+          course={courseQuery.data}
+          enrollment={enrollmentQuery.data ?? null}
+        />
 
-      <DetailPromo course={courseQuery.data} />
-    </div>
+        <DetailPromo course={courseQuery.data} />
+      </div>
+    </PageBackground>
   );
 }
