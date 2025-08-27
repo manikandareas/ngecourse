@@ -193,6 +193,63 @@ export type Enrollment = {
   percentComplete?: number;
 };
 
+export type QuizAttempt = {
+  _id: string;
+  _type: "quizAttempt";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  user?: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "user";
+  }>;
+  quiz?: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "quiz";
+  }>;
+  course?: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "course";
+  }>;
+  chapter?: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "chapter";
+  }>;
+  attemptNumber?: number;
+  status?: "in_progress" | "submitted" | "graded";
+  answers?: Array<{
+    questionIndex?: number;
+    selectedOptionIndex?: number;
+    isOutcome?: "correct" | "incorrect";
+    timeTakenMs?: number;
+    _type: "answer";
+    _key: string;
+  }>;
+  correctCount?: number;
+  totalQuestions?: number;
+  score?: number;
+  percentage?: number;
+  startedAt?: string;
+  submittedAt?: string;
+  durationMs?: number;
+  feedback?: string;
+  metadata?: {
+    custom?: string;
+  };
+};
+
 export type Quiz = {
   _id: string;
   _type: "quiz";
@@ -202,6 +259,7 @@ export type Quiz = {
   title?: string;
   slug?: Slug;
   description?: string;
+  maxAttempt?: number;
   questions?: Array<{
     question?: string;
     options?: Array<string>;
@@ -485,7 +543,7 @@ export type SanityAssetSourceData = {
   url?: string;
 };
 
-export type AllSanitySchemaTypes = ChatMessage | ChatSession | Recommendation | Enrollment | Quiz | Lesson | Chapter | Course | Topic | User | Color | RgbaColor | HsvaColor | HslaColor | Markdown | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
+export type AllSanitySchemaTypes = ChatMessage | ChatSession | Recommendation | Enrollment | QuizAttempt | Quiz | Lesson | Chapter | Course | Topic | User | Color | RgbaColor | HsvaColor | HslaColor | Markdown | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./app/features/ai-chat/data/index.ts
 // Variable: chatHistoryQuery
@@ -917,6 +975,88 @@ export type EnrollmentQueryResult = {
   percentComplete: number | null;
 } | null;
 
+// Source: ./app/features/quizzes/data/index.ts
+// Variable: quizQuery
+// Query: *[_type == "quiz" && slug.current == $slug][0]{      _id,      _type,      _createdAt,      _updatedAt,      title,      "slug": slug.current,      description,      maxAttempt,      questions[]{        _key,        question,        options,        correctOptionIndex,        explanation      }    }
+export type QuizQueryResult = {
+  _id: string;
+  _type: "quiz";
+  _createdAt: string;
+  _updatedAt: string;
+  title: string | null;
+  slug: string | null;
+  description: string | null;
+  maxAttempt: number | null;
+  questions: Array<{
+    _key: string;
+    question: string | null;
+    options: Array<string> | null;
+    correctOptionIndex: number | null;
+    explanation: string | null;
+  }> | null;
+} | null;
+// Variable: attemptQuery
+// Query: *[_type == "quizAttempt" && _id == $attemptId && user[0]._ref == $userId][0]{      _id,      _type,      _createdAt,      _updatedAt,      _rev,      attemptNumber,      status,      answers[]{        _key,        questionIndex,        selectedOptionIndex,        isOutcome,        timeTakenMs      },      correctCount,      totalQuestions,      score,      percentage,      startedAt,      submittedAt,      durationMs,      feedback,      "quiz": quiz[0]->{        _id,        title,        "slug": slug.current,        description,        questions[]{          _key,          question,          options,          correctOptionIndex,          explanation        }      },      "course": course[0]->{        _id,        title,        "slug": slug.current      },      "chapter": chapter[0]->{        _id,        title,        "slug": slug.current      }    }
+export type AttemptQueryResult = {
+  _id: string;
+  _type: "quizAttempt";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  attemptNumber: number | null;
+  status: "graded" | "in_progress" | "submitted" | null;
+  answers: Array<{
+    _key: string;
+    questionIndex: number | null;
+    selectedOptionIndex: number | null;
+    isOutcome: "correct" | "incorrect" | null;
+    timeTakenMs: number | null;
+  }> | null;
+  correctCount: number | null;
+  totalQuestions: number | null;
+  score: number | null;
+  percentage: number | null;
+  startedAt: string | null;
+  submittedAt: string | null;
+  durationMs: number | null;
+  feedback: string | null;
+  quiz: {
+    _id: string;
+    title: string | null;
+    slug: string | null;
+    description: string | null;
+    questions: Array<{
+      _key: string;
+      question: string | null;
+      options: Array<string> | null;
+      correctOptionIndex: number | null;
+      explanation: string | null;
+    }> | null;
+  } | null;
+  course: {
+    _id: string;
+    title: string | null;
+    slug: string | null;
+  } | null;
+  chapter: {
+    _id: string;
+    title: string | null;
+    slug: string | null;
+  } | null;
+} | null;
+// Variable: attemptsQuery
+// Query: *[_type == "quizAttempt" &&       user[0]._ref == $userId &&       quiz[0]._ref == $quizId] | order(_createdAt desc){      _id,      attemptNumber,      status,      percentage,      correctCount,      totalQuestions,      _createdAt,      submittedAt    }
+export type AttemptsQueryResult = Array<{
+  _id: string;
+  attemptNumber: number | null;
+  status: "graded" | "in_progress" | "submitted" | null;
+  percentage: number | null;
+  correctCount: number | null;
+  totalQuestions: number | null;
+  _createdAt: string;
+  submittedAt: string | null;
+}>;
+
 // Source: ./app/features/recommendation/data/index.tsx
 // Variable: recommendationQuery
 // Query: *[_type == "recommendation" && createdFor._ref == $userId][0]{      ...,      "courses": courses[]->{        _id,        title,        "slug": slug.current,        "topics": topics[]->,        description,        difficulty,        thumbnail,        trailer      }    }
@@ -1049,6 +1189,9 @@ declare module "@sanity/client" {
     "*[_type == \"lesson\" && slug.current == $slug][0]": LessonQueryResult;
     "*[_type == \"chapter\" && slug.current == $slug][0]{\n    ...,\n      \"contents\": contents[]->{\n          _id,\n          _type,\n          _createdAt,\n          _updatedAt,\n          title,\n          slug,\n        }\n    }": ChapterQueryResult;
     "\n    *[_type == \"enrollment\" &&\n      userEnrolled[0]._ref == $userId &&\n      course[0]->.slug.current == $courseSlug][0]{\n      _id,\n      _type,\n      _rev,\n      _createdAt,\n      _updatedAt,\n      \"userEnrolled\": userEnrolled[0]->,\n      \"course\": course[0]->,\n      \"contentsCompleted\": contentsCompleted[]->{\n        _id,\n        _type,\n        _createdAt,\n        _updatedAt,\n        title,\n        slug,\n      },\n      dateCompleted,\n      percentComplete\n    }\n  ": EnrollmentQueryResult;
+    "\n    *[_type == \"quiz\" && slug.current == $slug][0]{\n      _id,\n      _type,\n      _createdAt,\n      _updatedAt,\n      title,\n      \"slug\": slug.current,\n      description,\n      maxAttempt,\n      questions[]{\n        _key,\n        question,\n        options,\n        correctOptionIndex,\n        explanation\n      }\n    }\n  ": QuizQueryResult;
+    "\n    *[_type == \"quizAttempt\" && _id == $attemptId && user[0]._ref == $userId][0]{\n      _id,\n      _type,\n      _createdAt,\n      _updatedAt,\n      _rev,\n      attemptNumber,\n      status,\n      answers[]{\n        _key,\n        questionIndex,\n        selectedOptionIndex,\n        isOutcome,\n        timeTakenMs\n      },\n      correctCount,\n      totalQuestions,\n      score,\n      percentage,\n      startedAt,\n      submittedAt,\n      durationMs,\n      feedback,\n      \"quiz\": quiz[0]->{\n        _id,\n        title,\n        \"slug\": slug.current,\n        description,\n        questions[]{\n          _key,\n          question,\n          options,\n          correctOptionIndex,\n          explanation\n        }\n      },\n      \"course\": course[0]->{\n        _id,\n        title,\n        \"slug\": slug.current\n      },\n      \"chapter\": chapter[0]->{\n        _id,\n        title,\n        \"slug\": slug.current\n      }\n    }\n  ": AttemptQueryResult;
+    "\n    *[_type == \"quizAttempt\" && \n      user[0]._ref == $userId && \n      quiz[0]._ref == $quizId] | order(_createdAt desc){\n      _id,\n      attemptNumber,\n      status,\n      percentage,\n      correctCount,\n      totalQuestions,\n      _createdAt,\n      submittedAt\n    }\n  ": AttemptsQueryResult;
     "\n    *[_type == \"recommendation\" && createdFor._ref == $userId][0]{\n      ...,\n      \"courses\": courses[]->{\n        _id,\n        title,\n        \"slug\": slug.current,\n        \"topics\": topics[]->,\n        description,\n        difficulty,\n        thumbnail,\n        trailer\n      }\n    }\n  ": RecommendationQueryResult;
     "\n    *[_type == \"user\" && email == $email][0]\n  ": FindByEmailQueryResult;
     "\n    *[_type == \"user\" && clerkId == $clerkId][0]\n  ": FindByClerkIdQueryResult;

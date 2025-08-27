@@ -70,6 +70,41 @@ export const saveOnboardingSchema = z.object({
   level: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
 });
 
+/**
+ * Validation schema for starting a quiz
+ */
+export const startQuizSchema = z.object({
+  userId: z.string().min(1, 'User ID is required'),
+  courseSlug: z.string().min(1, 'Course slug is required'),
+  chapterSlug: z.string().min(1, 'Chapter slug is required'),
+  quizSlug: z.string().min(1, 'Quiz slug is required'),
+});
+
+/**
+ * Validation schema for submitting a quiz answer
+ */
+export const submitAnswerSchema = z.object({
+  userId: z.string().min(1, 'User ID is required'),
+  attemptId: z.string().min(1, 'Attempt ID is required'),
+  questionIndex: z.number().min(0, 'Question index must be non-negative'),
+  selectedOptionIndex: z.number().min(0, 'Selected option index must be non-negative'),
+});
+
+/**
+ * Validation schema for finalizing a quiz attempt
+ */
+export const finalizeAttemptSchema = z.object({
+  userId: z.string().min(1, 'User ID is required'),
+  attemptId: z.string().min(1, 'Attempt ID is required'),
+  answers: z.array(z.object({
+    questionIndex: z.number().min(0),
+    selectedOptionIndex: z.number().min(0),
+    isOutcome: z.enum(['correct', 'incorrect']),
+    timeTakenMs: z.number().min(0),
+  })).optional(),
+  correctCount: z.number().min(0).optional(),
+});
+
 // Export types for use in other files
 export type EnrollmentInput = z.infer<typeof enrollmentSchema>;
 export type ProgressionInput = z.infer<typeof progressionSchema>;
@@ -77,3 +112,6 @@ export type CreateUserInput = z.infer<typeof createUserSchema>;
 export type EnrollCourseDataInput = z.infer<typeof enrollCourseDataSchema>;
 export type AddProgressionDataInput = z.infer<typeof addProgressionDataSchema>;
 export type SaveOnboardingInput = z.infer<typeof saveOnboardingSchema>;
+export type StartQuizInput = z.infer<typeof startQuizSchema>;
+export type SubmitAnswerInput = z.infer<typeof submitAnswerSchema>;
+export type FinalizeAttemptInput = z.infer<typeof finalizeAttemptSchema>;

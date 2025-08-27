@@ -8,7 +8,8 @@
         "useTopLevelRegex": "off"
       },
       "style": {
-        "useBlockStatements": "off"
+        "useBlockStatements": "off",
+        "noNestedTernary": "off"
       },
       "suspicious": {
         "noConsole": "info"

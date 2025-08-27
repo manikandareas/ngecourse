@@ -45,6 +45,16 @@ export const ERROR_CODES = {
   CONTENT_NOT_FOUND: 'CONTENT_NOT_FOUND',
   INVALID_CONTENT_TYPE: 'INVALID_CONTENT_TYPE',
 
+  // Quiz errors
+  QUIZ_NOT_FOUND: 'QUIZ_NOT_FOUND',
+  ATTEMPT_NOT_FOUND: 'ATTEMPT_NOT_FOUND',
+  MAX_ATTEMPTS_REACHED: 'MAX_ATTEMPTS_REACHED',
+  QUESTION_LOCKED: 'QUESTION_LOCKED',
+  ATTEMPT_FINALIZED: 'ATTEMPT_FINALIZED',
+  INVALID_QUESTION: 'INVALID_QUESTION',
+  INVALID_CONTEXT: 'INVALID_CONTEXT',
+  ALREADY_FINALIZED: 'ALREADY_FINALIZED',
+
   // General errors
   UNKNOWN_ERROR: 'UNKNOWN_ERROR',
   VALIDATION_ERROR: 'VALIDATION_ERROR',
@@ -60,6 +70,7 @@ export const ERROR_CATEGORIES = {
   USER: 'USER',
   COURSE: 'COURSE',
   CONTENT: 'CONTENT',
+  QUIZ: 'QUIZ',
   VALIDATION: 'VALIDATION',
   PERMISSION: 'PERMISSION',
   SYSTEM: 'SYSTEM',
@@ -123,6 +134,16 @@ export const createValidationError = (
   code: keyof typeof ERROR_CODES = 'VALIDATION_ERROR'
 ) => {
   return new UsecaseError(message, code, ERROR_CATEGORIES.VALIDATION);
+};
+
+/**
+ * Helper function to create quiz-related errors
+ */
+export const createQuizError = (
+  message: string,
+  code: keyof typeof ERROR_CODES
+) => {
+  return new UsecaseError(message, code, ERROR_CATEGORIES.QUIZ);
 };
 
 /**

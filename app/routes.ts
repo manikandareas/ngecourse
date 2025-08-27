@@ -21,6 +21,14 @@ export default [
     '/courses/:slug/:chapterSlug/quizzes/:quizSlug',
     'routes/courses/quiz.tsx'
   ),
+  route(
+    '/courses/:courseSlug/:chapterSlug/quizzes/:quizSlug/a/:attemptId',
+    'routes/courses/quiz-attempt.tsx'
+  ),
+  route(
+    '/courses/:courseSlug/:chapterSlug/quizzes/:quizSlug/a/:attemptId/result',
+    'routes/courses/quiz-result.tsx'
+  ),
 
   //   Auth routes
   route('sign-in/*', 'routes/sign-in.tsx'),
