@@ -1,5 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import { FolderTree, Maximize, MoreVertical, Sparkles } from 'lucide-react';
+import {
+  ChevronLeft,
+  FolderTree,
+  Maximize,
+  MoreVertical,
+  Sparkles,
+} from 'lucide-react';
+import { useNavigate } from 'react-router';
 import { useMediaQuery } from 'usehooks-ts';
 import {
   Popover,
@@ -32,6 +39,8 @@ export const LessonHeader = ({
   );
   const isDesktop = useMediaQuery('(min-width: 1024px)');
 
+  const navigate = useNavigate();
+
   if (!(course && enrollment)) {
     return null;
   }
@@ -39,7 +48,16 @@ export const LessonHeader = ({
     <header className="tinted-blur sticky top-0 z-30 w-full border-hairline border-b px-4 py-3 sm:px-6">
       <div className="mx-auto flex w-full items-center justify-between gap-4">
         {/* Left: Structure trigger */}
-        <div className="flex min-w-0 flex-1 items-center">
+        <div className="flex min-w-0 flex-1 items-center gap-2">
+          <button
+            aria-label="Go back to course"
+            className="btn-ghost p-2.5"
+            onClick={() => navigate(`/courses/${courseSlug}`)}
+            type="button"
+          >
+            <ChevronLeft aria-hidden="true" size={16} />
+            <span className="sr-only">Go back to course</span>
+          </button>
           <LessonFileTree course={course} enrollment={enrollment}>
             <button
               aria-label="Open lesson structure"

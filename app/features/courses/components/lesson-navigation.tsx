@@ -107,7 +107,7 @@ export const LessonNavigation: React.FC<LessonNavigationProps> = ({
     <nav className="flex items-center justify-between rounded-2xl border border-hairline bg-white/3 p-6 backdrop-blur-sm">
       {canPrev ? (
         <button
-          className="btn-ghost disabled:opacity-50 disabled:cursor-not-allowed"
+          className="btn-ghost disabled:cursor-not-allowed disabled:opacity-50"
           disabled={!canInteract}
           onClick={handlePrevious}
           type="button"
@@ -123,7 +123,7 @@ export const LessonNavigation: React.FC<LessonNavigationProps> = ({
         <button
           className={cn(
             shouldShowComplete ? 'btn-primary' : 'btn-primary',
-            'disabled:opacity-50 disabled:cursor-not-allowed'
+            'disabled:cursor-not-allowed disabled:opacity-50'
           )}
           disabled={!canInteract || (shouldShowComplete && isPending)}
           onClick={handleNext}
