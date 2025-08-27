@@ -108,7 +108,7 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
   }
 
   return (
-    <PageBackground>
+    <PageBackground variant="sapphire-magenta">
       <div className="relative w-full space-y-6">
         <LessonHeader
           {...commonProps}
