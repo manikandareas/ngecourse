@@ -28,6 +28,7 @@ interface LessonHeaderProps {
   isChatOpen?: boolean;
   onMaximizeToggle?: (isMaximized: boolean) => void;
   isMaximized?: boolean;
+  showChatButton?: boolean;
 }
 
 export const LessonHeader = ({
@@ -38,6 +39,7 @@ export const LessonHeader = ({
   isChatOpen = false,
   onMaximizeToggle,
   isMaximized: externalIsMaximized,
+  showChatButton = true,
 }: LessonHeaderProps) => {
   const { data: course } = useQuery(courseQueryOption(courseSlug));
   const { data: enrollment } = useQuery(
@@ -182,16 +184,18 @@ export const LessonHeader = ({
           {isDesktop ? (
             /* Desktop: Individual Buttons */
             <>
-              <button
-                className={isChatOpen ? 'btn-primary' : 'btn-ghost'}
-                onClick={onChatToggle}
-                type="button"
-              >
-                <Sparkles aria-hidden="true" size={16} />
-                <span className="ml-2">
-                  {isChatOpen ? 'Close Chat' : 'Ask Genii'}
-                </span>
-              </button>
+              {showChatButton && (
+                <button
+                  className={isChatOpen ? 'btn-primary' : 'btn-ghost'}
+                  onClick={onChatToggle}
+                  type="button"
+                >
+                  <Sparkles aria-hidden="true" size={16} />
+                  <span className="ml-2">
+                    {isChatOpen ? 'Close Chat' : 'Ask Genii'}
+                  </span>
+                </button>
+              )}
 
               <button
                 aria-label={
@@ -233,18 +237,22 @@ export const LessonHeader = ({
                 className="tinted-blur w-48 border border-strong p-3"
               >
                 <div className="space-y-2">
-                  <button
-                    className={`w-full justify-start ${isChatOpen ? 'btn-primary' : 'btn-ghost'}`}
-                    onClick={onChatToggle}
-                    type="button"
-                  >
-                    <Sparkles aria-hidden="true" size={16} />
-                    <span className="ml-2">
-                      {isChatOpen ? 'Close Chat' : 'Ask Genii'}
-                    </span>
-                  </button>
+                  {showChatButton && (
+                    <>
+                      <button
+                        className={`w-full justify-start ${isChatOpen ? 'btn-primary' : 'btn-ghost'}`}
+                        onClick={onChatToggle}
+                        type="button"
+                      >
+                        <Sparkles aria-hidden="true" size={16} />
+                        <span className="ml-2">
+                          {isChatOpen ? 'Close Chat' : 'Ask Genii'}
+                        </span>
+                      </button>
 
-                  <Separator className="my-2 border-hairline" />
+                      <Separator className="my-2 border-hairline" />
+                    </>
+                  )}
 
                   <button
                     className="btn-ghost w-full justify-start"
