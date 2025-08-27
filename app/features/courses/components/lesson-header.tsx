@@ -3,9 +3,11 @@ import {
   ChevronLeft,
   FolderTree,
   Maximize,
+  Minimize,
   MoreVertical,
   Sparkles,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useMediaQuery } from 'usehooks-ts';
 import {
@@ -24,6 +26,8 @@ interface LessonHeaderProps {
   userId: string;
   onChatToggle?: () => void;
   isChatOpen?: boolean;
+  onMaximizeToggle?: (isMaximized: boolean) => void;
+  isMaximized?: boolean;
 }
 
 export const LessonHeader = ({
@@ -32,14 +36,107 @@ export const LessonHeader = ({
   userId,
   onChatToggle,
   isChatOpen = false,
+  onMaximizeToggle,
+  isMaximized: externalIsMaximized,
 }: LessonHeaderProps) => {
   const { data: course } = useQuery(courseQueryOption(courseSlug));
   const { data: enrollment } = useQuery(
     enrollmentQueryOption(userId, courseSlug)
   );
   const isDesktop = useMediaQuery('(min-width: 1024px)');
+  const [internalIsMaximized, setInternalIsMaximized] = useState(false);
 
+  const isMaximized = externalIsMaximized ?? internalIsMaximized;
   const navigate = useNavigate();
+
+  const enterFullscreen = async () => {
+    try {
+      const element = document.documentElement as HTMLElement & {
+        webkitRequestFullscreen?: () => Promise<void>;
+        msRequestFullscreen?: () => Promise<void>;
+      };
+
+      if (element.requestFullscreen) {
+        await element.requestFullscreen();
+      } else if (element.webkitRequestFullscreen) {
+        await element.webkitRequestFullscreen();
+      } else if (element.msRequestFullscreen) {
+        await element.msRequestFullscreen();
+      }
+    } catch {
+      // Silently fail if fullscreen is not supported or permission denied
+    }
+  };
+
+  const exitFullscreen = async () => {
+    try {
+      const doc = document as Document & {
+        webkitExitFullscreen?: () => Promise<void>;
+        msExitFullscreen?: () => Promise<void>;
+      };
+
+      if (doc.exitFullscreen) {
+        await doc.exitFullscreen();
+      } else if (doc.webkitExitFullscreen) {
+        await doc.webkitExitFullscreen();
+      } else if (doc.msExitFullscreen) {
+        await doc.msExitFullscreen();
+      }
+    } catch {
+      // Silently fail if fullscreen is not supported
+    }
+  };
+
+  const handleMaximizeToggle = async () => {
+    const newMaximizedState = !isMaximized;
+
+    if (newMaximizedState) {
+      await enterFullscreen();
+    } else {
+      await exitFullscreen();
+    }
+
+    if (externalIsMaximized === undefined) {
+      setInternalIsMaximized(newMaximizedState);
+    }
+    onMaximizeToggle?.(newMaximizedState);
+  };
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      const doc = document as Document & {
+        webkitFullscreenElement?: Element;
+        msFullscreenElement?: Element;
+      };
+
+      const isCurrentlyFullscreen = !!(
+        doc.fullscreenElement ||
+        doc.webkitFullscreenElement ||
+        doc.msFullscreenElement
+      );
+
+      if (externalIsMaximized === undefined) {
+        setInternalIsMaximized(isCurrentlyFullscreen);
+      }
+      onMaximizeToggle?.(isCurrentlyFullscreen);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener(
+        'webkitfullscreenchange',
+        handleFullscreenChange
+      );
+      document.removeEventListener(
+        'MSFullscreenChange',
+        handleFullscreenChange
+      );
+    };
+  }, [externalIsMaximized, onMaximizeToggle]);
 
   if (!(course && enrollment)) {
     return null;
@@ -97,12 +194,25 @@ export const LessonHeader = ({
               </button>
 
               <button
-                aria-label="Enter full screen"
+                aria-label={
+                  isMaximized ? 'Exit full screen' : 'Enter full screen'
+                }
                 className="btn-ghost p-2.5"
+                onClick={() => {
+                  handleMaximizeToggle().catch(() => {
+                    // Handle error silently
+                  });
+                }}
                 type="button"
               >
-                <Maximize aria-hidden="true" size={16} />
-                <span className="sr-only">Enter full screen</span>
+                {isMaximized ? (
+                  <Minimize aria-hidden="true" size={16} />
+                ) : (
+                  <Maximize aria-hidden="true" size={16} />
+                )}
+                <span className="sr-only">
+                  {isMaximized ? 'Exit full screen' : 'Enter full screen'}
+                </span>
               </button>
             </>
           ) : (
@@ -138,10 +248,21 @@ export const LessonHeader = ({
 
                   <button
                     className="btn-ghost w-full justify-start"
+                    onClick={() => {
+                      handleMaximizeToggle().catch(() => {
+                        // Handle error silently
+                      });
+                    }}
                     type="button"
                   >
-                    <Maximize aria-hidden="true" size={16} />
-                    <span className="ml-2">Full Screen</span>
+                    {isMaximized ? (
+                      <Minimize aria-hidden="true" size={16} />
+                    ) : (
+                      <Maximize aria-hidden="true" size={16} />
+                    )}
+                    <span className="ml-2">
+                      {isMaximized ? 'Exit Full Screen' : 'Full Screen'}
+                    </span>
                   </button>
                 </div>
               </PopoverContent>
