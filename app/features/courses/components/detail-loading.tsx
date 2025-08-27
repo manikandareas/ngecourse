@@ -1,47 +1,41 @@
 import { Skeleton } from '~/components/ui/skeleton';
+import { PageBackground } from '~/components/ui/page-background';
 
 const chapterSkeletonKeys = ['ch1', 'ch2', 'ch3'] as const;
 const itemSkeletonKeys = ['it1', 'it2', 'it3'] as const;
 
 function DetailHeroSkeleton() {
   return (
-    <section className="flex flex-col items-center justify-center gap-4 text-center">
+    <section className="flex flex-col items-center justify-center gap-8">
       {/* Difficulty badge */}
       <Skeleton className="h-7 w-20 rounded-full" />
 
-      {/* Main title - single line, larger */}
-      <Skeleton className="h-16 w-full max-w-4xl" />
+      {/* Main title - matching actual h1 structure */}
+      <Skeleton className="h-16 w-full max-w-lg xl:max-w-2xl" />
 
       {/* Topic badges row */}
-      <div className="flex items-center justify-center gap-3">
+      <div className="flex flex-wrap justify-center gap-3">
         <Skeleton className="h-8 w-32 rounded-full" />
         <Skeleton className="h-8 w-24 rounded-full" />
+        <Skeleton className="h-8 w-28 rounded-full" />
       </div>
 
-      {/* Description paragraph - 3 lines */}
-      <div className="mt-4 flex flex-col items-center gap-3 px-4">
-        <Skeleton className="h-4 w-full max-w-2xl" />
-        <Skeleton className="h-4 w-full max-w-xl" />
-        <Skeleton className="h-4 w-3/4 max-w-lg" />
+      {/* Description paragraph - matching actual structure */}
+      <div className="flex flex-col items-center gap-3 max-w-2xl">
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-5/6" />
+        <Skeleton className="h-4 w-3/4" />
       </div>
 
       {/* CTA button */}
-      <Skeleton className="mt-6 h-12 w-52 rounded-lg" />
+      <Skeleton className="h-12 w-52 rounded-full" />
 
-      {/* Video thumbnail with overlay elements */}
+      {/* Video thumbnail - matching HeroVideoDialog structure */}
       <div className="relative mt-8 w-full max-w-4xl">
-        <Skeleton className="aspect-video w-full rounded-xl" />
+        <Skeleton className="aspect-video w-full rounded-xl border border-hairline" />
         {/* Play button overlay */}
-        <div className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
           <Skeleton className="h-16 w-16 rounded-full" />
-        </div>
-        {/* Duration badge */}
-        <div className="absolute right-4 bottom-4">
-          <Skeleton className="h-6 w-16 rounded" />
-        </div>
-        {/* Views badge */}
-        <div className="absolute top-4 left-4">
-          <Skeleton className="h-8 w-20 rounded-lg" />
         </div>
       </div>
     </section>
@@ -50,61 +44,109 @@ function DetailHeroSkeleton() {
 
 function DetailContentsSkeleton() {
   return (
-    <div className="mx-auto max-w-4xl space-y-4">
-      {chapterSkeletonKeys.map((ch) => (
-        <div className="rounded-lg border bg-white p-6 shadow-sm" key={ch}>
-          {/* Chapter title */}
-          <Skeleton className="h-6 w-48" />
-          {/* Chapter items */}
-          <div className="mt-6 space-y-4">
-            {itemSkeletonKeys.map((it) => (
-              <div className="flex items-center gap-4" key={`${ch}-${it}`}>
-                <Skeleton className="h-5 w-5 flex-shrink-0 rounded-full" />
-                <Skeleton className="h-5 w-2/3" />
-                <div className="ml-auto">
-                  <Skeleton className="h-4 w-12" />
+    <section className="flex flex-col items-center gap-12">
+      {/* Header section */}
+      <div className="flex flex-col items-center gap-6">
+        {/* Contents badge */}
+        <Skeleton className="h-8 w-24 rounded-full" />
+        {/* Section title */}
+        <Skeleton className="h-12 w-full max-w-lg xl:max-w-2xl" />
+        {/* Description */}
+        <div className="flex flex-col items-center gap-3 max-w-2xl">
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-4/5" />
+        </div>
+      </div>
+
+      {/* Content structure - two columns */}
+      <div className="flex w-full flex-col-reverse items-start gap-8 lg:flex-row">
+        {/* Course structure side */}
+        <div className="flex-1 space-y-6">
+          {/* Course Structure title */}
+          <Skeleton className="h-6 w-40" />
+          {/* Course file tree container */}
+          <div className="glass-card">
+            <div className="space-y-4">
+              {chapterSkeletonKeys.map((ch) => (
+                <div key={ch}>
+                  {/* Chapter title */}
+                  <Skeleton className="h-5 w-48 mb-3" />
+                  {/* Chapter items */}
+                  <div className="ml-4 space-y-2">
+                    {itemSkeletonKeys.map((it) => (
+                      <div className="flex items-center gap-3" key={`${ch}-${it}`}>
+                        <Skeleton className="h-4 w-4 flex-shrink-0 rounded" />
+                        <Skeleton className="h-4 w-2/3" />
+                        <Skeleton className="h-4 w-10 ml-auto" />
+                      </div>
+                    ))}
+                  </div>
                 </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        
+        {/* Divider */}
+        <div className="w-px mx-6 hidden lg:block bg-white/8 h-96"></div>
+        
+        {/* Learning outcomes side */}
+        <div className="flex-1 space-y-6">
+          {/* Learning outcomes title */}
+          <Skeleton className="h-6 w-48" />
+          {/* Learning outcomes list */}
+          <div className="space-y-3">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div className="flex items-start gap-3" key={index}>
+                <Skeleton className="h-4 w-4 flex-shrink-0 rounded mt-0.5" />
+                <Skeleton className="h-4 w-full" />
               </div>
             ))}
           </div>
         </div>
-      ))}
-    </div>
+      </div>
+    </section>
   );
 }
 
 function DetailPromoSkeleton() {
   return (
-    <div className="mx-auto max-w-4xl rounded-xl border bg-gradient-to-r from-blue-50 to-indigo-50 p-8">
-      {/* Promo image/illustration */}
-      <div className="mb-6 flex justify-center">
-        <Skeleton className="h-32 w-48 rounded-lg" />
-      </div>
-
-      {/* Promo content */}
-      <div className="space-y-4 text-center">
-        <Skeleton className="mx-auto h-8 w-2/3" />
-        <div className="space-y-2">
-          <Skeleton className="mx-auto h-4 w-3/4" />
-          <Skeleton className="mx-auto h-4 w-1/2" />
+    <section className="relative mx-auto h-96 w-full rounded-xl overflow-hidden border border-hairline">
+      {/* Background image skeleton */}
+      <Skeleton className="h-full w-full" />
+      
+      {/* Overlay gradient simulation */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent" />
+      
+      {/* Content overlay */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 md:items-start md:justify-center">
+        <div className="glass-card max-w-md space-y-4">
+          {/* Title skeleton */}
+          <Skeleton className="h-8 w-full max-w-xs" />
+          
+          {/* Description skeleton */}
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-4/5" />
+          </div>
+          
+          {/* Button skeleton */}
+          <Skeleton className="h-12 w-full md:w-40 rounded-full" />
         </div>
-        <div className="pt-4">
-          <Skeleton className="mx-auto h-12 w-40 rounded-full" />
-        </div>
       </div>
-    </div>
+    </section>
   );
 }
 
 function DetailLoading() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="relative mx-auto w-full max-w-7xl space-y-20 px-6 py-16 xl:px-8">
+    <PageBackground>
+      <div className="glass-card relative mx-auto w-full max-w-6xl space-y-24 px-6 py-16 xl:px-0">
         <DetailHeroSkeleton />
         <DetailContentsSkeleton />
         <DetailPromoSkeleton />
       </div>
-    </div>
+    </PageBackground>
   );
 }
 

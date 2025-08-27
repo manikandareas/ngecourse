@@ -27,7 +27,7 @@ function ChapterChevron({ open }: { open: boolean }) {
       className="flex"
       transition={{ type: 'spring', bounce: 0, duration: 0.3 }}
     >
-      <ChevronRight className="size-4 text-gray-500" />
+      <ChevronRight className="size-4" style={{ color: 'var(--text-muted)' }} />
     </motion.span>
   );
 }
@@ -80,60 +80,77 @@ function ContentItem({
     ? `/courses/${course?.slug?.current}/${chapter?.slug?.current}/lessons/${content.slug?.current}`
     : `/courses/${course?.slug?.current}/${chapter?.slug?.current}/quizzes/${content.slug?.current}`;
 
-  const iconClass = (colorWhenCurrent: string, colorDefault: string) =>
-    cn('size-4', isContentCurrent(contentId) ? colorWhenCurrent : colorDefault);
+  // const iconClass = (colorWhenCurrent: string, colorDefault: string) =>
+  //   cn('size-4', isContentCurrent(contentId) ? colorWhenCurrent : colorDefault);
 
   const renderStatusIcon = () => {
     if (isContentLocked(contentId)) {
-      return <Lock className="size-4 text-gray-400" />;
+      return <Lock className="size-4" style={{ color: 'var(--text-muted)' }} />;
     }
     if (isContentCompleted(contentId)) {
       return (
-        <CheckCircle2 className="size-4 text-green-600 dark:text-green-400" />
+        <CheckCircle2 className="size-4" style={{ color: 'var(--success)' }} />
       );
     }
     if (isLesson) {
       return (
         <PlayCircle
-          className={iconClass(
-            'text-orange-600 dark:text-orange-400',
-            'text-blue-600 dark:text-blue-400'
-          )}
+          className="size-4"
+          style={{
+            color: isContentCurrent(contentId)
+              ? 'var(--warning)'
+              : 'var(--info)',
+          }}
         />
       );
     }
     return (
       <HelpCircle
-        className={iconClass(
-          'text-orange-600 dark:text-orange-400',
-          'text-purple-600 dark:text-purple-400'
-        )}
+        className="size-4"
+        style={{
+          color: isContentCurrent(contentId)
+            ? 'var(--warning)'
+            : 'var(--accent-alt)',
+        }}
       />
     );
   };
 
+  const getTextStyle = () => {
+    if (isContentLocked(contentId)) {
+      return { color: 'var(--text-muted)' };
+    }
+    if (isContentCompleted(contentId)) {
+      return { color: 'var(--success)' };
+    }
+    if (isActive) {
+      return { color: 'var(--info)' };
+    }
+    if (isContentCurrent(contentId)) {
+      return { color: 'var(--warning)' };
+    }
+    return { color: 'var(--text-secondary)' };
+  };
+
   const textClass = cn(
     'truncate text-sm',
-    isContentLocked(contentId) && 'text-gray-400 dark:text-gray-500',
-    !isContentLocked(contentId) &&
-      isActive &&
-      'font-medium text-blue-900 dark:text-blue-100',
-    !(isContentLocked(contentId) || isActive) &&
-      isContentCurrent(contentId) &&
-      'font-medium text-orange-700 dark:text-orange-300',
-    !(isContentLocked(contentId) || isActive || isContentCurrent(contentId)) &&
-      'text-gray-900 dark:text-white'
+    (isActive ||
+      isContentCurrent(contentId) ||
+      isContentCompleted(contentId)) &&
+      'font-medium'
   );
 
   if (isContentLocked(contentId)) {
     return (
       <li className="list-none">
         <button
-          className="flex w-full items-center gap-2 rounded-md py-2 pl-6 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-0 dark:hover:bg-gray-800/50"
+          className="flex w-full items-center gap-2 rounded-md py-2 pl-6 transition-colors hover:bg-white/3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
           type="button"
         >
           {renderStatusIcon()}
-          <span className={textClass}>{content.title}</span>
+          <span className={textClass} style={getTextStyle()}>
+            {content.title}
+          </span>
         </button>
       </li>
     );
@@ -141,11 +158,13 @@ function ContentItem({
   return (
     <li className="list-none">
       <Link
-        className="flex min-h-9 items-center gap-2 rounded-md py-2 pl-6 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
+        className="flex min-h-9 items-center gap-2 rounded-md py-2 pl-6 transition-colors hover:bg-white/3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
         to={contentPath}
       >
         {renderStatusIcon()}
-        <span className={textClass}>{content.title}</span>
+        <span className={textClass} style={getTextStyle()}>
+          {content.title}
+        </span>
       </Link>
     </li>
   );
@@ -178,7 +197,7 @@ function ChapterItem({
       <div className="flex items-center gap-2 py-2">
         <button
           aria-label={isExpanded ? 'Collapse chapter' : 'Expand chapter'}
-          className="-m-1 p-1"
+          className="-m-1 rounded p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
           onClick={onToggle}
           type="button"
         >
@@ -186,14 +205,16 @@ function ChapterItem({
         </button>
 
         <Folder
-          className={cn(
-            'size-6',
-            isChapterCompleted
-              ? 'fill-green-500 text-green-500'
-              : 'fill-sky-500 text-sky-500'
-          )}
+          className="size-6"
+          style={{
+            fill: isChapterCompleted ? 'var(--success)' : 'var(--info)',
+            color: isChapterCompleted ? 'var(--success)' : 'var(--info)',
+          }}
         />
-        <span className="truncate text-gray-900 text-sm dark:text-white">
+        <span
+          className="truncate text-sm"
+          style={{ color: 'var(--text-primary)' }}
+        >
           {chapter?.title}
         </span>
       </div>
@@ -291,8 +312,7 @@ export function CourseFileTree({
   return (
     <div
       className={cn(
-        'sticky top-0 flex h-screen w-full flex-col bg-white dark:bg-gray-900',
-        'border-gray-200 border-r dark:border-gray-700',
+        'glass-card sticky top-0 flex h-screen w-full flex-col',
         'lg:w-80 xl:w-96',
         className
       )}
@@ -304,8 +324,14 @@ export function CourseFileTree({
             <li className="list-none">
               <div className="flex items-center gap-2 py-2">
                 <ChapterChevron open />
-                <Folder className="size-6 fill-sky-500 text-sky-500" />
-                <span className="truncate text-gray-900 text-sm dark:text-white">
+                <Folder
+                  className="size-6"
+                  style={{ fill: 'var(--info)', color: 'var(--info)' }}
+                />
+                <span
+                  className="truncate text-sm"
+                  style={{ color: 'var(--text-primary)' }}
+                >
                   {course?.title}
                 </span>
               </div>

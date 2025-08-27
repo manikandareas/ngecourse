@@ -5,6 +5,7 @@ import type { ChatMessage } from 'sanity.types';
 import { useMediaQuery } from 'usehooks-ts';
 import { Drawer, DrawerContent } from '~/components/ui/drawer';
 import { MarkdownRenderer } from '~/components/ui/markdown-renderer';
+import { PageBackground } from '~/components/ui/page-background';
 import { Separator } from '~/components/ui/separator';
 import {
   ChatWindow,
@@ -89,11 +90,11 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
   };
 
   const lessonContent = (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="prose prose-slate dark:prose-invert max-w-none">
         <MarkdownRenderer content={lesson?.content ?? ''} />
       </div>
-      <Separator className="my-8" />
+      <Separator className="my-8 border-hairline" />
       <LessonNavigation {...commonProps} />
     </div>
   );
@@ -107,8 +108,8 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
   }
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      <div className="relative w-full space-y-4 sm:space-y-6">
+    <PageBackground>
+      <div className="relative w-full space-y-6">
         <LessonHeader
           {...commonProps}
           isChatOpen={isChatOpen}
@@ -118,48 +119,48 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
 
         {isDesktop ? (
           <div
-            className={`grid transition-all duration-300 ${
-              isChatOpen ? 'grid-cols-2 divide-x divide-border' : 'grid-cols-1'
+            className={`grid gap-6 px-4 transition-all duration-300 sm:px-6 ${
+              isChatOpen ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'
             }`}
           >
             <main
-              className={`mx-auto px-6 py-8 transition-all duration-300 ${
-                isChatOpen ? 'max-w-4xl' : 'max-w-4xl'
+              className={`transition-all duration-300 ${
+                isChatOpen ? 'max-w-none' : 'mx-auto max-w-5xl'
               }`}
             >
-              <div className="rounded-lg border bg-card/50 p-8 shadow-sm backdrop-blur-sm">
-                {lessonContent}
-              </div>
+              <article className="glass-card">{lessonContent}</article>
             </main>
 
             {isChatOpen && !chatHistoryPending && (
-              <div className="slide-in-from-right-full animate-in bg-card/30 backdrop-blur-sm duration-300">
-                <ChatWindow
-                  chatHistory={chatMessages}
-                  lessonId={lesson._id}
-                  variant="desktop"
-                />
-              </div>
+              <aside className="slide-in-from-right-full min-h-[600px] animate-in duration-300">
+                <div className="glass-card h-full min-h-[600px]">
+                  <ChatWindow
+                    chatHistory={chatMessages}
+                    lessonId={lesson._id}
+                    variant="desktop"
+                  />
+                </div>
+              </aside>
             )}
           </div>
         ) : (
           <>
-            <main className="mx-auto max-w-4xl px-4 py-6">
-              <div className="rounded-lg border bg-card/50 p-6 shadow-sm backdrop-blur-sm">
-                {lessonContent}
-              </div>
+            <main className="mx-auto max-w-4xl px-4 sm:px-6">
+              <article className="glass-card">{lessonContent}</article>
             </main>
 
             {isChatOpen && (
               <Drawer onOpenChange={setIsChatOpen} open={isChatOpen}>
-                <DrawerContent className="h-[100vh] max-h-[100vh]">
+                <DrawerContent className="tinted-blur h-[100vh] max-h-[100vh] border-strong border-t">
                   {!chatHistoryPending && (
-                    <ChatWindow
-                      chatHistory={chatMessages}
-                      lessonId={lesson._id}
-                      onClose={() => setIsChatOpen(false)}
-                      variant="mobile"
-                    />
+                    <div className="h-full p-4">
+                      <ChatWindow
+                        chatHistory={chatMessages}
+                        lessonId={lesson._id}
+                        onClose={() => setIsChatOpen(false)}
+                        variant="mobile"
+                      />
+                    </div>
                   )}
                 </DrawerContent>
               </Drawer>
@@ -167,6 +168,6 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
           </>
         )}
       </div>
-    </div>
+    </PageBackground>
   );
 }

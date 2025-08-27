@@ -25,12 +25,12 @@ export const LessonFileTree: React.FC<LessonFileTreeProps> = (props) => {
     <Sheet>
       <SheetTrigger asChild>{props.children}</SheetTrigger>
       <SheetContent
-        className="h-screen w-full overflow-hidden md:w-[26rem] "
+        className="glass-card h-screen w-full overflow-hidden md:w-[26rem]"
         side="left"
       >
         <ScrollArea>
           <SheetHeader>
-            <SheetTitle className="max-w-[18rem] truncate text-wrap">
+            <SheetTitle className="max-w-[18rem] truncate text-wrap" style={{color: 'var(--text-primary)'}}>
               {props.course?.title}
             </SheetTitle>
 

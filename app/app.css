@@ -22,6 +22,11 @@
   --accent: #3e5bff;
   --accent-alt: #5c3bff;
 
+  /* Status colors for file tree */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --info: var(--accent);
+
   /* Structure */
   --border: rgba(255, 255, 255, 0.08);
   --border-strong: rgba(255, 255, 255, 0.12);

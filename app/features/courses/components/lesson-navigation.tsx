@@ -6,7 +6,6 @@ import type {
   CourseContentsQueryResult,
   EnrollmentQueryResult,
 } from 'sanity.types';
-import { Button } from '~/components/ui/3d-button';
 import { enrollmentQueryOption } from '~/features/enrollments/hooks/get-enrollment';
 import { usecaseEnrollments } from '~/features/enrollments/usecase';
 import type { ProgressionInput } from '~/features/shared/schemas';
@@ -105,27 +104,37 @@ export const LessonNavigation: React.FC<LessonNavigationProps> = ({
   ]);
 
   return (
-    <div className="flex items-center justify-between border-t pt-6 sm:pt-6">
+    <nav className="flex items-center justify-between rounded-2xl border border-hairline bg-white/3 p-6 backdrop-blur-sm">
       {canPrev ? (
-        <Button
+        <button
+          className="btn-ghost disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={!canInteract}
           onClick={handlePrevious}
-          variant="outline"
+          type="button"
         >
-          <ArrowLeft />
-          Previous
-        </Button>
+          <ArrowLeft size={16} />
+          <span className="ml-2">Previous</span>
+        </button>
       ) : (
         <div />
       )}
 
-      <Button
-        className={cn(!hasNext && 'hidden')}
-        disabled={!canInteract || (shouldShowComplete && isPending)}
-        onClick={handleNext}
-      >
-        {shouldShowComplete ? 'Complete and Next' : 'Next'} <ArrowRight />
-      </Button>
-    </div>
+      {hasNext && (
+        <button
+          className={cn(
+            shouldShowComplete ? 'btn-primary' : 'btn-primary',
+            'disabled:opacity-50 disabled:cursor-not-allowed'
+          )}
+          disabled={!canInteract || (shouldShowComplete && isPending)}
+          onClick={handleNext}
+          type="button"
+        >
+          <span className="mr-2">
+            {shouldShowComplete ? 'Complete and Next' : 'Next'}
+          </span>
+          <ArrowRight size={16} />
+        </button>
+      )}
+    </nav>
   );
 };
