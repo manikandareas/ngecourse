@@ -24,6 +24,10 @@ export function Navbar() {
       link: '/courses',
     },
     {
+      name: 'Progress',
+      link: '/progress',
+    },
+    {
       name: 'Community',
       link: '/threads',
     },
@@ -65,113 +69,113 @@ export function Navbar() {
 
   return (
     <NavbarComp className="mx-auto max-w-6xl px-4 py-2">
-        {/* Desktop Navigation */}
-        <NavBody className="py-3">
+      {/* Desktop Navigation */}
+      <NavBody className="py-3">
+        <NavbarLogo />
+        <NavItems items={navItems} />
+        <div className="flex items-center gap-3">
+          <SignedOut>
+            <NavbarButton href="/sign-in" variant="secondary">
+              Sign In
+            </NavbarButton>
+            <NavbarButton variant="primary">Get Started</NavbarButton>
+          </SignedOut>
+          <SignedIn>
+            <button
+              className="inline-flex items-center gap-2 rounded-full border border-border-hairline bg-white/5 px-4 py-2.5 text-text-secondary transition-all duration-150 hover:border-border-strong hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+              type="button"
+            >
+              <Ticket className="size-4" />
+              <span className="hidden sm:inline">Feedback</span>
+            </button>
+            <div className="ml-2">
+              <UserButton
+                appearance={{
+                  elements: {
+                    avatarBox:
+                      'size-9 rounded-full border border-border-hairline hover:border-border-strong transition-colors duration-150',
+                  },
+                }}
+              />
+            </div>
+          </SignedIn>
+        </div>
+      </NavBody>
+
+      {/* Mobile Navigation */}
+      <MobileNav>
+        <MobileNavHeader>
           <NavbarLogo />
-          <NavItems items={navItems} />
-          <div className="flex items-center gap-3">
+          <MobileNavToggle
+            isOpen={isMobileMenuOpen}
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            ref={toggleButtonRef}
+          />
+        </MobileNavHeader>
+
+        <MobileNavMenu
+          isOpen={isMobileMenuOpen}
+          onClose={closeMobileMenu}
+          ref={mobileMenuRef}
+        >
+          <nav
+            aria-label="Mobile navigation"
+            className="flex w-full flex-col gap-4"
+          >
+            {navItems.map((item, idx) => (
+              <a
+                className="relative rounded-lg px-3 py-2.5 font-medium text-base text-text-secondary transition-all duration-150 hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                href={item.link}
+                key={`mobile-link-${idx.toString()}`}
+                onClick={closeMobileMenu}
+              >
+                <span className="block">{item.name}</span>
+              </a>
+            ))}
+          </nav>
+
+          <div className="flex w-full flex-col gap-4 border-border-hairline border-t pt-6">
             <SignedOut>
-              <NavbarButton href="/sign-in" variant="secondary">
+              <NavbarButton
+                className="w-full justify-center"
+                href="/sign-in"
+                onClick={closeMobileMenu}
+                variant="secondary"
+              >
                 Sign In
               </NavbarButton>
-              <NavbarButton variant="primary">Get Started</NavbarButton>
+              <NavbarButton
+                className="w-full justify-center"
+                onClick={closeMobileMenu}
+                variant="primary"
+              >
+                Get Started
+              </NavbarButton>
             </SignedOut>
             <SignedIn>
               <button
-                className="inline-flex items-center gap-2 rounded-full border border-border-hairline bg-white/5 px-4 py-2.5 text-text-secondary transition-all duration-150 hover:border-border-strong hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                aria-label="Send feedback"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border-hairline bg-white/5 px-4 py-3 text-text-secondary transition-all duration-150 hover:border-border-strong hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                onClick={closeMobileMenu}
                 type="button"
               >
                 <Ticket className="size-4" />
-                <span className="hidden sm:inline">Feedback</span>
+                Send Feedback
               </button>
-              <div className="ml-2">
+              <div className="flex justify-center pt-2">
                 <UserButton
                   appearance={{
                     elements: {
                       avatarBox:
-                        'size-9 rounded-full border border-border-hairline hover:border-border-strong transition-colors duration-150',
+                        'size-10 rounded-full border border-border-hairline hover:border-border-strong transition-colors duration-150',
                     },
                   }}
                 />
               </div>
             </SignedIn>
           </div>
-        </NavBody>
-
-        {/* Mobile Navigation */}
-        <MobileNav>
-          <MobileNavHeader>
-            <NavbarLogo />
-            <MobileNavToggle
-              isOpen={isMobileMenuOpen}
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              ref={toggleButtonRef}
-            />
-          </MobileNavHeader>
-
-          <MobileNavMenu
-            isOpen={isMobileMenuOpen}
-            onClose={closeMobileMenu}
-            ref={mobileMenuRef}
-          >
-            <nav
-              aria-label="Mobile navigation"
-              className="flex w-full flex-col gap-4"
-            >
-              {navItems.map((item, idx) => (
-                <a
-                  className="relative rounded-lg px-3 py-2.5 font-medium text-base text-text-secondary transition-all duration-150 hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
-                  href={item.link}
-                  key={`mobile-link-${idx.toString()}`}
-                  onClick={closeMobileMenu}
-                >
-                  <span className="block">{item.name}</span>
-                </a>
-              ))}
-            </nav>
-
-            <div className="flex w-full flex-col gap-4 border-border-hairline border-t pt-6">
-              <SignedOut>
-                <NavbarButton
-                  className="w-full justify-center"
-                  href="/sign-in"
-                  onClick={closeMobileMenu}
-                  variant="secondary"
-                >
-                  Sign In
-                </NavbarButton>
-                <NavbarButton
-                  className="w-full justify-center"
-                  onClick={closeMobileMenu}
-                  variant="primary"
-                >
-                  Get Started
-                </NavbarButton>
-              </SignedOut>
-              <SignedIn>
-                <button
-                  aria-label="Send feedback"
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border-hairline bg-white/5 px-4 py-3 text-text-secondary transition-all duration-150 hover:border-border-strong hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
-                  onClick={closeMobileMenu}
-                  type="button"
-                >
-                  <Ticket className="size-4" />
-                  Send Feedback
-                </button>
-                <div className="flex justify-center pt-2">
-                  <UserButton
-                    appearance={{
-                      elements: {
-                        avatarBox:
-                          'size-10 rounded-full border border-border-hairline hover:border-border-strong transition-colors duration-150',
-                      },
-                    }}
-                  />
-                </div>
-              </SignedIn>
-            </div>
-          </MobileNavMenu>
-        </MobileNav>
-      </NavbarComp>
+        </MobileNavMenu>
+      </MobileNav>
+    </NavbarComp>
   );
 }
