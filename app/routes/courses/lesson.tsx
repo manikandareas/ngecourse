@@ -124,7 +124,7 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
             }`}
           >
             <main
-              className={`transition-all duration-300 ${
+              className={`w-full transition-all duration-300 ${
                 isChatOpen ? 'max-w-none' : 'mx-auto max-w-5xl'
               }`}
             >
