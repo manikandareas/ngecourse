@@ -11,7 +11,6 @@ import {
 } from 'react-router';
 import type { Route } from './+types/root';
 import './app.css';
-import { SanityLiveProvider } from './components/sanity-live-provider';
 import { Toaster } from './components/ui/sonner';
 import { usecaseUser } from './features/users/usecase';
 import ReactQueryProvider from './lib/react-query';
@@ -83,15 +82,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App({ loaderData }: Route.ComponentProps) {
   return (
     <ReactQueryProvider>
-      <SanityLiveProvider>
-        <ClerkProvider
-          loaderData={loaderData}
-          signInFallbackRedirectUrl={'/'}
-          signUpFallbackRedirectUrl={'/onboarding'}
-        >
-          <Outlet />
-        </ClerkProvider>
-      </SanityLiveProvider>
+      <ClerkProvider
+        loaderData={loaderData}
+        signInFallbackRedirectUrl={'/'}
+        signUpFallbackRedirectUrl={'/onboarding'}
+      >
+        <Outlet />
+      </ClerkProvider>
     </ReactQueryProvider>
   );
 }

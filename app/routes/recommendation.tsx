@@ -28,11 +28,9 @@ import {
   useConfettiCelebration,
 } from '~/features/recommendation/components/success-celebration';
 import { recommendationQuery } from '~/features/recommendation/data';
-import { useRecommendationData } from '~/features/recommendation/hooks/use-recommendation-data';
+import { useLiveRecommendationData } from '~/features/recommendation/hooks/use-live-recommendation';
 import type { RecommendationData } from '~/features/recommendation/types';
-import { loadQuery } from '~/lib/sanity.loader.server';
-import { urlFor } from '~/lib/sanity-client';
-import { cn } from '~/lib/utils';
+import { client, urlFor } from '~/lib/sanity-client';
 import { getCurrentSession } from '~/root';
 import type { Route } from './+types/recommendation';
 
@@ -50,14 +48,16 @@ export async function loader(args: Route.LoaderArgs) {
     throw new Response('Unauthorized', { status: 401 });
   }
 
-  // Load initial recommendation data for SSR hydration - REQUIRED for live updates
-  const initial = await loadQuery<RecommendationData>(recommendationQuery, {
-    userId: currentSession._id,
-  });
+  // Load initial recommendation data for SSR hydration using direct Sanity client
+  // This ensures consistency with our live client implementation
+  const initialData = await client.fetch<RecommendationData>(
+    recommendationQuery,
+    { userId: currentSession._id }
+  );
 
   return {
     session: currentSession,
-    initial, // Pass the full loadQuery result (includes data and sourceMap)
+    initial: initialData, // Pass the direct data from Sanity client
   };
 }
 
@@ -70,23 +70,19 @@ export default function RecommendationPage(props: Route.ComponentProps) {
   const queryClient = useQueryClient();
   const confetti = useConfettiCelebration();
 
-  // Use the live recommendation hook with initial data for proper SSR hydration
+  // Use the new live recommendation hook with initial data for proper SSR hydration
+  // This replaces @sanity/react-loader with our custom Live Content API implementation
+  // providing real-time updates in both development and production
   const {
     data,
     status,
     message,
     error: recommendationError,
-  } = useRecommendationData(
+  } = useLiveRecommendationData(
     props.loaderData.session._id,
     props.loaderData.initial
   );
-  // biome-ignore lint/suspicious/noConsole: Debugging live data
-  console.log({
-    data,
-    status,
-    message,
-    recommendationError,
-  });
+
   const handleSkip = () => {
     navigate('/');
   };
@@ -180,37 +176,9 @@ export default function RecommendationPage(props: Route.ComponentProps) {
 
   return (
     <PageBackground className="overflow-x-hidden" variant="purple-cyan">
-      <div className="relative flex min-h-screen">
+      <div className="relative flex min-h-screen items-center">
         <div className="mx-auto w-full max-w-6xl px-6 py-8 xl:px-0">
           <div className="container mx-auto space-y-8">
-            {/* Header Badge - Only show when not loading */}
-            {status !== 'pending' && (
-              <motion.div
-                animate={{ opacity: 1, y: 0 }}
-                className={cn(
-                  'mb-2 flex w-fit items-center space-x-2 rounded-full',
-                  'bg-primary/20 ring-1 ring-accent',
-                  'whitespace-pre px-2 py-1'
-                )}
-                initial={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.8, ease: 'easeOut' }}
-              >
-                <div
-                  className={cn(
-                    'w-fit rounded-full bg-secondary px-2 py-0.5',
-                    'font-medium text-primary text-xs sm:text-sm',
-                    'text-center'
-                  )}
-                >
-                  📣 Recommendation
-                </div>
-                <p className="font-medium text-primary text-xs sm:text-sm">
-                  Courses
-                </p>
-                <ArrowRight className="ml-1 text-primary" size={12} />
-              </motion.div>
-            )}
-
             {/* Loading States */}
             {(status === 'pending' || status === 'processing') && (
               <div className="space-y-8">
@@ -266,12 +234,13 @@ export default function RecommendationPage(props: Route.ComponentProps) {
                     </motion.h1>
                     <motion.p
                       animate={{ opacity: 1, y: 0 }}
-                      className="mx-auto max-w-lg text-base/7 text-text-secondary"
+                      className="mx-auto max-w-2xl text-base/7 text-text-secondary"
                       initial={{ opacity: 0, y: 20 }}
                       transition={{ delay: confetti.isComplete ? 0.6 : 0.1 }}
                     >
-                      We've curated these courses specifically for your learning
-                      goals and experience level.
+                      {data.reason
+                        ? data.reason
+                        : "We've curated these courses specifically for your learning goals and experience level."}
                     </motion.p>
                   </div>
 
