@@ -11,6 +11,8 @@ export default [
     index('routes/home.tsx'),
     route('/courses', 'routes/courses/courses.tsx'),
     route('/courses/:slug', 'routes/courses/course.tsx'),
+    route('/privacy', 'routes/privacy.tsx'),
+    route('/terms', 'routes/terms.tsx'),
   ]),
 
   route(
