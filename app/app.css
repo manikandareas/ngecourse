@@ -153,8 +153,18 @@
 
   /* Box shadow */
   --shadow-soft: var(--shadow-soft);
-}
 
+  --animate-bounce-x: bounce-x 0.5s ease-in-out infinite alternate;
+
+  @keyframes bounce-x {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(4px);
+    } /* jarak gerak */
+  }
+}
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -223,11 +233,16 @@
     -webkit-backdrop-filter: blur(24px) saturate(1.4);
     border: 1px solid var(--border-strong);
     border-radius: var(--radius);
-    box-shadow: var(--shadow-soft), 0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+    box-shadow:
+      var(--shadow-soft),
+      0 0 0 1px rgba(255, 255, 255, 0.02) inset;
     /* Fallback for browsers without backdrop-filter support */
-    background-image: 
+    background-image:
       linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
-      linear-gradient(rgba(var(--overlay-rgb), 0.95), rgba(var(--overlay-rgb), 0.95));
+      linear-gradient(
+        rgba(var(--overlay-rgb), 0.95),
+        rgba(var(--overlay-rgb), 0.95)
+      );
   }
 
   /* Subtle variant for less prominent surfaces */

@@ -23,7 +23,7 @@ export function RecommendationSection({
         <div className="group mx-auto w-fit rounded-full border border-accent/30 bg-accent/5 px-4 py-2 backdrop-blur-sm transition-all hover:border-accent/50 hover:bg-accent/10">
           <AnimatedShinyText className="inline-flex items-center justify-center text-accent transition ease-out hover:text-accent/90">
             <span>✨ Curated For You</span>
-            <ArrowRightIcon className="ml-1 size-3 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
+            <ArrowRightIcon className="ml-1 size-3 animate-bounce-x transition-transform duration-300 ease-in-out will-change-transform group-hover:translate-x-0.5" />
           </AnimatedShinyText>
         </div>
         <h2 className="font-light text-3xl text-text-primary leading-[1.1] tracking-tight sm:text-4xl">
