@@ -1,4 +1,5 @@
 import { ArrowRight } from 'lucide-react';
+import type { Topic } from 'sanity.types';
 import { Button } from '~/components/ui/3d-button';
 import { CourseBadge } from '~/features/courses/components/course-badge';
 import DetailEnrollDialog from '~/features/courses/components/detail-enroll-dialog';
@@ -11,6 +12,9 @@ export const RecommendationCard = ({
   slug,
   onEnroll,
   isLoading,
+  duration = 'TBD',
+  lessonsCount = 0,
+  topics = [],
 }: {
   title: string;
   description: string;
@@ -19,6 +23,9 @@ export const RecommendationCard = ({
   slug: string;
   onEnroll: () => void;
   isLoading: boolean;
+  duration?: string;
+  lessonsCount?: number;
+  topics?: unknown[];
 }) => {
   return (
     <div className="flex flex-col gap-2">
@@ -36,15 +43,15 @@ export const RecommendationCard = ({
         <DetailEnrollDialog
           description={description}
           difficulty={difficulty}
-          duration={'10 hours'}
+          duration={duration}
           id={slug}
           image={image}
           isLoading={isLoading}
-          lessonsCount={15}
+          lessonsCount={lessonsCount}
           onEnroll={onEnroll}
           slug={slug}
           title={title}
-          topics={[]}
+          topics={topics as Topic[]}
         >
           <Button className="" type="button">
             Enroll <ArrowRight />

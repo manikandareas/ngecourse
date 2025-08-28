@@ -8,6 +8,9 @@ import {
   UsecaseError,
 } from '~/features/shared/errors';
 
+const EXTERNAL_SERVICE_URL =
+  import.meta.env.VITE_EXTERNAL_SERVICE_URL || 'http://localhost:4000';
+
 const recommendCourses = async (query: string, token: string) => {
   const querySchema = z.string().min(1, 'Query must not be empty');
   const validationResult = querySchema.safeParse(query);
@@ -20,7 +23,7 @@ const recommendCourses = async (query: string, token: string) => {
 
   try {
     const res = await axios.post(
-      'http://localhost:4000/api/recommendations',
+      `${EXTERNAL_SERVICE_URL}/api/recommendations`,
       {
         query,
       },

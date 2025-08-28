@@ -15,10 +15,6 @@ export const action = async ({ request }: Route.ActionArgs) => {
         usecaseUser.userCreated(evt.data);
         break;
       }
-      case 'session.created':
-        console.log('NGAPAIN KEK');
-        break;
-
       default:
         break;
     }

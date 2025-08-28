@@ -32,6 +32,11 @@ export function CourseBadge(props: {
 
   const config = difficultyConfig[props.difficulty];
 
+  // If config is undefined (invalid difficulty value), return null or fallback
+  if (!config) {
+    return null;
+  }
+
   return (
     <Badge
       className={cn(

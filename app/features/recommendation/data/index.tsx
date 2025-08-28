@@ -1,22 +1,30 @@
 import { defineQuery } from 'groq';
 import { client } from '~/lib/sanity-client';
 
-const getRecommendationForUser = async (userId: string) => {
-  const recommendationQuery = defineQuery(`
-    *[_type == "recommendation" && createdFor._ref == $userId][0]{
-      ...,
-      "courses": courses[]->{
-        _id,
-        title,
-        "slug": slug.current,
-        "topics": topics[]->,
-        description,
-        difficulty,
-        thumbnail,
-        trailer
-      }
+export const recommendationQuery = defineQuery(`
+  *[_type == "recommendation" && createdFor._ref == $userId][0]{
+    _id,
+    _type,
+    _createdAt,
+    _updatedAt,
+    query,
+    reason,
+    status,
+    message,
+    "courses": courses[]->{
+      _id,
+      title,
+      "slug": slug.current,
+      "topics": topics[]->,
+      description,
+      difficulty,
+      thumbnail,
+      trailer
     }
-  `);
+  }
+`);
+
+const getRecommendationForUser = async (userId: string) => {
   try {
     return await client.fetch(recommendationQuery, { userId });
   } catch (error) {

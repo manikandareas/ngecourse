@@ -156,6 +156,8 @@ export type Recommendation = {
     _key: string;
     [internalGroqTypeReferenceTo]?: "course";
   }>;
+  status?: "in_progress" | "completed" | "failed";
+  message?: string;
 };
 
 export type Enrollment = {
@@ -1059,21 +1061,16 @@ export type AttemptsQueryResult = Array<{
 
 // Source: ./app/features/recommendation/data/index.tsx
 // Variable: recommendationQuery
-// Query: *[_type == "recommendation" && createdFor._ref == $userId][0]{      ...,      "courses": courses[]->{        _id,        title,        "slug": slug.current,        "topics": topics[]->,        description,        difficulty,        thumbnail,        trailer      }    }
+// Query: *[_type == "recommendation" && createdFor._ref == $userId][0]{    _id,    _type,    _createdAt,    _updatedAt,    query,    reason,    status,    message,    "courses": courses[]->{      _id,      title,      "slug": slug.current,      "topics": topics[]->,      description,      difficulty,      thumbnail,      trailer    }  }
 export type RecommendationQueryResult = {
   _id: string;
   _type: "recommendation";
   _createdAt: string;
   _updatedAt: string;
-  _rev: string;
-  query?: string;
-  reason?: string;
-  createdFor?: {
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "user";
-  };
+  query: string | null;
+  reason: string | null;
+  status: "completed" | "failed" | "in_progress" | null;
+  message: string | null;
   courses: Array<{
     _id: string;
     title: string | null;
@@ -1192,7 +1189,7 @@ declare module "@sanity/client" {
     "\n    *[_type == \"quiz\" && slug.current == $slug][0]{\n      _id,\n      _type,\n      _createdAt,\n      _updatedAt,\n      title,\n      \"slug\": slug.current,\n      description,\n      maxAttempt,\n      questions[]{\n        _key,\n        question,\n        options,\n        correctOptionIndex,\n        explanation\n      }\n    }\n  ": QuizQueryResult;
     "\n    *[_type == \"quizAttempt\" && _id == $attemptId && user[0]._ref == $userId][0]{\n      _id,\n      _type,\n      _createdAt,\n      _updatedAt,\n      _rev,\n      attemptNumber,\n      status,\n      answers[]{\n        _key,\n        questionIndex,\n        selectedOptionIndex,\n        isOutcome,\n        timeTakenMs\n      },\n      correctCount,\n      totalQuestions,\n      score,\n      percentage,\n      startedAt,\n      submittedAt,\n      durationMs,\n      feedback,\n      \"quiz\": quiz[0]->{\n        _id,\n        title,\n        \"slug\": slug.current,\n        description,\n        questions[]{\n          _key,\n          question,\n          options,\n          correctOptionIndex,\n          explanation\n        }\n      },\n      \"course\": course[0]->{\n        _id,\n        title,\n        \"slug\": slug.current\n      },\n      \"chapter\": chapter[0]->{\n        _id,\n        title,\n        \"slug\": slug.current\n      }\n    }\n  ": AttemptQueryResult;
     "\n    *[_type == \"quizAttempt\" && \n      user[0]._ref == $userId && \n      quiz[0]._ref == $quizId] | order(_createdAt desc){\n      _id,\n      attemptNumber,\n      status,\n      percentage,\n      correctCount,\n      totalQuestions,\n      _createdAt,\n      submittedAt\n    }\n  ": AttemptsQueryResult;
-    "\n    *[_type == \"recommendation\" && createdFor._ref == $userId][0]{\n      ...,\n      \"courses\": courses[]->{\n        _id,\n        title,\n        \"slug\": slug.current,\n        \"topics\": topics[]->,\n        description,\n        difficulty,\n        thumbnail,\n        trailer\n      }\n    }\n  ": RecommendationQueryResult;
+    "\n  *[_type == \"recommendation\" && createdFor._ref == $userId][0]{\n    _id,\n    _type,\n    _createdAt,\n    _updatedAt,\n    query,\n    reason,\n    status,\n    message,\n    \"courses\": courses[]->{\n      _id,\n      title,\n      \"slug\": slug.current,\n      \"topics\": topics[]->,\n      description,\n      difficulty,\n      thumbnail,\n      trailer\n    }\n  }\n": RecommendationQueryResult;
     "\n    *[_type == \"user\" && email == $email][0]\n  ": FindByEmailQueryResult;
     "\n    *[_type == \"user\" && clerkId == $clerkId][0]\n  ": FindByClerkIdQueryResult;
     "\n    *[_type == \"user\" && username == $username][0]\n  ": FindByUsernameQueryResult;
