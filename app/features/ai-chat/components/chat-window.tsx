@@ -39,11 +39,13 @@ interface ChatWindowProps {
   onClose?: () => void;
 }
 
+const EXTERNAL_SERVICE_URL =
+  import.meta.env.VITE_EXTERNAL_SERVICE_URL || 'http://localhost:4000';
+
 export const ChatWindow = ({
   lessonId,
   chatHistory,
   variant = 'desktop',
-  onClose,
 }: ChatWindowProps) => {
   const { getToken } = useAuth();
 
@@ -63,15 +65,13 @@ export const ChatWindow = ({
 
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
-      api: 'http://localhost:4000/api/chat',
+      api: `${EXTERNAL_SERVICE_URL}/api/chat`,
       body: {
         lessonId,
       },
     }),
     messages: chatHistory,
   });
-  console.log(chatHistory);
-
   return (
     <div
       className={`relative mx-auto size-full ${
@@ -95,7 +95,7 @@ export const ChatWindow = ({
                               <SourcesTrigger
                                 count={
                                   message.parts.filter(
-                                    (part) => part.type === 'source-url'
+                                    (p) => p.type === 'source-url'
                                   ).length
                                 }
                               />
@@ -108,6 +108,8 @@ export const ChatWindow = ({
                               </SourcesContent>
                             </>
                           );
+                        default:
+                          return null;
                       }
                     })}
                   </Sources>
@@ -179,7 +181,7 @@ export function toUIMessage(doc: ChatMessage): UIMessage {
       parts: [],
     };
   }
-  console.log({ doc });
+
   return {
     id: doc.messageId || '',
     role: doc.role || 'user',
