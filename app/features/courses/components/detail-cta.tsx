@@ -65,22 +65,19 @@ export const DetailCTA: React.FC<DetailCTAProps> = (props) => {
   return (
     <div className="">
       {props.enrollment ? (
-        <button
-          className="btn-primary group focus-visible:ring-2"
+        <Button
+          aria-label="Continue learning this course"
           onClick={() => {
             if (currentPath) {
               navigate(currentPath);
             }
           }}
+          size={'lg'}
           type="button"
-          aria-label="Continue learning this course"
-          style={{
-            '--tw-ring-color': 'rgb(62 91 255 / 0.6)'
-          } as React.CSSProperties}
         >
           Continue Learning
           <ArrowRightIcon className="ml-2 size-4 transition-transform group-hover:translate-x-1" />
-        </button>
+        </Button>
       ) : (
         <DetailEnrollDialog
           description={props.course.description || 'Course Description'}
@@ -95,13 +92,15 @@ export const DetailCTA: React.FC<DetailCTAProps> = (props) => {
           title={props.course.title || 'Course Title'}
           topics={(props.course.topics as Topic[]) || []}
         >
-          <button 
-            className="btn-primary group px-8 py-3 focus-visible:ring-2" 
-            type="button"
+          <button
             aria-label="Start learning this course"
-            style={{
-              '--tw-ring-color': 'rgb(62 91 255 / 0.6)'
-            } as React.CSSProperties}
+            className="btn-primary group px-8 py-3 focus-visible:ring-2"
+            style={
+              {
+                '--tw-ring-color': 'rgb(62 91 255 / 0.6)',
+              } as React.CSSProperties
+            }
+            type="button"
           >
             Start Learning Now
             <ArrowRightIcon className="ml-2 size-4 transition-transform group-hover:translate-x-1" />
