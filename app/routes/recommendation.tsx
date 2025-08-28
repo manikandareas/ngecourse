@@ -116,11 +116,11 @@ export default function RecommendationPage(props: Route.ComponentProps) {
         `Enrollment failed: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     },
-    onSuccess: (res) => {
+    onSuccess: (res, variable) => {
       if (res.success) {
         document.getElementById('dialog-close')?.click();
         toast.success('Successfully enrolled in the course!');
-        navigate('/');
+        navigate(`/courses/${variable.courseSlug}`);
         return;
       }
 
@@ -135,6 +135,7 @@ export default function RecommendationPage(props: Route.ComponentProps) {
       });
       return;
     }
+
     mutate({
       courseSlug,
       userId: props.loaderData.session._id,
