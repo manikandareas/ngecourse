@@ -27,7 +27,6 @@ interface FooterProps {
 
 export function Footer({
   logo,
-  brandName,
   socialLinks,
   mainLinks,
   legalLinks,
@@ -37,13 +36,7 @@ export function Footer({
     <footer className="mx-auto max-w-7xl pt-16 pb-6 lg:pt-24 lg:pb-8">
       <div className="px-4 lg:px-8">
         <div className="md:flex md:items-start md:justify-between">
-          <Link
-            aria-label={brandName}
-            className="flex items-center gap-x-2"
-            to="/"
-          >
-            {logo}
-          </Link>
+          {logo}
           <ul className="mt-6 flex list-none space-x-3 md:mt-0">
             {socialLinks.map((link, i) => (
               <li key={i.toString()}>
@@ -53,9 +46,9 @@ export function Footer({
                   size="icon"
                   variant="secondary"
                 >
-                  <a aria-label={link.label} href={link.href} target="_blank">
+                  <Link aria-label={link.label} target="_blank" to={link.href}>
                     {link.icon}
-                  </a>
+                  </Link>
                 </Button>
               </li>
             ))}

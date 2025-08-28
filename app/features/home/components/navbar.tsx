@@ -32,6 +32,7 @@ export function Navbar() {
     {
       name: 'Progress',
       link: '/progress',
+      isAuthRequired: true,
     },
     {
       name: 'Community',
@@ -82,16 +83,14 @@ export function Navbar() {
         <div className="flex items-center gap-3">
           <SignedOut>
             <SignInButton mode="modal">
-              <Button
-                onClick={() => console.log('sign in')}
-                type="button"
-                variant="secondary"
-              >
+              <Button className="z-50" type="button" variant="secondary">
                 Sign In
               </Button>
             </SignInButton>
             <SignUpButton mode="modal">
-              <Button>Get Started</Button>
+              <Button className="z-50" type="button">
+                Get Started
+              </Button>
             </SignUpButton>
           </SignedOut>
           <SignedIn>

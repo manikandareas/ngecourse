@@ -1,3 +1,4 @@
+import { useAuth } from '@clerk/react-router';
 import { IconMenu2, IconX } from '@tabler/icons-react';
 import {
   AnimatePresence,
@@ -24,6 +25,7 @@ interface NavItemsProps {
   items: {
     name: string;
     link: string;
+    isAuthRequired?: boolean;
   }[];
   className?: string;
   onItemClick?: () => void;
@@ -108,36 +110,42 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
   const [hovered, setHovered] = useState<number | null>(null);
   const [focused, setFocused] = useState<number | null>(null);
 
+  const { isSignedIn } = useAuth();
   return (
-    <nav 
+    // biome-ignore lint/nursery/noNoninteractiveElementInteractions: false positive
+    <nav
+      aria-label="Main navigation"
       className={cn(
         'absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 font-medium text-sm text-text-primary transition duration-150 lg:flex lg:space-x-2',
         className
       )}
       onMouseLeave={() => setHovered(null)}
-      role="navigation"
-      aria-label="Main navigation"
     >
-      {items.map((item, idx) => (
-        <Link
-          className="relative px-4 py-2.5 text-text-secondary hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 rounded-full transition-colors duration-150"
-          key={`link-${idx.toString()}`}
-          onClick={onItemClick}
-          onMouseEnter={() => setHovered(idx)}
-          onFocus={() => setFocused(idx)}
-          onBlur={() => setFocused(null)}
-          to={item.link}
-        >
-          {(hovered === idx || focused === idx) && (
-            <motion.div
-              className="absolute inset-0 h-full w-full rounded-full bg-white/10 border border-border-hairline"
-              layoutId={focused === idx ? 'focused' : 'hovered'}
-              transition={{ duration: 0.15, ease: 'easeOut' }}
-            />
-          )}
-          <span className="relative z-20">{item.name}</span>
-        </Link>
-      ))}
+      {items.map((item, idx) => {
+        if (item.isAuthRequired && !isSignedIn) {
+          return null;
+        }
+        return (
+          <Link
+            className="relative rounded-full px-4 py-2.5 text-text-secondary transition-colors duration-150 hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+            key={`link-${idx.toString()}`}
+            onBlur={() => setFocused(null)}
+            onClick={onItemClick}
+            onFocus={() => setFocused(idx)}
+            onMouseEnter={() => setHovered(idx)}
+            to={item.link}
+          >
+            {(hovered === idx || focused === idx) && (
+              <motion.div
+                className="absolute inset-0 h-full w-full rounded-full border border-border-hairline bg-white/10"
+                layoutId={focused === idx ? 'focused' : 'hovered'}
+                transition={{ duration: 0.15, ease: 'easeOut' }}
+              />
+            )}
+            <span className="relative z-20">{item.name}</span>
+          </Link>
+        );
+      })}
     </nav>
   );
 };
@@ -151,7 +159,7 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
         y: visible ? 4 : 0,
       }}
       className={cn(
-        'relative z-50 mx-auto flex w-full max-w-[calc(100vw-1rem)] flex-col items-center justify-between px-4 py-4 lg:hidden rounded-2xl',
+        'relative z-50 mx-auto flex w-full max-w-[calc(100vw-1rem)] flex-col items-center justify-between rounded-2xl px-4 py-4 lg:hidden',
         visible ? 'tinted-blur border border-border-strong' : 'bg-transparent',
         className
       )}
@@ -182,50 +190,54 @@ export const MobileNavHeader = ({
   );
 };
 
-export const MobileNavMenu = React.forwardRef<HTMLElement, MobileNavMenuProps>(({ children, className, isOpen }, ref) => {
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.section
-          ref={ref}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          className={cn(
-            'absolute inset-x-0 top-20 z-50 flex w-full flex-col items-start justify-start gap-6 glass-card-strong text-text-primary',
-            className
-          )}
-          exit={{ opacity: 0, y: -10, scale: 0.95 }}
-          initial={{ opacity: 0, y: -10, scale: 0.95 }}
-          transition={{ duration: 0.15, ease: 'easeOut' }}
-          role="region"
-          aria-label="Mobile navigation menu"
-        >
-          {children}
-        </motion.section>
-      )}
-    </AnimatePresence>
-  );
-});
+export const MobileNavMenu = React.forwardRef<HTMLElement, MobileNavMenuProps>(
+  ({ children, className, isOpen }, ref) => {
+    return (
+      <AnimatePresence>
+        {isOpen && (
+          <motion.section
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            aria-label="Mobile navigation menu"
+            className={cn(
+              'glass-card-strong absolute inset-x-0 top-20 z-50 flex w-full flex-col items-start justify-start gap-6 text-text-primary',
+              className
+            )}
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            ref={ref}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
+          >
+            {children}
+          </motion.section>
+        )}
+      </AnimatePresence>
+    );
+  }
+);
 
 MobileNavMenu.displayName = 'MobileNavMenu';
 
-export const MobileNavToggle = React.forwardRef<HTMLButtonElement, {
-  isOpen: boolean;
-  onClick: () => void;
-}>(({ isOpen, onClick }, ref) => {
+export const MobileNavToggle = React.forwardRef<
+  HTMLButtonElement,
+  {
+    isOpen: boolean;
+    onClick: () => void;
+  }
+>(({ isOpen, onClick }, ref) => {
   return (
     <motion.button
-      ref={ref}
-      className="inline-flex items-center justify-center size-11 rounded-full bg-white/5 border border-border-hairline hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 active:translate-y-[1px] transition-all duration-150"
-      onClick={onClick}
-      whileTap={{ scale: 0.95 }}
       aria-expanded={isOpen}
       aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
+      className="inline-flex size-11 items-center justify-center rounded-full border border-border-hairline bg-white/5 transition-all duration-150 hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 active:translate-y-[1px]"
+      onClick={onClick}
+      ref={ref}
       type="button"
+      whileTap={{ scale: 0.95 }}
     >
       {isOpen ? (
-        <IconX className="text-text-primary size-5" aria-hidden="true" />
+        <IconX aria-hidden="true" className="size-5 text-text-primary" />
       ) : (
-        <IconMenu2 className="text-text-primary size-5" aria-hidden="true" />
+        <IconMenu2 aria-hidden="true" className="size-5 text-text-primary" />
       )}
     </motion.button>
   );
@@ -236,21 +248,26 @@ MobileNavToggle.displayName = 'MobileNavToggle';
 export const NavbarLogo = () => {
   return (
     <Link
-      className="relative z-20 mr-4 flex items-center space-x-3 px-3 py-2 rounded-full hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 transition-all duration-150 group"
-      to="/"
       aria-label="Go to homepage"
+      className="group relative z-20 mr-4 flex items-center space-x-3 rounded-full px-3 py-2 transition-all duration-150 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+      to="/"
     >
-      <div className="size-8 rounded-full bg-gradient-to-br from-accent to-accent-alt flex items-center justify-center" role="img" aria-hidden="true">
+      <div
+        aria-hidden="true"
+        className="flex size-8 items-center justify-center rounded-full bg-gradient-to-br from-accent to-accent-alt"
+        role="img"
+      >
         <img
           alt=""
+          className="invert filter"
           height={20}
           src="https://assets.aceternity.com/logo-dark.png"
           width={20}
-          className="filter invert"
-          role="presentation"
         />
       </div>
-      <span className="font-medium text-text-primary text-base group-hover:text-accent transition-colors duration-150">Genii</span>
+      <span className="font-medium text-base text-text-primary transition-colors duration-150 group-hover:text-accent">
+        Genii
+      </span>
     </Link>
   );
 };
