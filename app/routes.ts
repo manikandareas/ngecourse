@@ -13,6 +13,7 @@ export default [
     route('/courses/:slug', 'routes/courses/course.tsx'),
     route('/privacy', 'routes/privacy.tsx'),
     route('/terms', 'routes/terms.tsx'),
+    route('/progress', 'routes/progress.tsx'),
   ]),
 
   route(

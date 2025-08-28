@@ -977,6 +977,180 @@ export type EnrollmentQueryResult = {
   percentComplete: number | null;
 } | null;
 
+// Source: ./app/features/progress/data/index.ts
+// Variable: getUserProgressDataQuery
+// Query: *[_type == "user" && clerkId == $clerkId][0]{    _id,    username,    firstname,    lastname,    studyStreak,    streakStartDate,    learningGoals,    studyPlan,    level,    onboardingStatus  }
+export type GetUserProgressDataQueryResult = {
+  _id: string;
+  username: string | null;
+  firstname: string | null;
+  lastname: string | null;
+  studyStreak: number | null;
+  streakStartDate: number | null;
+  learningGoals: Array<string> | null;
+  studyPlan: string | null;
+  level: "advanced" | "beginner" | "intermediate" | null;
+  onboardingStatus: "completed" | "not_started" | null;
+} | null;
+// Variable: getUserEnrollmentsQuery
+// Query: *[_type == "enrollment" && userEnrolled[0]._ref == $userId]{    _id,    percentComplete,    dateCompleted,    contentsCompleted,    course[0]->{      _id,      title,      "slug": slug.current,      description,      difficulty,      thumbnail,      topics[]->{        _id,        title,        "slug": slug.current      }    }  }
+export type GetUserEnrollmentsQueryResult = Array<{
+  _id: string;
+  percentComplete: number | null;
+  dateCompleted: string | null;
+  contentsCompleted: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "lesson";
+  } | {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "quiz";
+  }> | null;
+  course: {
+    _id: string;
+    title: string | null;
+    slug: string | null;
+    description: string | null;
+    difficulty: "advanced" | "beginner" | "intermediate" | null;
+    thumbnail: {
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    } | null;
+    topics: Array<{
+      _id: string;
+      title: string | null;
+      slug: string | null;
+    }> | null;
+  } | null;
+}>;
+// Variable: getRecentQuizAttemptsQuery
+// Query: *[_type == "quizAttempt" && user[0]._ref == $userId] | order(submittedAt desc)[0...5]{    _id,    score,    percentage,    totalQuestions,    correctCount,    submittedAt,    status,    quiz[0]->{      _id,      title,      "slug": slug.current    },    course[0]->{      _id,      title,      "slug": slug.current    },    chapter[0]->{      _id,      title    }  }
+export type GetRecentQuizAttemptsQueryResult = Array<{
+  _id: string;
+  score: number | null;
+  percentage: number | null;
+  totalQuestions: number | null;
+  correctCount: number | null;
+  submittedAt: string | null;
+  status: "graded" | "in_progress" | "submitted" | null;
+  quiz: {
+    _id: string;
+    title: string | null;
+    slug: string | null;
+  } | null;
+  course: {
+    _id: string;
+    title: string | null;
+    slug: string | null;
+  } | null;
+  chapter: {
+    _id: string;
+    title: string | null;
+  } | null;
+}>;
+// Variable: getRecentlyCompletedContentQuery
+// Query: *[_type == "enrollment" && userEnrolled[0]._ref == $userId && count(contentsCompleted) > 0]{    _id,    "recentCompletions": contentsCompleted[-5..-1][]->{      _id,      _type,      title,      "slug": slug.current,      "parentChapter": *[_type == "chapter" && references(^._id)][0]{        _id,        title,        "slug": slug.current      },      "parentCourse": *[_type == "chapter" && references(^._id)][0].course[0]->{        _id,        title,        "slug": slug.current      }    },    course[0]->{      _id,      title,      "slug": slug.current    },    percentComplete,    dateCompleted  }
+export type GetRecentlyCompletedContentQueryResult = Array<{
+  _id: string;
+  recentCompletions: Array<{
+    _id: string;
+    _type: "lesson";
+    title: string | null;
+    slug: string | null;
+    parentChapter: {
+      _id: string;
+      title: string | null;
+      slug: string | null;
+    } | null;
+    parentCourse: {
+      _id: string;
+      title: string | null;
+      slug: string | null;
+    } | null;
+  } | {
+    _id: string;
+    _type: "quiz";
+    title: string | null;
+    slug: string | null;
+    parentChapter: {
+      _id: string;
+      title: string | null;
+      slug: string | null;
+    } | null;
+    parentCourse: {
+      _id: string;
+      title: string | null;
+      slug: string | null;
+    } | null;
+  }> | null;
+  course: {
+    _id: string;
+    title: string | null;
+    slug: string | null;
+  } | null;
+  percentComplete: number | null;
+  dateCompleted: string | null;
+}>;
+// Variable: getCourseProgressQuery
+// Query: *[_type == "enrollment" && userEnrolled[0]._ref == $userId && course[0]._ref == $courseId][0]{    _id,    percentComplete,    contentsCompleted,    dateCompleted,    course[0]->{      _id,      title,      "slug": slug.current,      chapters[]->{        _id,        title,        "slug": slug.current,        contents[]->{          _id,          _type,          title,          "slug": slug.current        }      }    }  }
+export type GetCourseProgressQueryResult = {
+  _id: string;
+  percentComplete: number | null;
+  contentsCompleted: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "lesson";
+  } | {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "quiz";
+  }> | null;
+  dateCompleted: string | null;
+  course: {
+    _id: string;
+    title: string | null;
+    slug: string | null;
+    chapters: Array<{
+      _id: string;
+      title: string | null;
+      slug: string | null;
+      contents: Array<{
+        _id: string;
+        _type: "lesson";
+        title: string | null;
+        slug: string | null;
+      } | {
+        _id: string;
+        _type: "quiz";
+        title: string | null;
+        slug: string | null;
+      }> | null;
+    }> | null;
+  } | null;
+} | null;
+// Variable: getUserActivityStatsQuery
+// Query: {    "totalEnrollments": count(*[_type == "enrollment" && userEnrolled[0]._ref == $userId]),    "completedCourses": count(*[_type == "enrollment" && userEnrolled[0]._ref == $userId && percentComplete == 100]),    "totalQuizAttempts": count(*[_type == "quizAttempt" && user[0]._ref == $userId]),    "averageQuizScore": math::avg(*[_type == "quizAttempt" && user[0]._ref == $userId && status == "graded"].percentage),    "totalContentCompleted": math::sum(*[_type == "enrollment" && userEnrolled[0]._ref == $userId]{ "c": count(contentsCompleted) }.c)  }
+export type GetUserActivityStatsQueryResult = {
+  totalEnrollments: number;
+  completedCourses: number;
+  totalQuizAttempts: number;
+  averageQuizScore: number | null;
+  totalContentCompleted: number;
+};
+
 // Source: ./app/features/quizzes/data/index.ts
 // Variable: quizQuery
 // Query: *[_type == "quiz" && slug.current == $slug][0]{      _id,      _type,      _createdAt,      _updatedAt,      title,      "slug": slug.current,      description,      maxAttempt,      questions[]{        _key,        question,        options,        correctOptionIndex,        explanation      }    }
@@ -1186,6 +1360,12 @@ declare module "@sanity/client" {
     "*[_type == \"lesson\" && slug.current == $slug][0]": LessonQueryResult;
     "*[_type == \"chapter\" && slug.current == $slug][0]{\n    ...,\n      \"contents\": contents[]->{\n          _id,\n          _type,\n          _createdAt,\n          _updatedAt,\n          title,\n          slug,\n        }\n    }": ChapterQueryResult;
     "\n    *[_type == \"enrollment\" &&\n      userEnrolled[0]._ref == $userId &&\n      course[0]->.slug.current == $courseSlug][0]{\n      _id,\n      _type,\n      _rev,\n      _createdAt,\n      _updatedAt,\n      \"userEnrolled\": userEnrolled[0]->,\n      \"course\": course[0]->,\n      \"contentsCompleted\": contentsCompleted[]->{\n        _id,\n        _type,\n        _createdAt,\n        _updatedAt,\n        title,\n        slug,\n      },\n      dateCompleted,\n      percentComplete\n    }\n  ": EnrollmentQueryResult;
+    "\n  *[_type == \"user\" && clerkId == $clerkId][0]{\n    _id,\n    username,\n    firstname,\n    lastname,\n    studyStreak,\n    streakStartDate,\n    learningGoals,\n    studyPlan,\n    level,\n    onboardingStatus\n  }\n": GetUserProgressDataQueryResult;
+    "\n  *[_type == \"enrollment\" && userEnrolled[0]._ref == $userId]{\n    _id,\n    percentComplete,\n    dateCompleted,\n    contentsCompleted,\n    course[0]->{\n      _id,\n      title,\n      \"slug\": slug.current,\n      description,\n      difficulty,\n      thumbnail,\n      topics[]->{\n        _id,\n        title,\n        \"slug\": slug.current\n      }\n    }\n  }\n": GetUserEnrollmentsQueryResult;
+    "\n  *[_type == \"quizAttempt\" && user[0]._ref == $userId] | order(submittedAt desc)[0...5]{\n    _id,\n    score,\n    percentage,\n    totalQuestions,\n    correctCount,\n    submittedAt,\n    status,\n    quiz[0]->{\n      _id,\n      title,\n      \"slug\": slug.current\n    },\n    course[0]->{\n      _id,\n      title,\n      \"slug\": slug.current\n    },\n    chapter[0]->{\n      _id,\n      title\n    }\n  }\n": GetRecentQuizAttemptsQueryResult;
+    "\n  *[_type == \"enrollment\" && userEnrolled[0]._ref == $userId && count(contentsCompleted) > 0]{\n    _id,\n    \"recentCompletions\": contentsCompleted[-5..-1][]->{\n      _id,\n      _type,\n      title,\n      \"slug\": slug.current,\n      \"parentChapter\": *[_type == \"chapter\" && references(^._id)][0]{\n        _id,\n        title,\n        \"slug\": slug.current\n      },\n      \"parentCourse\": *[_type == \"chapter\" && references(^._id)][0].course[0]->{\n        _id,\n        title,\n        \"slug\": slug.current\n      }\n    },\n    course[0]->{\n      _id,\n      title,\n      \"slug\": slug.current\n    },\n    percentComplete,\n    dateCompleted\n  }\n": GetRecentlyCompletedContentQueryResult;
+    "\n  *[_type == \"enrollment\" && userEnrolled[0]._ref == $userId && course[0]._ref == $courseId][0]{\n    _id,\n    percentComplete,\n    contentsCompleted,\n    dateCompleted,\n    course[0]->{\n      _id,\n      title,\n      \"slug\": slug.current,\n      chapters[]->{\n        _id,\n        title,\n        \"slug\": slug.current,\n        contents[]->{\n          _id,\n          _type,\n          title,\n          \"slug\": slug.current\n        }\n      }\n    }\n  }\n": GetCourseProgressQueryResult;
+    "\n  {\n    \"totalEnrollments\": count(*[_type == \"enrollment\" && userEnrolled[0]._ref == $userId]),\n    \"completedCourses\": count(*[_type == \"enrollment\" && userEnrolled[0]._ref == $userId && percentComplete == 100]),\n    \"totalQuizAttempts\": count(*[_type == \"quizAttempt\" && user[0]._ref == $userId]),\n    \"averageQuizScore\": math::avg(*[_type == \"quizAttempt\" && user[0]._ref == $userId && status == \"graded\"].percentage),\n    \"totalContentCompleted\": math::sum(*[_type == \"enrollment\" && userEnrolled[0]._ref == $userId]{ \"c\": count(contentsCompleted) }.c)\n  }\n": GetUserActivityStatsQueryResult;
     "\n    *[_type == \"quiz\" && slug.current == $slug][0]{\n      _id,\n      _type,\n      _createdAt,\n      _updatedAt,\n      title,\n      \"slug\": slug.current,\n      description,\n      maxAttempt,\n      questions[]{\n        _key,\n        question,\n        options,\n        correctOptionIndex,\n        explanation\n      }\n    }\n  ": QuizQueryResult;
     "\n    *[_type == \"quizAttempt\" && _id == $attemptId && user[0]._ref == $userId][0]{\n      _id,\n      _type,\n      _createdAt,\n      _updatedAt,\n      _rev,\n      attemptNumber,\n      status,\n      answers[]{\n        _key,\n        questionIndex,\n        selectedOptionIndex,\n        isOutcome,\n        timeTakenMs\n      },\n      correctCount,\n      totalQuestions,\n      score,\n      percentage,\n      startedAt,\n      submittedAt,\n      durationMs,\n      feedback,\n      \"quiz\": quiz[0]->{\n        _id,\n        title,\n        \"slug\": slug.current,\n        description,\n        questions[]{\n          _key,\n          question,\n          options,\n          correctOptionIndex,\n          explanation\n        }\n      },\n      \"course\": course[0]->{\n        _id,\n        title,\n        \"slug\": slug.current\n      },\n      \"chapter\": chapter[0]->{\n        _id,\n        title,\n        \"slug\": slug.current\n      }\n    }\n  ": AttemptQueryResult;
     "\n    *[_type == \"quizAttempt\" && \n      user[0]._ref == $userId && \n      quiz[0]._ref == $quizId] | order(_createdAt desc){\n      _id,\n      attemptNumber,\n      status,\n      percentage,\n      correctCount,\n      totalQuestions,\n      _createdAt,\n      submittedAt\n    }\n  ": AttemptsQueryResult;
