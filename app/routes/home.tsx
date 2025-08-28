@@ -1,7 +1,7 @@
-import { ArrowRight, MoveRight, PhoneCall } from 'lucide-react';
+import { SignUpButton } from '@clerk/react-router';
+import { ArrowRight, MoveRight } from 'lucide-react';
 import { motion } from 'motion/react';
-import { Link } from 'react-router';
-import { Button, buttonVariants } from '~/components/ui/3d-button';
+import { Button } from '~/components/ui/3d-button';
 import { PageBackground } from '~/components/ui/page-background';
 import { cn } from '~/lib/utils';
 
@@ -32,15 +32,11 @@ export default function Home() {
               </p>
             </div>
             <div className="flex flex-row gap-4">
-              <Button className="gap-4" size="lg" variant="outline">
-                Jump on a call <PhoneCall className="h-4 w-4" />
-              </Button>
-              <Link
-                className={buttonVariants({ size: 'lg', className: 'gap-4' })}
-                to="/sign-up"
-              >
-                Sign up here <MoveRight className="h-4 w-4" />
-              </Link>
+              <SignUpButton mode="modal">
+                <Button className="gap-4" size="lg">
+                  Sign up here <MoveRight className="h-4 w-4" />
+                </Button>
+              </SignUpButton>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-8">

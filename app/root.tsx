@@ -82,7 +82,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App({ loaderData }: Route.ComponentProps) {
   return (
     <ReactQueryProvider>
-      <ClerkProvider loaderData={loaderData}>
+      <ClerkProvider
+        loaderData={loaderData}
+        signInFallbackRedirectUrl={'/'}
+        signUpFallbackRedirectUrl={'/onboarding'}
+      >
         <Outlet />
       </ClerkProvider>
     </ReactQueryProvider>

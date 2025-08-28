@@ -1,13 +1,19 @@
-import { SignedIn, SignedOut, UserButton } from '@clerk/react-router';
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignUpButton,
+  UserButton,
+} from '@clerk/react-router';
 import { Ticket } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { Button } from '~/components/ui/3d-button';
 import {
   MobileNav,
   MobileNavHeader,
   MobileNavMenu,
   MobileNavToggle,
   NavBody,
-  NavbarButton,
   Navbar as NavbarComp,
   NavbarLogo,
   NavItems,
@@ -75,10 +81,18 @@ export function Navbar() {
         <NavItems items={navItems} />
         <div className="flex items-center gap-3">
           <SignedOut>
-            <NavbarButton href="/sign-in" variant="secondary">
-              Sign In
-            </NavbarButton>
-            <NavbarButton variant="primary">Get Started</NavbarButton>
+            <SignInButton mode="modal">
+              <Button
+                onClick={() => console.log('sign in')}
+                type="button"
+                variant="secondary"
+              >
+                Sign In
+              </Button>
+            </SignInButton>
+            <SignUpButton mode="modal">
+              <Button>Get Started</Button>
+            </SignUpButton>
           </SignedOut>
           <SignedIn>
             <button
@@ -136,21 +150,23 @@ export function Navbar() {
 
           <div className="flex w-full flex-col gap-4 border-border-hairline border-t pt-6">
             <SignedOut>
-              <NavbarButton
-                className="w-full justify-center"
-                href="/sign-in"
-                onClick={closeMobileMenu}
-                variant="secondary"
-              >
-                Sign In
-              </NavbarButton>
-              <NavbarButton
-                className="w-full justify-center"
-                onClick={closeMobileMenu}
-                variant="primary"
-              >
-                Get Started
-              </NavbarButton>
+              <SignInButton mode="modal">
+                <Button
+                  className="w-full justify-center"
+                  onClick={closeMobileMenu}
+                  variant="secondary"
+                >
+                  Sign In
+                </Button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <Button
+                  className="w-full justify-center"
+                  onClick={closeMobileMenu}
+                >
+                  Get Started
+                </Button>
+              </SignUpButton>
             </SignedOut>
             <SignedIn>
               <button
