@@ -5,6 +5,7 @@ import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { PageBackground } from '~/components/ui/page-background';
 import { LessonHeader } from '~/features/courses/components/lesson-header';
+import { LessonNavigation } from '~/features/courses/components/lesson-navigation';
 import { useStartQuizMutation } from '../hooks/quiz-mutations';
 
 interface QuizPageProps {
@@ -247,6 +248,11 @@ export function QuizPage({
             )}
           </div>
         </main>
+
+        {/* Navigation Controls */}
+        <div className="mx-auto max-w-4xl px-4 pb-8 sm:px-6">
+          <LessonNavigation courseSlug={courseSlug} userId={userId} />
+        </div>
       </div>
     </PageBackground>
   );

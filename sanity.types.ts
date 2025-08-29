@@ -135,6 +135,85 @@ export type ChatSession = {
   };
 };
 
+export type UserAchievement = {
+  _id: string;
+  _type: "userAchievement";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  user?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "user";
+  };
+  achievement?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "achievement";
+  };
+  earned?: boolean;
+  earnedAt?: string;
+  progress?: number;
+  notified?: boolean;
+};
+
+export type Achievement = {
+  _id: string;
+  _type: "achievement";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  id?: string;
+  title?: string;
+  description?: string;
+  icon?: string;
+  category?: "first_steps" | "streak" | "quiz" | "course" | "social";
+  course?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "course";
+  };
+  criteria?: {
+    type?: "lesson_count" | "quiz_score" | "course_completion" | "streak_days" | "custom";
+    target?: number;
+    threshold?: number;
+  };
+  points?: number;
+  isActive?: boolean;
+};
+
+export type LearningSession = {
+  _id: string;
+  _type: "learningSession";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  user?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "user";
+  };
+  course?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "course";
+  };
+  startTime?: string;
+  endTime?: string;
+  durationMinutes?: number;
+  activitiesCompleted?: Array<{
+    type?: "lesson" | "quiz" | "reading";
+    contentId?: string;
+    timeSpent?: number;
+    _key: string;
+  }>;
+};
+
 export type Recommendation = {
   _id: string;
   _type: "recommendation";
@@ -390,6 +469,14 @@ export type User = {
   studyStreak?: number;
   streakStartDate?: number;
   delivery_preference?: string;
+  analytics?: {
+    totalXP?: number;
+    currentLevel?: number;
+    totalStudyTimeMinutes?: number;
+    averageSessionTime?: number;
+    strongestSkills?: Array<string>;
+    improvementAreas?: Array<string>;
+  };
 };
 
 export type Color = {
@@ -545,8 +632,243 @@ export type SanityAssetSourceData = {
   url?: string;
 };
 
-export type AllSanitySchemaTypes = ChatMessage | ChatSession | Recommendation | Enrollment | QuizAttempt | Quiz | Lesson | Chapter | Course | Topic | User | Color | RgbaColor | HsvaColor | HslaColor | Markdown | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
+export type AllSanitySchemaTypes = ChatMessage | ChatSession | UserAchievement | Achievement | LearningSession | Recommendation | Enrollment | QuizAttempt | Quiz | Lesson | Chapter | Course | Topic | User | Color | RgbaColor | HsvaColor | HslaColor | Markdown | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
 export declare const internalGroqTypeReferenceTo: unique symbol;
+// Source: ./app/features/achievements/data/index.ts
+// Variable: getUserAchievementsQuery
+// Query: *[_type == "userAchievement" && user._ref == $userId]{    _id,    earned,    earnedAt,    progress,    notified,    achievement->{      _id,      id,      title,      description,      icon,      category,      criteria,      points,      isActive,      course->    }  } | order(achievement->category, earned desc, achievement->points desc)
+export type GetUserAchievementsQueryResult = Array<{
+  _id: string;
+  earned: boolean | null;
+  earnedAt: string | null;
+  progress: number | null;
+  notified: boolean | null;
+  achievement: {
+    _id: string;
+    id: string | null;
+    title: string | null;
+    description: string | null;
+    icon: string | null;
+    category: "course" | "first_steps" | "quiz" | "social" | "streak" | null;
+    criteria: {
+      type?: "course_completion" | "custom" | "lesson_count" | "quiz_score" | "streak_days";
+      target?: number;
+      threshold?: number;
+    } | null;
+    points: number | null;
+    isActive: boolean | null;
+    course: {
+      _id: string;
+      _type: "course";
+      _createdAt: string;
+      _updatedAt: string;
+      _rev: string;
+      title?: string;
+      slug?: Slug;
+      description?: string;
+      difficulty?: "advanced" | "beginner" | "intermediate";
+      thumbnail?: {
+        asset?: {
+          _ref: string;
+          _type: "reference";
+          _weak?: boolean;
+          [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+        };
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        _type: "image";
+      };
+      trailer?: string;
+      topics?: Array<{
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        _key: string;
+        [internalGroqTypeReferenceTo]?: "topic";
+      }>;
+      chapters?: Array<{
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        _key: string;
+        [internalGroqTypeReferenceTo]?: "chapter";
+      }>;
+    } | null;
+  } | null;
+}>;
+// Variable: getAvailableAchievementsQuery
+// Query: *[_type == "achievement" && isActive == true] | order(category, points asc){    _id,    id,    title,    description,    icon,    category,    criteria,    points,    isActive,    course->  }
+export type GetAvailableAchievementsQueryResult = Array<{
+  _id: string;
+  id: string | null;
+  title: string | null;
+  description: string | null;
+  icon: string | null;
+  category: "course" | "first_steps" | "quiz" | "social" | "streak" | null;
+  criteria: {
+    type?: "course_completion" | "custom" | "lesson_count" | "quiz_score" | "streak_days";
+    target?: number;
+    threshold?: number;
+  } | null;
+  points: number | null;
+  isActive: boolean | null;
+  course: {
+    _id: string;
+    _type: "course";
+    _createdAt: string;
+    _updatedAt: string;
+    _rev: string;
+    title?: string;
+    slug?: Slug;
+    description?: string;
+    difficulty?: "advanced" | "beginner" | "intermediate";
+    thumbnail?: {
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    };
+    trailer?: string;
+    topics?: Array<{
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      _key: string;
+      [internalGroqTypeReferenceTo]?: "topic";
+    }>;
+    chapters?: Array<{
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      _key: string;
+      [internalGroqTypeReferenceTo]?: "chapter";
+    }>;
+  } | null;
+}>;
+// Variable: getAchievementByIdQuery
+// Query: *[_type == "achievement" && id == $achievementId][0]{    _id,    id,    title,    description,    icon,    category,    criteria,    points,    isActive,    course->  }
+export type GetAchievementByIdQueryResult = {
+  _id: string;
+  id: string | null;
+  title: string | null;
+  description: string | null;
+  icon: string | null;
+  category: "course" | "first_steps" | "quiz" | "social" | "streak" | null;
+  criteria: {
+    type?: "course_completion" | "custom" | "lesson_count" | "quiz_score" | "streak_days";
+    target?: number;
+    threshold?: number;
+  } | null;
+  points: number | null;
+  isActive: boolean | null;
+  course: {
+    _id: string;
+    _type: "course";
+    _createdAt: string;
+    _updatedAt: string;
+    _rev: string;
+    title?: string;
+    slug?: Slug;
+    description?: string;
+    difficulty?: "advanced" | "beginner" | "intermediate";
+    thumbnail?: {
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    };
+    trailer?: string;
+    topics?: Array<{
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      _key: string;
+      [internalGroqTypeReferenceTo]?: "topic";
+    }>;
+    chapters?: Array<{
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      _key: string;
+      [internalGroqTypeReferenceTo]?: "chapter";
+    }>;
+  } | null;
+} | null;
+// Variable: getUserAchievementRecordQuery
+// Query: *[_type == "userAchievement" && user._ref == $userId && achievement._ref == $achievementId][0]
+export type GetUserAchievementRecordQueryResult = {
+  _id: string;
+  _type: "userAchievement";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  user?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "user";
+  };
+  achievement?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "achievement";
+  };
+  earned?: boolean;
+  earnedAt?: string;
+  progress?: number;
+  notified?: boolean;
+} | null;
+// Variable: getUserProgressForAchievementsQuery
+// Query: {    "user": *[_type == "user" && _id == $userId][0]{      _id,      studyStreak,      streakStartDate    },    "enrollments": *[_type == "enrollment" && userEnrolled[0]._ref == $userId]{      _id,      percentComplete,      dateCompleted,      "totalContent": count(course[0]->chapters[]->contents[]),      "completedContent": count(contentsCompleted),      "course": course[0]->{        _id,        title,        "slug": slug.current      }    },    "completedCourses": count(*[_type == "enrollment" && userEnrolled[0]._ref == $userId && percentComplete == 100 && defined(dateCompleted)]),    "completedCoursesList": *[_type == "enrollment" && userEnrolled[0]._ref == $userId && percentComplete == 100 && defined(dateCompleted)]{      _id,      dateCompleted,      "course": course[0]->{        _id,        title,        "slug": slug.current      }    },    "quizAttempts": *[_type == "quizAttempt" && user[0]._ref == $userId && status == "graded"]{      percentage,      submittedAt    },    "highScoringQuizzes": count(*[_type == "quizAttempt" && user[0]._ref == $userId && status == "graded" && percentage >= 90])  }
+export type GetUserProgressForAchievementsQueryResult = {
+  user: {
+    _id: string;
+    studyStreak: number | null;
+    streakStartDate: number | null;
+  } | null;
+  enrollments: Array<{
+    _id: string;
+    percentComplete: number | null;
+    dateCompleted: string | null;
+    totalContent: number | null;
+    completedContent: number | null;
+    course: {
+      _id: string;
+      title: string | null;
+      slug: string | null;
+    } | null;
+  }>;
+  completedCourses: number;
+  completedCoursesList: Array<{
+    _id: string;
+    dateCompleted: string | null;
+    course: {
+      _id: string;
+      title: string | null;
+      slug: string | null;
+    } | null;
+  }>;
+  quizAttempts: Array<{
+    percentage: number | null;
+    submittedAt: string | null;
+  }>;
+  highScoringQuizzes: number;
+};
+
 // Source: ./app/features/ai-chat/data/index.ts
 // Variable: chatHistoryQuery
 // Query: *[_type == "chatMessage" &&    session._ref in *[_type == "chatSession" &&      $userId in users[]._ref &&      $lessonId in lessons[]._ref &&      status == "active"]._id  ] | order(_createdAt asc) {    _id,    messageId,    role,    parts,    metadata,    session->{      _id,      sessionId,      status    }  }
@@ -919,6 +1241,14 @@ export type EnrollmentQueryResult = {
     studyStreak?: number;
     streakStartDate?: number;
     delivery_preference?: string;
+    analytics?: {
+      totalXP?: number;
+      currentLevel?: number;
+      totalStudyTimeMinutes?: number;
+      averageSessionTime?: number;
+      strongestSkills?: Array<string>;
+      improvementAreas?: Array<string>;
+    };
   } | null;
   course: {
     _id: string;
@@ -1301,6 +1631,14 @@ export type FindByEmailQueryResult = {
   studyStreak?: number;
   streakStartDate?: number;
   delivery_preference?: string;
+  analytics?: {
+    totalXP?: number;
+    currentLevel?: number;
+    totalStudyTimeMinutes?: number;
+    averageSessionTime?: number;
+    strongestSkills?: Array<string>;
+    improvementAreas?: Array<string>;
+  };
 } | null;
 // Variable: findByClerkIdQuery
 // Query: *[_type == "user" && clerkId == $clerkId][0]
@@ -1323,6 +1661,14 @@ export type FindByClerkIdQueryResult = {
   studyStreak?: number;
   streakStartDate?: number;
   delivery_preference?: string;
+  analytics?: {
+    totalXP?: number;
+    currentLevel?: number;
+    totalStudyTimeMinutes?: number;
+    averageSessionTime?: number;
+    strongestSkills?: Array<string>;
+    improvementAreas?: Array<string>;
+  };
 } | null;
 // Variable: findByUsernameQuery
 // Query: *[_type == "user" && username == $username][0]
@@ -1345,12 +1691,25 @@ export type FindByUsernameQueryResult = {
   studyStreak?: number;
   streakStartDate?: number;
   delivery_preference?: string;
+  analytics?: {
+    totalXP?: number;
+    currentLevel?: number;
+    totalStudyTimeMinutes?: number;
+    averageSessionTime?: number;
+    strongestSkills?: Array<string>;
+    improvementAreas?: Array<string>;
+  };
 } | null;
 
 // Query TypeMap
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
+    "\n  *[_type == \"userAchievement\" && user._ref == $userId]{\n    _id,\n    earned,\n    earnedAt,\n    progress,\n    notified,\n    achievement->{\n      _id,\n      id,\n      title,\n      description,\n      icon,\n      category,\n      criteria,\n      points,\n      isActive,\n      course->\n    }\n  } | order(achievement->category, earned desc, achievement->points desc)\n": GetUserAchievementsQueryResult;
+    "\n  *[_type == \"achievement\" && isActive == true] | order(category, points asc){\n    _id,\n    id,\n    title,\n    description,\n    icon,\n    category,\n    criteria,\n    points,\n    isActive,\n    course->\n  }\n": GetAvailableAchievementsQueryResult;
+    "\n  *[_type == \"achievement\" && id == $achievementId][0]{\n    _id,\n    id,\n    title,\n    description,\n    icon,\n    category,\n    criteria,\n    points,\n    isActive,\n    course->\n  }\n": GetAchievementByIdQueryResult;
+    "\n  *[_type == \"userAchievement\" && user._ref == $userId && achievement._ref == $achievementId][0]\n": GetUserAchievementRecordQueryResult;
+    "\n  {\n    \"user\": *[_type == \"user\" && _id == $userId][0]{\n      _id,\n      studyStreak,\n      streakStartDate\n    },\n    \"enrollments\": *[_type == \"enrollment\" && userEnrolled[0]._ref == $userId]{\n      _id,\n      percentComplete,\n      dateCompleted,\n      \"totalContent\": count(course[0]->chapters[]->contents[]),\n      \"completedContent\": count(contentsCompleted),\n      \"course\": course[0]->{\n        _id,\n        title,\n        \"slug\": slug.current\n      }\n    },\n    \"completedCourses\": count(*[_type == \"enrollment\" && userEnrolled[0]._ref == $userId && percentComplete == 100 && defined(dateCompleted)]),\n    \"completedCoursesList\": *[_type == \"enrollment\" && userEnrolled[0]._ref == $userId && percentComplete == 100 && defined(dateCompleted)]{\n      _id,\n      dateCompleted,\n      \"course\": course[0]->{\n        _id,\n        title,\n        \"slug\": slug.current\n      }\n    },\n    \"quizAttempts\": *[_type == \"quizAttempt\" && user[0]._ref == $userId && status == \"graded\"]{\n      percentage,\n      submittedAt\n    },\n    \"highScoringQuizzes\": count(*[_type == \"quizAttempt\" && user[0]._ref == $userId && status == \"graded\" && percentage >= 90])\n  }\n": GetUserProgressForAchievementsQueryResult;
     "*[_type == \"chatMessage\" &&\n    session._ref in *[_type == \"chatSession\" &&\n      $userId in users[]._ref &&\n      $lessonId in lessons[]._ref &&\n      status == \"active\"]._id\n  ] | order(_createdAt asc) {\n    _id,\n    messageId,\n    role,\n    parts,\n    metadata,\n    session->{\n      _id,\n      sessionId,\n      status\n    }\n  }": ChatHistoryQueryResult;
     "*[_type == \"course\"]{\n    ...,\n    \"slug\": slug.current,\n    \"topics\": topics[]->\n    }": CoursesQueryResult;
     "*[_type == \"course\" && slug.current == $slug][0]{\n    ...,\n    \"slug\": slug.current,\n    }": CourseQueryResult;

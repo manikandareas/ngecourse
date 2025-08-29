@@ -41,7 +41,7 @@ export const useFinalizeQuizMutation = () => {
   return useMutation({
     mutationFn: (params: FinalizeAttemptInput) =>
       usecaseQuizzes.finalizeAttempt(params),
-    onSuccess: (_, variables) => {
+    onSuccess: (result, variables) => {
       // Invalidate both attempt and attempts list
       queryClient.invalidateQueries({
         queryKey: ['quiz-attempt', variables.attemptId, variables.userId],
@@ -49,6 +49,23 @@ export const useFinalizeQuizMutation = () => {
       queryClient.invalidateQueries({
         queryKey: ['user-quiz-attempts', variables.userId],
       });
+
+      // If course was completed, invalidate enrollment and achievement queries
+      if (
+        result.success &&
+        (result.courseCompleted ||
+          (result.newlyEarnedAchievements?.length ?? 0) > 0)
+      ) {
+        queryClient.invalidateQueries({
+          queryKey: ['user-enrollments', variables.userId],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['user-achievements', variables.userId],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['user-progress-achievements', variables.userId],
+        });
+      }
     },
   });
 };

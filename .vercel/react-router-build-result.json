@@ -1,0 +1,278 @@
+{
+  "buildManifest": {
+    "serverBundles": {
+      "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0": {
+        "id": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+        "file": "build/server/nodejs_eyJydW50aW1lIjoibm9kZWpzIn0/index.js",
+        "config": {
+          "runtime": "nodejs"
+        }
+      }
+    },
+    "routeIdToServerBundleId": {
+      "root": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/home": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/courses/courses": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/courses/course": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/privacy": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/terms": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/progress": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/courses/lesson": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/courses/quiz": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/courses/quiz-attempt": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/courses/quiz-result": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/sign-in": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/sign-up": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/onboarding": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/recommendation": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/api/webhooks": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
+    },
+    "routes": {
+      "root": {
+        "path": "",
+        "id": "root",
+        "file": "app/root.tsx",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/layout": {
+        "id": "routes/layout",
+        "parentId": "root",
+        "file": "app/routes/layout.tsx",
+        "config": {}
+      },
+      "routes/home": {
+        "id": "routes/home",
+        "parentId": "routes/layout",
+        "file": "app/routes/home.tsx",
+        "index": true,
+        "config": {}
+      },
+      "routes/courses/courses": {
+        "id": "routes/courses/courses",
+        "parentId": "routes/layout",
+        "file": "app/routes/courses/courses.tsx",
+        "path": "/courses",
+        "config": {}
+      },
+      "routes/courses/course": {
+        "id": "routes/courses/course",
+        "parentId": "routes/layout",
+        "file": "app/routes/courses/course.tsx",
+        "path": "/courses/:slug",
+        "config": {}
+      },
+      "routes/privacy": {
+        "id": "routes/privacy",
+        "parentId": "routes/layout",
+        "file": "app/routes/privacy.tsx",
+        "path": "/privacy",
+        "config": {}
+      },
+      "routes/terms": {
+        "id": "routes/terms",
+        "parentId": "routes/layout",
+        "file": "app/routes/terms.tsx",
+        "path": "/terms",
+        "config": {}
+      },
+      "routes/progress": {
+        "id": "routes/progress",
+        "parentId": "routes/layout",
+        "file": "app/routes/progress.tsx",
+        "path": "/progress",
+        "config": {}
+      },
+      "routes/courses/lesson": {
+        "id": "routes/courses/lesson",
+        "parentId": "root",
+        "file": "app/routes/courses/lesson.tsx",
+        "path": "/courses/:slug/:chapterSlug/lessons/:lessonSlug",
+        "config": {}
+      },
+      "routes/courses/quiz": {
+        "id": "routes/courses/quiz",
+        "parentId": "root",
+        "file": "app/routes/courses/quiz.tsx",
+        "path": "/courses/:slug/:chapterSlug/quizzes/:quizSlug",
+        "config": {}
+      },
+      "routes/courses/quiz-attempt": {
+        "id": "routes/courses/quiz-attempt",
+        "parentId": "root",
+        "file": "app/routes/courses/quiz-attempt.tsx",
+        "path": "/courses/:courseSlug/:chapterSlug/quizzes/:quizSlug/a/:attemptId",
+        "config": {}
+      },
+      "routes/courses/quiz-result": {
+        "id": "routes/courses/quiz-result",
+        "parentId": "root",
+        "file": "app/routes/courses/quiz-result.tsx",
+        "path": "/courses/:courseSlug/:chapterSlug/quizzes/:quizSlug/a/:attemptId/result",
+        "config": {}
+      },
+      "routes/sign-in": {
+        "id": "routes/sign-in",
+        "parentId": "root",
+        "file": "app/routes/sign-in.tsx",
+        "path": "sign-in/*",
+        "config": {}
+      },
+      "routes/sign-up": {
+        "id": "routes/sign-up",
+        "parentId": "root",
+        "file": "app/routes/sign-up.tsx",
+        "path": "sign-up/*",
+        "config": {}
+      },
+      "routes/onboarding": {
+        "id": "routes/onboarding",
+        "parentId": "root",
+        "file": "app/routes/onboarding.tsx",
+        "path": "/onboarding",
+        "config": {}
+      },
+      "routes/recommendation": {
+        "id": "routes/recommendation",
+        "parentId": "root",
+        "file": "app/routes/recommendation.tsx",
+        "path": "/recommendation",
+        "config": {}
+      },
+      "routes/api/webhooks": {
+        "id": "routes/api/webhooks",
+        "parentId": "root",
+        "file": "app/routes/api/webhooks.ts",
+        "path": "api/webhooks",
+        "config": {}
+      }
+    }
+  },
+  "reactRouterConfig": {
+    "appDirectory": "/Users/manikandareas/Development/project/ngecourse/app",
+    "basename": "/",
+    "buildDirectory": "/Users/manikandareas/Development/project/ngecourse/build",
+    "future": {
+      "unstable_middleware": false,
+      "unstable_optimizeDeps": false,
+      "unstable_splitRouteModules": false,
+      "unstable_subResourceIntegrity": false,
+      "unstable_viteEnvironmentApi": false
+    },
+    "routes": {
+      "root": {
+        "path": "",
+        "id": "root",
+        "file": "root.tsx"
+      },
+      "routes/layout": {
+        "id": "routes/layout",
+        "parentId": "root",
+        "file": "routes/layout.tsx"
+      },
+      "routes/home": {
+        "id": "routes/home",
+        "parentId": "routes/layout",
+        "file": "routes/home.tsx",
+        "index": true
+      },
+      "routes/courses/courses": {
+        "id": "routes/courses/courses",
+        "parentId": "routes/layout",
+        "file": "routes/courses/courses.tsx",
+        "path": "/courses"
+      },
+      "routes/courses/course": {
+        "id": "routes/courses/course",
+        "parentId": "routes/layout",
+        "file": "routes/courses/course.tsx",
+        "path": "/courses/:slug"
+      },
+      "routes/privacy": {
+        "id": "routes/privacy",
+        "parentId": "routes/layout",
+        "file": "routes/privacy.tsx",
+        "path": "/privacy"
+      },
+      "routes/terms": {
+        "id": "routes/terms",
+        "parentId": "routes/layout",
+        "file": "routes/terms.tsx",
+        "path": "/terms"
+      },
+      "routes/progress": {
+        "id": "routes/progress",
+        "parentId": "routes/layout",
+        "file": "routes/progress.tsx",
+        "path": "/progress"
+      },
+      "routes/courses/lesson": {
+        "id": "routes/courses/lesson",
+        "parentId": "root",
+        "file": "routes/courses/lesson.tsx",
+        "path": "/courses/:slug/:chapterSlug/lessons/:lessonSlug"
+      },
+      "routes/courses/quiz": {
+        "id": "routes/courses/quiz",
+        "parentId": "root",
+        "file": "routes/courses/quiz.tsx",
+        "path": "/courses/:slug/:chapterSlug/quizzes/:quizSlug"
+      },
+      "routes/courses/quiz-attempt": {
+        "id": "routes/courses/quiz-attempt",
+        "parentId": "root",
+        "file": "routes/courses/quiz-attempt.tsx",
+        "path": "/courses/:courseSlug/:chapterSlug/quizzes/:quizSlug/a/:attemptId"
+      },
+      "routes/courses/quiz-result": {
+        "id": "routes/courses/quiz-result",
+        "parentId": "root",
+        "file": "routes/courses/quiz-result.tsx",
+        "path": "/courses/:courseSlug/:chapterSlug/quizzes/:quizSlug/a/:attemptId/result"
+      },
+      "routes/sign-in": {
+        "id": "routes/sign-in",
+        "parentId": "root",
+        "file": "routes/sign-in.tsx",
+        "path": "sign-in/*"
+      },
+      "routes/sign-up": {
+        "id": "routes/sign-up",
+        "parentId": "root",
+        "file": "routes/sign-up.tsx",
+        "path": "sign-up/*"
+      },
+      "routes/onboarding": {
+        "id": "routes/onboarding",
+        "parentId": "root",
+        "file": "routes/onboarding.tsx",
+        "path": "/onboarding"
+      },
+      "routes/recommendation": {
+        "id": "routes/recommendation",
+        "parentId": "root",
+        "file": "routes/recommendation.tsx",
+        "path": "/recommendation"
+      },
+      "routes/api/webhooks": {
+        "id": "routes/api/webhooks",
+        "parentId": "root",
+        "file": "routes/api/webhooks.ts",
+        "path": "api/webhooks"
+      }
+    },
+    "routeDiscovery": {
+      "mode": "lazy",
+      "manifestPath": "/__manifest"
+    },
+    "serverBuildFile": "index.js",
+    "serverModuleFormat": "esm",
+    "ssr": true
+  },
+  "viteConfig": {
+    "build": {
+      "assetsDir": "assets"
+    }
+  }
+}

@@ -58,6 +58,7 @@ const fetchUserActivityStats = async (userId: string) => {
   }
 };
 
+
 // Query options
 export const userProgressDataQueryOption = (clerkId: string) =>
   queryOptions({
@@ -94,6 +95,7 @@ export const userActivityStatsQueryOption = (userId: string) =>
     enabled: !!userId,
   });
 
+
 // Hooks
 export const useUserProgressData = (clerkId: string) =>
   useQuery(userProgressDataQueryOption(clerkId));
@@ -109,3 +111,4 @@ export const useRecentlyCompletedContent = (userId: string) =>
 
 export const useUserActivityStats = (userId: string) =>
   useQuery(userActivityStatsQueryOption(userId));
+

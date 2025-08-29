@@ -1,5 +1,9 @@
 import React from 'react';
 import type { User } from 'sanity.types';
+import {
+  transformUserAchievementsToDisplay,
+  useUserAchievements,
+} from '~/features/achievements/hooks';
 import { AchievementsBadges } from '~/features/progress/components/achievements-badges';
 import { ActivityFeed } from '~/features/progress/components/activity-feed';
 import { EnrolledCourseCard } from '~/features/progress/components/enrolled-course-card';
@@ -11,7 +15,6 @@ import {
   useUserEnrollments,
   useUserProgressData,
 } from '~/features/progress/hooks/useProgressData';
-import { generateDummyAchievements } from '~/features/progress/utils/progressCalculations';
 import { getCurrentSession } from '~/root';
 import type { Route } from './+types/progress';
 
@@ -67,11 +70,16 @@ export default function ProgressPage(props: Route.ComponentProps) {
     useRecentlyCompletedContent(session._id);
   const { data: activityStats, isLoading: activityStatsLoading } =
     useUserActivityStats(session._id);
+  const { data: userAchievements, isLoading: achievementsLoading } =
+    useUserAchievements(session._id);
 
-  // Generate dummy data for features not yet in Sanity
-  const dummyAchievements = React.useMemo(
-    () => generateDummyAchievements(),
-    []
+  // Transform achievements for display
+  const achievementsForDisplay = React.useMemo(
+    () =>
+      userAchievements
+        ? transformUserAchievementsToDisplay(userAchievements)
+        : [],
+    [userAchievements]
   );
 
   return (
@@ -160,8 +168,28 @@ export default function ProgressPage(props: Route.ComponentProps) {
                 recentQuizAttempts={recentQuizAttempts || []}
               />
 
-              {/* Achievements Section (Dummy Data) */}
-              <AchievementsBadges achievements={dummyAchievements} />
+              {/* Achievements Section */}
+              {achievementsLoading ? (
+                <div className="tinted-blur-subtle animate-pulse rounded-2xl p-6">
+                  <div className="mb-4 h-6 w-32 rounded bg-white/10" />
+                  <div className="space-y-3">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <div
+                        className="flex items-center gap-4 rounded-lg p-3"
+                        key={`achievement-loading-${i.toString()}`}
+                      >
+                        <div className="h-10 w-10 flex-shrink-0 rounded-full bg-white/10" />
+                        <div className="min-w-0 flex-1 space-y-2">
+                          <div className="h-4 w-3/4 rounded bg-white/10" />
+                          <div className="h-3 w-full rounded bg-white/10" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <AchievementsBadges achievements={achievementsForDisplay} />
+              )}
             </div>
           </div>
         </div>

@@ -1,3 +1,4 @@
+import { usecaseEnrollments } from '~/features/enrollments/usecase';
 import {
   createQuizError,
   createValidationError,
@@ -76,6 +77,33 @@ export const finalizeAttempt = async (params: FinalizeAttemptInput) => {
       _rev: attempt._rev,
     });
 
+    // Update course progression if quiz is completed
+    let progressionResult = null;
+    let newlyEarnedAchievements: any[] = [];
+
+    if (attempt.quiz && attempt.course && attempt.chapter) {
+      try {
+        progressionResult = await usecaseEnrollments.addProgression({
+          userId,
+          contentId: attempt.quiz._id,
+          courseId: attempt.course._id,
+          courseSlug: attempt.course.slug || '',
+          nextPath: '', // Quiz completion doesn't need next path
+        });
+
+        if (progressionResult.success) {
+          newlyEarnedAchievements =
+            progressionResult.newlyEarnedAchievements || [];
+        }
+      } catch (progressionError) {
+        // Don't fail quiz finalization if progression update fails
+        console.error(
+          'Failed to update course progression after quiz completion:',
+          progressionError
+        );
+      }
+    }
+
     return {
       success: true,
       finalScore: {
@@ -84,6 +112,8 @@ export const finalizeAttempt = async (params: FinalizeAttemptInput) => {
         percentage,
         score,
       },
+      courseCompleted: progressionResult?.isCompleted,
+      newlyEarnedAchievements,
     };
   } catch (error) {
     if (error instanceof UsecaseError) {

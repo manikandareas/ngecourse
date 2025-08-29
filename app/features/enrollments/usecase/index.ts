@@ -12,6 +12,7 @@ import {
   type ProgressionInput,
   progressionSchema,
 } from '~/features/shared/schemas';
+import { awardCourseCompletionAchievements } from './achievement-integration';
 
 const enroll = async (courseSlug: string, userId: string) => {
   // Validate input
@@ -133,12 +134,27 @@ const addProgression = async (params: ProgressionInput) => {
       percentComplete: completionPercentage,
     });
 
+    // Award achievements if course is completed
+    let newlyEarnedAchievements: any[] = [];
+    if (isCourseCompleted) {
+      try {
+        newlyEarnedAchievements = await awardCourseCompletionAchievements(
+          userId,
+          courseId
+        );
+      } catch (achievementError) {
+        // Don't fail the progression if achievement awarding fails
+        console.error('Failed to award achievements:', achievementError);
+      }
+    }
+
     return {
       success: true,
       isCompleted: isCourseCompleted,
       percentage: completionPercentage,
       response: progressionResponse,
       nextPath,
+      newlyEarnedAchievements, // Include newly earned achievements in response
     };
   } catch (error) {
     if (error instanceof UsecaseError) {

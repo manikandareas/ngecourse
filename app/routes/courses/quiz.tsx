@@ -34,7 +34,9 @@ export async function loader(args: Route.LoaderArgs) {
 
   // Get quiz and user attempts
   const quiz = await dataQuizzes.getQuizBySlug(quizSlug);
-  const attempts = quiz ? await dataQuizzes.getUserQuizAttempts(currentSession._id, quiz._id) : [];
+  const attempts = quiz
+    ? await dataQuizzes.getUserQuizAttempts(currentSession._id, quiz._id)
+    : [];
 
   return {
     quiz,
@@ -42,13 +44,13 @@ export async function loader(args: Route.LoaderArgs) {
     courseSlug,
     chapterSlug,
     quizSlug,
-    userId: currentSession._id
+    userId: currentSession._id,
   };
 }
 
 export default function QuizRoute() {
   const data = useLoaderData<typeof loader>();
-  
+
   return (
     <PageBackground variant="purple-cyan">
       <QuizPage {...data} />
