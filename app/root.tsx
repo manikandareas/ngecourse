@@ -8,9 +8,12 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useNavigate,
 } from 'react-router';
 import type { Route } from './+types/root';
 import './app.css';
+import { useState } from 'react';
+import { ErrorFallback } from './components/ui/error-fallback';
 import { Toaster } from './components/ui/sonner';
 import { usecaseUser } from './features/users/usecase';
 import ReactQueryProvider from './lib/react-query';
@@ -94,30 +97,46 @@ export default function App({ loaderData }: Route.ComponentProps) {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  let message = 'Oops!';
+  const navigate = useNavigate();
+  const [refreshing, setRefreshing] = useState(false);
+
   let details = 'An unexpected error occurred.';
   let stack: string | undefined;
 
-  if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? '404' : 'Error';
-    details =
-      error.status === 404
-        ? 'The requested page could not be found.'
-        : error.statusText || details;
+  const isResponse = isRouteErrorResponse(error);
+  const isNotFound = isResponse && error.status === 404;
+
+  if (isResponse) {
+    details = isNotFound
+      ? 'The page you’re looking for doesn’t exist or has moved.'
+      : error.statusText || details;
   } else if (import.meta.env.DEV && error && error instanceof Error) {
     details = error.message;
     stack = error.stack;
   }
 
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    // Give a tiny delay for the spinner to be visible
+    setTimeout(() => window.location.reload(), 100);
+  };
+
   return (
-    <main className="container mx-auto p-4 pt-16">
-      <h1>{message}</h1>
-      <p>{details}</p>
-      {stack && (
-        <pre className="w-full overflow-x-auto p-4">
-          <code>{stack}</code>
-        </pre>
-      )}
-    </main>
+    <ErrorFallback
+      details={details}
+      isNotFound={isNotFound}
+      onBack={handleBack}
+      onRefresh={handleRefresh}
+      refreshing={refreshing}
+      stack={stack}
+    />
   );
 }
