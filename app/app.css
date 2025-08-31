@@ -355,4 +355,118 @@
   .field-error {
     @apply text-sm text-red-300;
   }
+
+  /* Cosmic Scrollbar */
+  .cosmic-scrollbar {
+    /* Firefox support */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(62, 91, 255, 0.4) rgba(12, 14, 24, 0.2);
+  }
+
+  /* Webkit browsers (Chrome, Safari, Edge) */
+  .cosmic-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    background: transparent;
+  }
+
+  .cosmic-scrollbar::-webkit-scrollbar-track {
+    background: linear-gradient(to bottom, 
+      rgba(var(--overlay-rgb), 0.1) 0%,
+      rgba(var(--overlay-rgb), 0.2) 50%,
+      rgba(var(--overlay-rgb), 0.1) 100%);
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .cosmic-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, 
+      rgba(62, 91, 255, 0.3) 0%, 
+      rgba(92, 59, 255, 0.25) 50%,
+      rgba(62, 91, 255, 0.3) 100%);
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Subtle inner glow */
+    box-shadow: 
+      inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+      0 0 4px rgba(62, 91, 255, 0.2);
+  }
+
+  /* Hover state - Enhanced cosmic glow */
+  .cosmic-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, 
+      rgba(62, 91, 255, 0.5) 0%, 
+      rgba(92, 59, 255, 0.4) 30%,
+      rgba(62, 91, 255, 0.6) 70%,
+      rgba(92, 59, 255, 0.5) 100%);
+    
+    box-shadow: 
+      inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 0 8px rgba(62, 91, 255, 0.4),
+      0 0 16px rgba(62, 91, 255, 0.2);
+    
+    transform: scaleX(1.1);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  /* Active state - Intense cosmic energy */
+  .cosmic-scrollbar::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(135deg, 
+      rgba(62, 91, 255, 0.7) 0%, 
+      rgba(92, 59, 255, 0.6) 25%,
+      rgba(62, 91, 255, 0.8) 50%,
+      rgba(92, 59, 255, 0.7) 75%,
+      rgba(62, 91, 255, 0.7) 100%);
+    
+    box-shadow: 
+      inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+      0 0 12px rgba(62, 91, 255, 0.6),
+      0 0 24px rgba(62, 91, 255, 0.3),
+      0 0 36px rgba(62, 91, 255, 0.1);
+    
+    transform: scaleX(1.15);
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  /* Corner styling */
+  .cosmic-scrollbar::-webkit-scrollbar-corner {
+    background: rgba(var(--overlay-rgb), 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .cosmic-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .cosmic-scrollbar::-webkit-scrollbar-thumb:hover {
+      transform: none; /* Disable scale on mobile */
+    }
+  }
+
+  /* Accessibility - Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .cosmic-scrollbar::-webkit-scrollbar-thumb {
+      transition: background 200ms ease-out, box-shadow 200ms ease-out;
+    }
+    
+    .cosmic-scrollbar::-webkit-scrollbar-thumb:hover,
+    .cosmic-scrollbar::-webkit-scrollbar-thumb:active {
+      transform: none;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .cosmic-scrollbar::-webkit-scrollbar-thumb {
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .cosmic-scrollbar::-webkit-scrollbar-thumb:hover {
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+  }
 }

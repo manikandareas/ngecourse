@@ -182,43 +182,28 @@ export const LessonHeader = ({
         {/* Right: Actions */}
         <div className="flex min-w-0 flex-1 items-center justify-end gap-3">
           {isDesktop ? (
-            /* Desktop: Individual Buttons */
-            <>
-              {showChatButton && (
-                <button
-                  className={isChatOpen ? 'btn-primary' : 'btn-ghost'}
-                  onClick={onChatToggle}
-                  type="button"
-                >
-                  <Sparkles aria-hidden="true" size={16} />
-                  <span className="ml-2">
-                    {isChatOpen ? 'Close Chat' : 'Ask Genii'}
-                  </span>
-                </button>
+            /* Desktop: Only fullscreen button (chat handled by FAB) */
+            <button
+              aria-label={
+                isMaximized ? 'Exit full screen' : 'Enter full screen'
+              }
+              className="btn-ghost p-2.5"
+              onClick={() => {
+                handleMaximizeToggle().catch(() => {
+                  // Handle error silently
+                });
+              }}
+              type="button"
+            >
+              {isMaximized ? (
+                <Minimize aria-hidden="true" size={16} />
+              ) : (
+                <Maximize aria-hidden="true" size={16} />
               )}
-
-              <button
-                aria-label={
-                  isMaximized ? 'Exit full screen' : 'Enter full screen'
-                }
-                className="btn-ghost p-2.5"
-                onClick={() => {
-                  handleMaximizeToggle().catch(() => {
-                    // Handle error silently
-                  });
-                }}
-                type="button"
-              >
-                {isMaximized ? (
-                  <Minimize aria-hidden="true" size={16} />
-                ) : (
-                  <Maximize aria-hidden="true" size={16} />
-                )}
-                <span className="sr-only">
-                  {isMaximized ? 'Exit full screen' : 'Enter full screen'}
-                </span>
-              </button>
-            </>
+              <span className="sr-only">
+                {isMaximized ? 'Exit full screen' : 'Enter full screen'}
+              </span>
+            </button>
           ) : (
             /* Mobile: Dropdown Menu */
             <Popover>

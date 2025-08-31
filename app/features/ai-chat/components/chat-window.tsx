@@ -75,9 +75,7 @@ export const ChatWindow = ({
   return (
     <div
       className={`relative mx-auto size-full ${
-        variant === 'mobile'
-          ? 'h-full max-w-full p-4'
-          : 'h-[calc(100vh-68px)] max-w-4xl p-6'
+        variant === 'mobile' ? 'h-full max-w-full p-4' : 'h-full max-w-none p-6'
       }`}
     >
       <div className="flex h-full flex-col">
@@ -150,6 +148,7 @@ export const ChatWindow = ({
 
         <PromptInput className="mt-4" onSubmit={handleSubmit}>
           <PromptInputTextarea
+            data-chat-input
             onChange={(e) => setInput(e.target.value)}
             value={input}
           />

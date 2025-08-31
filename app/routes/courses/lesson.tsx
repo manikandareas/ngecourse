@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigation } from 'react-router';
 import type { ChatMessage } from 'sanity.types';
 import { useMediaQuery } from 'usehooks-ts';
+import { ChatCloseButton } from '~/components/ui/chat-close-button';
+import { ChatSideTrigger } from '~/components/ui/chat-side-trigger';
 import { Drawer, DrawerContent } from '~/components/ui/drawer';
 import { MarkdownRenderer } from '~/components/ui/markdown-renderer';
 import { PageBackground } from '~/components/ui/page-background';
@@ -79,6 +81,23 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
     lesson?._id as string
   );
 
+  // Focus management for chat
+  useEffect(() => {
+    if (isChatOpen && !chatHistoryPending) {
+      // Small delay to ensure chat window is rendered
+      const focusTimer = setTimeout(() => {
+        const chatInput = document.querySelector(
+          '[data-chat-input]'
+        ) as HTMLTextAreaElement;
+        if (chatInput) {
+          chatInput.focus();
+        }
+      }, 150);
+
+      return () => clearTimeout(focusTimer);
+    }
+  }, [isChatOpen, chatHistoryPending]);
+
   const toggleChat = () => setIsChatOpen(!isChatOpen);
 
   const chatMessages =
@@ -109,7 +128,7 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
 
   return (
     <PageBackground variant="sapphire-magenta">
-      <div className="relative w-full space-y-6">
+      <div className="relative w-full ">
         <LessonHeader
           {...commonProps}
           isChatOpen={isChatOpen}
@@ -117,23 +136,32 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
           title={lesson.title || 'Lesson Title'}
         />
 
+        {/* Desktop Chat Trigger */}
+        {isDesktop && (
+          <ChatSideTrigger
+            isOpen={isChatOpen}
+            onClick={toggleChat}
+            text="Butuh Bantuan?"
+          />
+        )}
+
         {isDesktop ? (
           <div
             className={`grid gap-6 px-4 transition-all duration-300 sm:px-6 ${
-              isChatOpen ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'
+              isChatOpen ? 'grid-cols-[2fr_1fr]' : 'grid-cols-1'
             }`}
           >
             <main
-              className={`w-full transition-all duration-300 ${
-                isChatOpen ? 'max-w-none' : 'mx-auto max-w-5xl'
-              }`}
+              className={'mx-auto w-full max-w-5xl transition-all duration-300'}
             >
               <article className="glass-card">{lessonContent}</article>
             </main>
 
             {isChatOpen && !chatHistoryPending && (
-              <aside className="slide-in-from-right-full min-h-[600px] animate-in duration-300">
-                <div className="glass-card h-full min-h-[600px]">
+              <aside className="slide-in-from-right-full relative animate-in duration-300">
+                {/* Close Button positioned outside chat */}
+                <ChatCloseButton isOpen={isChatOpen} onClick={toggleChat} />
+                <div className="sticky top-4 h-[calc(100vh-4rem-1rem)] overflow-hidden rounded-r-2xl border-hairline border-l bg-background">
                   <ChatWindow
                     chatHistory={chatMessages}
                     lessonId={lesson._id}
@@ -151,15 +179,51 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
 
             {isChatOpen && (
               <Drawer onOpenChange={setIsChatOpen} open={isChatOpen}>
-                <DrawerContent className="tinted-blur h-[100vh] max-h-[100vh] border-strong border-t">
-                  {!chatHistoryPending && (
-                    <div className="h-full p-4">
-                      <ChatWindow
-                        chatHistory={chatMessages}
-                        lessonId={lesson._id}
-                        onClose={() => setIsChatOpen(false)}
-                        variant="mobile"
-                      />
+                <DrawerContent className="h-[100vh] max-h-[100vh] border-strong border-t bg-background/95 backdrop-blur-xl">
+                  {chatHistoryPending ? (
+                    <div className="flex h-full items-center justify-center p-4">
+                      <div className="text-center">
+                        <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+                        <p className="text-text-secondary">Loading chat...</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex h-full flex-col p-4">
+                      {/* Mobile Chat Header */}
+                      <div className="mb-4 flex items-center justify-between border-hairline border-b pb-4">
+                        <h2 className="font-semibold text-lg text-text-primary">
+                          Ask Genii
+                        </h2>
+                        <button
+                          aria-label="Close chat"
+                          className="btn-ghost p-2"
+                          onClick={() => setIsChatOpen(false)}
+                          type="button"
+                        >
+                          <svg
+                            className="h-5 w-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <title>Close</title>
+                            <path
+                              d="M6 18L18 6M6 6l12 12"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                      <div className="flex-1 overflow-hidden">
+                        <ChatWindow
+                          chatHistory={chatMessages}
+                          lessonId={lesson._id}
+                          onClose={() => setIsChatOpen(false)}
+                          variant="mobile"
+                        />
+                      </div>
                     </div>
                   )}
                 </DrawerContent>
