@@ -158,7 +158,7 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
             </main>
 
             {isChatOpen && !chatHistoryPending && (
-              <aside className="slide-in-from-right-full relative animate-in duration-300">
+              <aside className="slide-in-from-right-full relative max-w-2xl animate-in duration-300">
                 {/* Close Button positioned outside chat */}
                 <ChatCloseButton isOpen={isChatOpen} onClick={toggleChat} />
                 <div className="sticky top-4 h-[calc(100vh-4rem-1rem)] overflow-hidden rounded-r-2xl border-hairline border-l bg-background">

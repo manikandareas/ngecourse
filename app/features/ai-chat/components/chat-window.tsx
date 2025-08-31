@@ -31,6 +31,7 @@ import {
   SourcesContent,
   SourcesTrigger,
 } from '~/components/ai-elements/source';
+import { Suggestion, Suggestions } from '~/components/ai-elements/suggestion';
 
 interface ChatWindowProps {
   chatHistory: UIMessage[];
@@ -41,6 +42,12 @@ interface ChatWindowProps {
 
 const EXTERNAL_SERVICE_URL =
   import.meta.env.VITE_EXTERNAL_SERVICE_URL || 'http://localhost:4000';
+
+const suggestions = [
+  'Bisakah dijelaskan dengan cerita yang menarik?',
+  'Boleh ditambah contoh kode yang lebih banyak?',
+  'Ada contoh penggunaan di dunia nyata tidak?',
+];
 
 export const ChatWindow = ({
   lessonId,
@@ -61,6 +68,13 @@ export const ChatWindow = ({
       );
       setInput('');
     }
+  };
+
+  const handleSuggestionClick = async (suggestion: string) => {
+    sendMessage(
+      { text: suggestion },
+      { headers: { Authorization: `Bearer ${await getToken()}` } }
+    );
   };
 
   const { messages, sendMessage, status } = useChat({
@@ -145,26 +159,36 @@ export const ChatWindow = ({
           </ConversationContent>
           <ConversationScrollButton />
         </Conversation>
-
-        <PromptInput className="mt-4" onSubmit={handleSubmit}>
-          <PromptInputTextarea
-            data-chat-input
-            onChange={(e) => setInput(e.target.value)}
-            value={input}
-          />
-          <PromptInputToolbar>
-            <PromptInputTools>
-              <PromptInputButton
-                onClick={() => setWebSearch(!webSearch)}
-                variant={webSearch ? 'default' : 'ghost'}
-              >
-                <GlobeIcon size={16} />
-                <span>Search</span>
-              </PromptInputButton>
-            </PromptInputTools>
-            <PromptInputSubmit disabled={!input} status={status} />
-          </PromptInputToolbar>
-        </PromptInput>
+        <div className="mt-4 flex flex-col gap-4 bg-background">
+          <Suggestions>
+            {suggestions.map((suggestion) => (
+              <Suggestion
+                key={suggestion}
+                onClick={handleSuggestionClick}
+                suggestion={suggestion}
+              />
+            ))}
+          </Suggestions>
+          <PromptInput onSubmit={handleSubmit}>
+            <PromptInputTextarea
+              data-chat-input
+              onChange={(e) => setInput(e.target.value)}
+              value={input}
+            />
+            <PromptInputToolbar>
+              <PromptInputTools>
+                <PromptInputButton
+                  onClick={() => setWebSearch(!webSearch)}
+                  variant={webSearch ? 'default' : 'ghost'}
+                >
+                  <GlobeIcon size={16} />
+                  <span>Search</span>
+                </PromptInputButton>
+              </PromptInputTools>
+              <PromptInputSubmit disabled={!input} status={status} />
+            </PromptInputToolbar>
+          </PromptInput>
+        </div>
       </div>
     </div>
   );
