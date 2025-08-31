@@ -22,7 +22,7 @@ type DetailCTAProps = {
 export const DetailCTA: React.FC<DetailCTAProps> = (props) => {
   const navigate = useNavigate();
 
-  const { contentProgression } = useContentProgression(
+  const { contentProgression, courseProgress } = useContentProgression(
     props.course,
     props.enrollment
   );
@@ -55,6 +55,28 @@ export const DetailCTA: React.FC<DetailCTAProps> = (props) => {
     return new Map(entries);
   }, [props.course]);
 
+  const firstContentPath = useMemo(() => {
+    const courseSlug = props.course.slug?.current;
+    if (!courseSlug) return null;
+
+    for (const chapter of props.course.chapters ?? []) {
+      const chapterSlug = chapter?.slug?.current;
+      if (!chapterSlug) continue;
+      const base = `/courses/${courseSlug}/${chapterSlug}`;
+      for (const cnt of chapter?.contents ?? []) {
+        if (!cnt?._id) continue;
+        const cslug = cnt?.slug?.current;
+        if (!cslug) continue;
+        const path =
+          cnt._type === 'lesson'
+            ? `${base}/lessons/${cslug}`
+            : `${base}/quizzes/${cslug}`;
+        return path;
+      }
+    }
+    return null;
+  }, [props.course]);
+
   const currentPath = useMemo(() => {
     if (!contentIndex) return null;
     const current = contentProgression.find((c) => c.isCurrentContent);
@@ -62,12 +84,29 @@ export const DetailCTA: React.FC<DetailCTAProps> = (props) => {
     return contentIndex.get(current.id) ?? null;
   }, [contentIndex, contentProgression]);
 
+  const isCourseCompleted = useMemo(() => {
+    return (
+      courseProgress.totalCount > 0 &&
+      courseProgress.completedCount >= courseProgress.totalCount
+    );
+  }, [courseProgress]);
+
   return (
     <div className="">
       {props.enrollment ? (
         <Button
-          aria-label="Continue learning this course"
+          aria-label={
+            isCourseCompleted
+              ? 'Review this course'
+              : 'Continue learning this course'
+          }
           onClick={() => {
+            if (isCourseCompleted) {
+              if (firstContentPath) {
+                navigate(firstContentPath);
+              }
+              return;
+            }
             if (currentPath) {
               navigate(currentPath);
             }
@@ -75,7 +114,7 @@ export const DetailCTA: React.FC<DetailCTAProps> = (props) => {
           size={'lg'}
           type="button"
         >
-          Continue Learning
+          {isCourseCompleted ? 'Review Course' : 'Continue Learning'}
           <ArrowRightIcon className="ml-2 size-4 transition-transform group-hover:translate-x-1" />
         </Button>
       ) : (
@@ -92,19 +131,14 @@ export const DetailCTA: React.FC<DetailCTAProps> = (props) => {
           title={props.course.title || 'Course Title'}
           topics={(props.course.topics as Topic[]) || []}
         >
-          <button
+          <Button
             aria-label="Start learning this course"
-            className="btn-primary group px-8 py-3 focus-visible:ring-2"
-            style={
-              {
-                '--tw-ring-color': 'rgb(62 91 255 / 0.6)',
-              } as React.CSSProperties
-            }
+            size={'lg'}
             type="button"
           >
             Start Learning Now
             <ArrowRightIcon className="ml-2 size-4 transition-transform group-hover:translate-x-1" />
-          </button>
+          </Button>
         </DetailEnrollDialog>
       )}
     </div>

@@ -87,7 +87,7 @@ const steps = [
 
 export default function LearningGoalsPage(props: Route.ComponentProps) {
   const navigate = useNavigate();
-  const { mutate: saveOnboarding } = useMutation({
+  const { mutate: saveOnboarding, isPending } = useMutation({
     mutationFn: async ({
       userId,
       data,
@@ -272,6 +272,7 @@ export default function LearningGoalsPage(props: Route.ComponentProps) {
                 <div className="flex justify-between pt-6">
                   {currentStep > 0 ? (
                     <Button
+                      disabled={isPending}
                       onClick={prevStep}
                       size="lg"
                       type="button"
@@ -284,7 +285,7 @@ export default function LearningGoalsPage(props: Route.ComponentProps) {
                   )}
                   {currentStep < steps.length - 1 && (
                     <Button
-                      disabled={!isCurrentStepValid}
+                      disabled={!isCurrentStepValid || isPending}
                       onClick={nextStep}
                       size="lg"
                       type="button"
@@ -293,14 +294,8 @@ export default function LearningGoalsPage(props: Route.ComponentProps) {
                     </Button>
                   )}
                   {currentStep === steps.length - 1 && (
-                    <Button
-                      disabled={form.formState.isSubmitting}
-                      size="lg"
-                      type="submit"
-                    >
-                      {form.formState.isSubmitting
-                        ? 'Saving...'
-                        : 'Finish Setup'}
+                    <Button disabled={isPending} size="lg" type="submit">
+                      {isPending ? 'Saving...' : 'Finish Setup'}
                     </Button>
                   )}
                 </div>

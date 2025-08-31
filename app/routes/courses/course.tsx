@@ -67,6 +67,7 @@ export default function CourseDetailPage(props: Route.ComponentProps) {
         <DetailHero
           course={courseQuery.data}
           enrollment={enrollmentQuery.data as EnrollmentQueryResult}
+          userId={props.loaderData.currentSession?._id}
         />
 
         <DetailContents
