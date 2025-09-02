@@ -44,37 +44,6 @@ export function StreakOverview({ user, className }: StreakOverviewProps) {
 
   const weeklyStreak = generateWeeklyStreak();
 
-  const streakStats = [
-    {
-      icon: Flame,
-      label: 'Current Streak',
-      value: `${currentStreak}`,
-      unit: 'days',
-      color: currentStreak > 0 ? 'text-accent' : 'text-text-secondary',
-    },
-    {
-      icon: TrendingUp,
-      label: 'Longest Streak',
-      value: `${longestStreak}`,
-      unit: 'days',
-      color: longestStreak > 7 ? 'text-success' : 'text-text-secondary',
-    },
-    {
-      icon: Target,
-      label: 'XP Earned',
-      value: `${analytics?.totalXP || 0}`,
-      unit: 'XP',
-      color: 'text-info',
-    },
-    {
-      icon: Calendar,
-      label: 'Study Time',
-      value: `${Math.floor((analytics?.totalStudyTimeMinutes || 0) / 60)}`,
-      unit: 'hours',
-      color: 'text-purple-400',
-    },
-  ];
-
   return (
     <div className={cn('space-y-6', className)}>
       {/* Main streak display */}
@@ -109,7 +78,10 @@ export function StreakOverview({ user, className }: StreakOverviewProps) {
         <h4 className="font-medium text-sm text-text-primary">This Week</h4>
         <div className="flex justify-between gap-1">
           {weeklyStreak.map((day, index) => (
-            <div className="flex flex-col items-center gap-2" key={index}>
+            <div
+              className="flex flex-col items-center gap-2"
+              key={index.toString()}
+            >
               <div className="font-medium text-text-secondary text-xs">
                 {day.dayName}
               </div>

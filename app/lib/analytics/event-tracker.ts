@@ -7,7 +7,7 @@ import type {
 
 // Default configuration
 const DEFAULT_CONFIG: EventTrackerConfig = {
-  apiEndpoint: `${import.meta.env.VITE_EXTERNAL_SERVICE_URL || 'http://localhost:3001'}/api/events`,
+  apiEndpoint: `${import.meta.env.VITE_EXTERNAL_SERVICE_URL || 'http://localhost:3000'}/api/events`,
   maxRetries: 3,
   retryDelayMs: 1000,
   offlineStorageKey: 'ngecourse_analytics_queue',

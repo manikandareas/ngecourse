@@ -58,7 +58,6 @@ const fetchUserActivityStats = async (userId: string) => {
   }
 };
 
-
 // Query options
 export const userProgressDataQueryOption = (clerkId: string) =>
   queryOptions({
@@ -95,9 +94,11 @@ export const userActivityStatsQueryOption = (userId: string) =>
     enabled: !!userId,
   });
 
-
 // Combined data fetchers for optimization
-const fetchUserProgressAndActivity = async (clerkId: string, userId: string) => {
+const fetchUserProgressAndActivity = async (
+  clerkId: string,
+  userId: string
+) => {
   try {
     const [userData, activityStats] = await Promise.all([
       client.fetch(getUserProgressDataQuery, { clerkId }),
@@ -117,18 +118,26 @@ const fetchRecentActivities = async (userId: string) => {
       client.fetch(getRecentQuizAttemptsQuery, { userId }),
       client.fetch(getRecentlyCompletedContentQuery, { userId }),
     ]);
-    
+
     // Combine and sort activities by date for unified feed
     const allActivities = [
-      ...(recentQuizAttempts || []).map((quiz: any) => ({ ...quiz, type: 'quiz' })),
-      ...(recentlyCompleted || []).map((content: any) => ({ ...content, type: 'content' }))
-    ].sort((a, b) => new Date(b.completedAt || b.createdAt).getTime() - new Date(a.completedAt || a.createdAt).getTime())
-     .slice(0, 5); // Limit to 5 most recent activities
+      ...(recentQuizAttempts || []).map((quiz) => ({ ...quiz, type: 'quiz' })),
+      ...(recentlyCompleted || []).map((content: any) => ({
+        ...content,
+        type: 'content',
+      })),
+    ]
+      .sort(
+        (a, b) =>
+          new Date(b.completedAt || b.createdAt).getTime() -
+          new Date(a.completedAt || a.createdAt).getTime()
+      )
+      .slice(0, 5); // Limit to 5 most recent activities
 
     return {
       recentQuizAttempts,
       recentlyCompleted,
-      combinedActivities: allActivities
+      combinedActivities: allActivities,
     };
   } catch (error) {
     throw new Error(
@@ -138,7 +147,10 @@ const fetchRecentActivities = async (userId: string) => {
 };
 
 // Optimized query options
-export const userProgressAndActivityQueryOption = (clerkId: string, userId: string) =>
+export const userProgressAndActivityQueryOption = (
+  clerkId: string,
+  userId: string
+) =>
   queryOptions({
     queryKey: ['user-progress-activity', clerkId, userId],
     queryFn: () => fetchUserProgressAndActivity(clerkId, userId),
@@ -174,4 +186,3 @@ export const useUserProgressAndActivity = (clerkId: string, userId: string) =>
 
 export const useRecentActivities = (userId: string) =>
   useQuery(recentActivitiesQueryOption(userId));
-

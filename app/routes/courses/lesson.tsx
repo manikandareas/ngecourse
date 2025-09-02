@@ -89,7 +89,7 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
 
     const initializeTracking = async () => {
       // Start session for the course
-      const courseId = lesson?._id; // Using lesson ID as course context
+      const courseId = props.loaderData.enrollment.course?._id; // Using lesson ID as course context
       if (courseId) {
         await startSession(courseId);
         sessionStarted = true;
@@ -107,7 +107,12 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
         endSession('navigation');
       }
     };
-  }, [lesson?._id, startSession, endSession, startActivity]);
+  }, [
+    props.loaderData.enrollment.course?._id,
+    startSession,
+    endSession,
+    startActivity,
+  ]);
 
   // Handle page visibility changes to pause/resume tracking
   useEffect(() => {
