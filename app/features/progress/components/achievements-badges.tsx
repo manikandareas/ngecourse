@@ -21,6 +21,29 @@ export const AchievementsBadges: React.FC<AchievementsBadgesProps> = ({
   achievements,
 }) => {
   const earnedCount = achievements.filter((a) => a.earned).length;
+  
+  // Get recent achievements - prioritize earned ones, limit to 3
+  const recentAchievements = [...achievements]
+    .sort((a, b) => {
+      // First sort by earned status
+      if (a.earned !== b.earned) {
+        return b.earned ? 1 : -1;
+      }
+      // Then sort by earnedAt date for earned achievements
+      if (a.earned && b.earned && a.earnedAt && b.earnedAt) {
+        return new Date(b.earnedAt).getTime() - new Date(a.earnedAt).getTime();
+      }
+      // For unearned, sort by progress percentage
+      if (!a.earned && !b.earned) {
+        const aProgress = a.progress && a.target ? a.progress / a.target : 0;
+        const bProgress = b.progress && b.target ? b.progress / b.target : 0;
+        return bProgress - aProgress;
+      }
+      return 0;
+    })
+    .slice(0, 3);
+
+  const hasMoreAchievements = achievements.length > 3;
 
   return (
     <div className="tinted-blur-subtle rounded-2xl p-6">
@@ -30,24 +53,24 @@ export const AchievementsBadges: React.FC<AchievementsBadgesProps> = ({
           Achievements
         </h3>
         <div className="text-sm text-text-secondary">
-          {earnedCount} of {achievements.length}
+          {earnedCount} earned
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-3">
-        {achievements.map((achievement) => (
+      <div className="space-y-3">
+        {recentAchievements.map((achievement) => (
           <div
-            className={`flex items-center gap-4 rounded-lg p-3 transition-all ${
+            className={`flex items-center gap-3 rounded-lg p-3 transition-all ${
               achievement.earned
-                ? 'border border-green-500/20 bg-green-500/10'
+                ? 'border border-success/20 bg-success/10'
                 : 'border border-hairline bg-white/5'
             }`}
             key={achievement.id}
           >
             {/* Icon */}
             <div
-              className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-lg ${
-                achievement.earned ? 'bg-green-500/20' : 'bg-white/10'
+              className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm ${
+                achievement.earned ? 'bg-success/20' : 'bg-white/10'
               }`}
             >
               {achievement.icon}
@@ -55,59 +78,55 @@ export const AchievementsBadges: React.FC<AchievementsBadgesProps> = ({
 
             {/* Content */}
             <div className="min-w-0 flex-1">
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <h4
-                    className={`font-medium text-sm ${
-                      achievement.earned
-                        ? 'text-green-400'
-                        : 'text-text-primary'
-                    }`}
-                  >
-                    {achievement.title}
-                  </h4>
-                  <p className="mt-1 text-text-secondary text-xs">
-                    {achievement.description}
-                  </p>
-                </div>
-
-                {achievement.earned && achievement.earnedAt && (
-                  <div className="whitespace-nowrap text-text-muted text-xs">
-                    {formatTimeAgo(achievement.earnedAt)}
-                  </div>
-                )}
-              </div>
-
-              {/* Progress Bar for Unearned Achievements */}
+              <h4
+                className={`font-medium text-sm ${
+                  achievement.earned
+                    ? 'text-success'
+                    : 'text-text-primary'
+                }`}
+              >
+                {achievement.title}
+              </h4>
+              <p className="text-text-secondary text-xs">
+                {achievement.description}
+              </p>
+              
+              {/* Simplified progress for unearned */}
               {!achievement.earned &&
                 achievement.progress !== undefined &&
                 achievement.target && (
-                  <div className="mt-2">
-                    <div className="mb-1 flex items-center justify-between text-xs">
-                      <span className="text-text-secondary">
-                        {achievement.progress} / {achievement.target}
-                      </span>
-                      <span className="text-text-muted">
-                        {Math.round(
-                          (achievement.progress / achievement.target) * 100
-                        )}
-                        %
-                      </span>
-                    </div>
-                    <div className="h-1.5 w-full rounded-full bg-gray-700">
+                  <div className="mt-1">
+                    <div className="h-1 w-full rounded-full bg-white/10">
                       <div
-                        className="h-1.5 rounded-full bg-accent transition-all duration-300"
+                        className="h-1 rounded-full bg-accent transition-all duration-300"
                         style={{
-                          width: `${(achievement.progress / achievement.target) * 100}%`,
+                          width: `${Math.min((achievement.progress / achievement.target) * 100, 100)}%`,
                         }}
                       />
                     </div>
                   </div>
                 )}
             </div>
+
+            {achievement.earned && achievement.earnedAt && (
+              <div className="text-success text-xs">
+                {formatTimeAgo(achievement.earnedAt)}
+              </div>
+            )}
           </div>
         ))}
       </div>
+      
+      {hasMoreAchievements && (
+        <div className="mt-4 text-center">
+          <button
+            className="font-medium text-accent text-sm transition-colors hover:text-accent/80"
+            type="button"
+          >
+            View All Achievements ({achievements.length})
+          </button>
+        </div>
+      )}
     </div>
   );
 };

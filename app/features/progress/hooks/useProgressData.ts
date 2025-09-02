@@ -96,7 +96,63 @@ export const userActivityStatsQueryOption = (userId: string) =>
   });
 
 
-// Hooks
+// Combined data fetchers for optimization
+const fetchUserProgressAndActivity = async (clerkId: string, userId: string) => {
+  try {
+    const [userData, activityStats] = await Promise.all([
+      client.fetch(getUserProgressDataQuery, { clerkId }),
+      client.fetch(getUserActivityStatsQuery, { userId }),
+    ]);
+    return { userData, activityStats };
+  } catch (error) {
+    throw new Error(
+      `Failed to fetch user progress and activity: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+};
+
+const fetchRecentActivities = async (userId: string) => {
+  try {
+    const [recentQuizAttempts, recentlyCompleted] = await Promise.all([
+      client.fetch(getRecentQuizAttemptsQuery, { userId }),
+      client.fetch(getRecentlyCompletedContentQuery, { userId }),
+    ]);
+    
+    // Combine and sort activities by date for unified feed
+    const allActivities = [
+      ...(recentQuizAttempts || []).map((quiz: any) => ({ ...quiz, type: 'quiz' })),
+      ...(recentlyCompleted || []).map((content: any) => ({ ...content, type: 'content' }))
+    ].sort((a, b) => new Date(b.completedAt || b.createdAt).getTime() - new Date(a.completedAt || a.createdAt).getTime())
+     .slice(0, 5); // Limit to 5 most recent activities
+
+    return {
+      recentQuizAttempts,
+      recentlyCompleted,
+      combinedActivities: allActivities
+    };
+  } catch (error) {
+    throw new Error(
+      `Failed to fetch recent activities: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+};
+
+// Optimized query options
+export const userProgressAndActivityQueryOption = (clerkId: string, userId: string) =>
+  queryOptions({
+    queryKey: ['user-progress-activity', clerkId, userId],
+    queryFn: () => fetchUserProgressAndActivity(clerkId, userId),
+    enabled: !!clerkId && !!userId,
+  });
+
+export const recentActivitiesQueryOption = (userId: string) =>
+  queryOptions({
+    queryKey: ['recent-activities', userId],
+    queryFn: () => fetchRecentActivities(userId),
+    enabled: !!userId,
+  });
+
+// Individual hooks (keeping for backward compatibility)
 export const useUserProgressData = (clerkId: string) =>
   useQuery(userProgressDataQueryOption(clerkId));
 
@@ -111,4 +167,11 @@ export const useRecentlyCompletedContent = (userId: string) =>
 
 export const useUserActivityStats = (userId: string) =>
   useQuery(userActivityStatsQueryOption(userId));
+
+// New consolidated hooks
+export const useUserProgressAndActivity = (clerkId: string, userId: string) =>
+  useQuery(userProgressAndActivityQueryOption(clerkId, userId));
+
+export const useRecentActivities = (userId: string) =>
+  useQuery(recentActivitiesQueryOption(userId));
 

@@ -24,8 +24,7 @@
       "routes/sign-in": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/sign-up": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/onboarding": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
-      "routes/recommendation": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
-      "routes/api/webhooks": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
+      "routes/recommendation": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
     },
     "routes": {
       "root": {
@@ -139,13 +138,6 @@
         "file": "app/routes/recommendation.tsx",
         "path": "/recommendation",
         "config": {}
-      },
-      "routes/api/webhooks": {
-        "id": "routes/api/webhooks",
-        "parentId": "root",
-        "file": "app/routes/api/webhooks.ts",
-        "path": "api/webhooks",
-        "config": {}
       }
     }
   },
@@ -254,12 +246,6 @@
         "parentId": "root",
         "file": "routes/recommendation.tsx",
         "path": "/recommendation"
-      },
-      "routes/api/webhooks": {
-        "id": "routes/api/webhooks",
-        "parentId": "root",
-        "file": "routes/api/webhooks.ts",
-        "path": "api/webhooks"
       }
     },
     "routeDiscovery": {

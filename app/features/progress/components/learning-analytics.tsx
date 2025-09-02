@@ -1,4 +1,4 @@
-import { BarChart3, BookOpen, Clock, TrendingUp } from 'lucide-react';
+import { BarChart3, BookOpen, Calendar, Clock, Target, TrendingUp, Zap } from 'lucide-react';
 import { useMemo } from 'react';
 import type { User } from 'sanity.types';
 import { cn } from '~/lib/utils';
@@ -11,17 +11,38 @@ interface LearningAnalyticsProps {
 
 export function LearningAnalytics({ user, activityStats, className }: LearningAnalyticsProps) {
   const analytics = user?.analytics;
+  const currentStreak = user?.studyStreak || 0;
   
   const insights = useMemo(() => {
     const totalStudyMinutes = analytics?.totalStudyTimeMinutes || 0;
     const averageSessionTime = analytics?.averageSessionTime || 0;
     const currentLevel = analytics?.currentLevel || 1;
     const totalXP = analytics?.totalXP || 0;
+    const totalEnrollments = activityStats?.totalEnrollments || 0;
+    const completedCourses = activityStats?.completedCourses || 0;
+    const averageQuizScore = activityStats?.averageQuizScore || 0;
     
     // Calculate XP needed for next level (example formula)
     const xpForNextLevel = currentLevel * 100;
     const xpProgress = totalXP % xpForNextLevel;
     const xpProgressPercent = Math.floor((xpProgress / xpForNextLevel) * 100);
+
+    // Calculate completion rate
+    const completionRate = totalEnrollments > 0 
+      ? Math.floor((completedCourses / totalEnrollments) * 100) 
+      : 0;
+
+    // Determine study consistency level
+    const studyConsistency = currentStreak > 7 ? 'excellent' 
+      : currentStreak > 3 ? 'good' 
+      : currentStreak > 0 ? 'fair' 
+      : 'needs improvement';
+
+    // Determine performance level
+    const performanceLevel = averageQuizScore >= 90 ? 'excellent'
+      : averageQuizScore >= 80 ? 'good'
+      : averageQuizScore >= 70 ? 'fair'
+      : 'needs improvement';
 
     return {
       studyTime: {
@@ -36,36 +57,60 @@ export function LearningAnalytics({ user, activityStats, className }: LearningAn
         progressPercent: xpProgressPercent,
       },
       activity: {
-        totalEnrollments: activityStats?.totalEnrollments || 0,
-        completedCourses: activityStats?.completedCourses || 0,
-        averageQuizScore: activityStats?.averageQuizScore || 0,
+        totalEnrollments,
+        completedCourses,
+        averageQuizScore,
         contentCompleted: activityStats?.totalContentCompleted || 0,
+        completionRate,
+      },
+      performance: {
+        consistency: studyConsistency,
+        level: performanceLevel,
+        streak: currentStreak,
       },
     };
-  }, [analytics, activityStats]);
+  }, [analytics, activityStats, currentStreak]);
+
+  const getInsightColor = (level: string) => {
+    switch (level) {
+      case 'excellent': return 'text-success';
+      case 'good': return 'text-info';
+      case 'fair': return 'text-warning';
+      default: return 'text-error';
+    }
+  };
+
+  const getInsightBgColor = (level: string) => {
+    switch (level) {
+      case 'excellent': return 'bg-success/20';
+      case 'good': return 'bg-info/20';
+      case 'fair': return 'bg-warning/20';
+      default: return 'bg-error/20';
+    }
+  };
 
   const analyticsCards = [
     {
       icon: Clock,
       title: 'Study Time',
       value: `${insights.studyTime.total}h`,
-      subtitle: `Avg: ${insights.studyTime.average}min/session`,
+      subtitle: `${insights.studyTime.average}min avg session`,
       color: 'text-blue-400',
       bgColor: 'bg-blue-400/10',
     },
     {
-      icon: TrendingUp,
-      title: 'Level Progress',
-      value: `Level ${insights.level.current}`,
-      subtitle: `${insights.level.progressPercent}% to next level`,
-      color: 'text-accent',
-      bgColor: 'bg-accent/10',
+      icon: Target,
+      title: 'Consistency',
+      value: insights.performance.consistency.charAt(0).toUpperCase() + insights.performance.consistency.slice(1),
+      subtitle: `${insights.performance.streak} day streak`,
+      color: getInsightColor(insights.performance.consistency),
+      bgColor: getInsightBgColor(insights.performance.consistency),
     },
     {
       icon: BookOpen,
-      title: 'Content Completed',
-      value: insights.activity.contentCompleted,
-      subtitle: `Across ${insights.activity.totalEnrollments} courses`,
+      title: 'Completion Rate',
+      value: `${insights.activity.completionRate}%`,
+      subtitle: `${insights.activity.completedCourses}/${insights.activity.totalEnrollments} courses`,
       color: 'text-success',
       bgColor: 'bg-success/10',
     },
@@ -73,11 +118,70 @@ export function LearningAnalytics({ user, activityStats, className }: LearningAn
       icon: BarChart3,
       title: 'Quiz Performance',
       value: `${Math.floor(insights.activity.averageQuizScore)}%`,
-      subtitle: 'Average quiz score',
-      color: 'text-purple-400',
-      bgColor: 'bg-purple-400/10',
+      subtitle: insights.performance.level.charAt(0).toUpperCase() + insights.performance.level.slice(1),
+      color: getInsightColor(insights.performance.level),
+      bgColor: getInsightBgColor(insights.performance.level),
     },
   ];
+
+  // Smart recommendations based on performance
+  const recommendations = useMemo(() => {
+    const recs = [];
+
+    // Study consistency recommendations
+    if (currentStreak === 0) {
+      recs.push({
+        icon: Calendar,
+        title: 'Start Your Learning Journey',
+        description: 'Complete a lesson today to begin building your study habit.',
+        color: 'text-accent',
+        bgColor: 'bg-accent/20',
+      });
+    } else if (currentStreak < 7) {
+      recs.push({
+        icon: Target,
+        title: 'Build Consistency',
+        description: `${7 - currentStreak} more days to reach a week streak!`,
+        color: 'text-info',
+        bgColor: 'bg-info/20',
+      });
+    }
+
+    // Session time recommendations
+    if (insights.studyTime.average < 20) {
+      recs.push({
+        icon: Clock,
+        title: 'Extend Study Sessions',
+        description: 'Try studying for 30-45 minutes for better retention.',
+        color: 'text-warning',
+        bgColor: 'bg-warning/20',
+      });
+    }
+
+    // Performance recommendations
+    if (insights.activity.averageQuizScore < 80) {
+      recs.push({
+        icon: Zap,
+        title: 'Review Before Quizzes',
+        description: 'Spend extra time reviewing lesson content before taking quizzes.',
+        color: 'text-purple-400',
+        bgColor: 'bg-purple-400/20',
+      });
+    }
+
+    // If no specific recommendations, add a general one
+    if (recs.length === 0) {
+      recs.push({
+        icon: Target,
+        title: 'Keep Up the Great Work!',
+        description: 'You\'re doing excellent. Consider taking on more challenging courses.',
+        color: 'text-success',
+        bgColor: 'bg-success/20',
+      });
+    }
+
+    return recs.slice(0, 2); // Limit to 2 recommendations to avoid clutter
+  }, [currentStreak, insights]);
 
   return (
     <div className={cn('space-y-6', className)}>
@@ -137,53 +241,50 @@ export function LearningAnalytics({ user, activityStats, className }: LearningAn
         </div>
       </div>
 
-      {/* Study recommendations */}
-      {insights.studyTime.total < 5 && (
-        <div className="rounded-lg border border-info/20 bg-info/10 p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="h-4 w-4 text-info" />
-            <span className="font-medium text-sm text-text-primary">
-              Study Recommendation
-            </span>
-          </div>
-          <p className="text-text-secondary text-xs">
-            Try to study for at least 30 minutes daily to maintain consistent progress and build a strong learning habit.
-          </p>
-        </div>
-      )}
-
-      {/* Skills insights */}
-      {analytics?.strongestSkills && analytics.strongestSkills.length > 0 && (
+      {/* Smart Recommendations */}
+      {recommendations.length > 0 && (
         <div className="space-y-3">
           <h4 className="font-medium text-sm text-text-primary">
-            Your Strongest Skills
+            Personalized Recommendations
           </h4>
-          <div className="flex flex-wrap gap-2">
-            {analytics.strongestSkills.slice(0, 5).map((skill) => (
-              <span
-                key={skill}
-                className="rounded-full bg-success/20 px-3 py-1 text-success text-xs"
+          <div className="space-y-3">
+            {recommendations.map((rec, index) => (
+              <div
+                key={index}
+                className={cn('rounded-lg border border-hairline p-4', rec.bgColor)}
               >
-                {skill}
-              </span>
+                <div className="flex items-start gap-3">
+                  <div className={cn('rounded-full p-1', rec.bgColor)}>
+                    <rec.icon className={cn('h-4 w-4', rec.color)} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className={cn('font-medium text-sm mb-1', rec.color)}>
+                      {rec.title}
+                    </div>
+                    <p className="text-text-secondary text-xs">
+                      {rec.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Improvement areas */}
-      {analytics?.improvementAreas && analytics.improvementAreas.length > 0 && (
+      {/* Skills insights - Only show if available */}
+      {analytics?.strongestSkills && analytics.strongestSkills.length > 0 && (
         <div className="space-y-3">
           <h4 className="font-medium text-sm text-text-primary">
-            Areas for Improvement
+            Strong Skills
           </h4>
           <div className="flex flex-wrap gap-2">
-            {analytics.improvementAreas.slice(0, 3).map((area) => (
+            {analytics.strongestSkills.slice(0, 3).map((skill) => (
               <span
-                key={area}
-                className="rounded-full bg-warning/20 px-3 py-1 text-warning text-xs"
+                key={skill}
+                className="rounded-full bg-success/20 px-3 py-1 text-success text-xs"
               >
-                {area}
+                {skill}
               </span>
             ))}
           </div>

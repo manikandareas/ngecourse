@@ -2,6 +2,7 @@ import { CheckCircle, Play } from 'lucide-react';
 import type React from 'react';
 import { Link } from 'react-router';
 import { Button } from '~/components/ui/button';
+import { ProgressArc } from '~/components/ui/progress-arc';
 import { urlFor } from '~/lib/sanity-client';
 import {
   formatProgressPercentage,
@@ -43,7 +44,7 @@ export const EnrolledCourseCard: React.FC<EnrolledCourseCardProps> = ({
   const progressBarColor = getProgressBarColor(percentComplete);
 
   return (
-    <div className="tinted-blur-subtle group hover:-translate-y-1 relative flex flex-col overflow-hidden rounded-2xl transition-all duration-200 hover:bg-white/8">
+    <div className="group relative overflow-hidden rounded-2xl border border-white/5 bg-white/[0.02] backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-white/10 hover:bg-white/[0.05] hover:shadow-xl hover:shadow-black/10">
       {/* Image Container */}
       <div className="relative overflow-hidden rounded-t-2xl">
         <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
