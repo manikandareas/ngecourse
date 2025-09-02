@@ -11,7 +11,8 @@ export const getUserProgressDataQuery = defineQuery(`
     learningGoals,
     studyPlan,
     level,
-    onboardingStatus
+    onboardingStatus,
+    analytics
   }
 `);
 

@@ -7,6 +7,10 @@
         "noImgElement": "off",
         "useTopLevelRegex": "off"
       },
+      "nursery": {
+        "noNestedComponentDefinitions": "off",
+        "noShadow": "off"
+      },
       "style": {
         "useBlockStatements": "off",
         "noNestedTernary": "off"

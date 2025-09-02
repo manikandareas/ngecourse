@@ -10,6 +10,7 @@ import { CourseCompletionModal } from '~/features/achievements';
 import { enrollmentQueryOption } from '~/features/enrollments/hooks/get-enrollment';
 import { usecaseEnrollments } from '~/features/enrollments/usecase';
 import type { ProgressionInput } from '~/features/shared/schemas';
+import { useEventTracking } from '~/hooks/use-event-tracking';
 import { cn } from '~/lib/utils';
 import { courseQueryOption } from '../hooks/get-course';
 import { useSequentialNavigation } from '../hooks/sequential-navigation';
@@ -27,6 +28,7 @@ export const LessonNavigation: React.FC<LessonNavigationProps> = ({
   const navigation = useNavigation();
   const navigate = useNavigate();
   const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const { completeLesson } = useEventTracking();
 
   const courseQuery = useQuery(courseQueryOption(courseSlug));
 
@@ -78,8 +80,22 @@ export const LessonNavigation: React.FC<LessonNavigationProps> = ({
     onSettled: () => {
       queryClient.invalidateQueries(enrollmentQueryOption(userId, courseSlug));
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (data.success) {
+        // Track lesson completion analytics
+        const currentContent = sequentialNavigationState.currentItem;
+        if (currentContent?.contentId && courseQuery.data) {
+          await completeLesson(
+            currentContent.contentId.toString(),
+            courseQuery.data._id,
+            {
+              contentType: currentContent.type,
+              isCourseFinal: data.isCompleted,
+              difficulty: courseQuery.data.difficulty,
+            }
+          );
+        }
+
         // Check if course was completed
         if (data.isCompleted) {
           setShowCompletionModal(true);

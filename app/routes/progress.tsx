@@ -7,7 +7,11 @@ import {
 import { AchievementsBadges } from '~/features/progress/components/achievements-badges';
 import { ActivityFeed } from '~/features/progress/components/activity-feed';
 import { EnrolledCourseCard } from '~/features/progress/components/enrolled-course-card';
+import { LearningAnalytics } from '~/features/progress/components/learning-analytics';
 import { ProgressOverview } from '~/features/progress/components/progress-overview';
+import { StreakCalendar } from '~/features/progress/components/streak-calendar';
+import { StreakOverview } from '~/features/progress/components/streak-overview';
+import { StudyInsights } from '~/features/progress/components/study-insights';
 import {
   useRecentlyCompletedContent,
   useRecentQuizAttempts,
@@ -94,6 +98,22 @@ export default function ProgressPage(props: Route.ComponentProps) {
             user={(userData as User) ?? null}
           />
 
+          {/* Learning Analytics Section */}
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+            <div className="tinted-blur-subtle rounded-2xl p-6">
+              <LearningAnalytics 
+                activityStats={activityStats}
+                user={(userData as User) ?? null}
+              />
+            </div>
+            <div className="tinted-blur-subtle rounded-2xl p-6">
+              <StudyInsights
+                activityStats={activityStats}
+                user={(userData as User) ?? null}
+              />
+            </div>
+          </div>
+
           {/* Main Content Grid */}
           <div className="grid grid-cols-1 gap-8 xl:grid-cols-3">
             {/* Left Column - Enrolled Courses */}
@@ -163,6 +183,35 @@ export default function ProgressPage(props: Route.ComponentProps) {
 
             {/* Right Column - Activity Feed & Features */}
             <div className="space-y-6">
+              {/* Streak Overview Section */}
+              {userLoading ? (
+                <div className="tinted-blur-subtle animate-pulse rounded-2xl p-6">
+                  <div className="mx-auto mb-4 h-8 w-16 rounded bg-white/10" />
+                  <div className="space-y-3">
+                    <div className="h-4 w-full rounded bg-white/10" />
+                    <div className="grid grid-cols-2 gap-4">
+                      {Array.from({ length: 4 }).map((_, i) => (
+                        <div className="h-20 rounded bg-white/10" key={`streak-loading-${i}`} />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="tinted-blur-subtle rounded-2xl p-6">
+                  <StreakOverview user={(userData as User) ?? null} />
+                </div>
+              )}
+
+              {/* Streak Calendar Section */}
+              {!userLoading && (
+                <div className="tinted-blur-subtle rounded-2xl p-6">
+                  <StreakCalendar
+                    streakStartDate={userData?.streakStartDate}
+                    studyStreak={userData?.studyStreak}
+                  />
+                </div>
+              )}
+
               <ActivityFeed
                 recentlyCompletedContent={recentlyCompleted || []}
                 recentQuizAttempts={recentQuizAttempts || []}

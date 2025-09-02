@@ -1,4 +1,5 @@
 import { ArrowRight, Clock, Play, RotateCcw, Target } from 'lucide-react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import type { Quiz } from 'sanity.types';
 import { Badge } from '~/components/ui/badge';
@@ -6,6 +7,7 @@ import { Button } from '~/components/ui/button';
 import { PageBackground } from '~/components/ui/page-background';
 import { LessonHeader } from '~/features/courses/components/lesson-header';
 import { LessonNavigation } from '~/features/courses/components/lesson-navigation';
+import { useEventTracking } from '~/hooks/use-event-tracking';
 import { useStartQuizMutation } from '../hooks/quiz-mutations';
 
 interface QuizPageProps {
@@ -36,6 +38,28 @@ export function QuizPage({
 }: QuizPageProps) {
   const navigate = useNavigate();
   const startQuizMutation = useStartQuizMutation();
+  const { startSession, endSession } = useEventTracking();
+
+  // Session tracking for quiz page
+  useEffect(() => {
+    let sessionStarted = false;
+    
+    const initializeTracking = async () => {
+      if (quiz?._id) {
+        await startSession(quiz._id);
+        sessionStarted = true;
+      }
+    };
+
+    initializeTracking();
+
+    // Cleanup on unmount
+    return () => {
+      if (sessionStarted) {
+        endSession('navigation');
+      }
+    };
+  }, [quiz?._id, startSession, endSession]);
 
   if (!quiz) {
     return (

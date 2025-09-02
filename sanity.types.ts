@@ -367,6 +367,7 @@ export type Lesson = {
     [internalGroqTypeReferenceTo]?: "chapter";
   }>;
   content?: string;
+  videoUrl?: string;
 };
 
 export type Chapter = {
@@ -434,6 +435,13 @@ export type Course = {
     _weak?: boolean;
     _key: string;
     [internalGroqTypeReferenceTo]?: "chapter";
+  }>;
+  learningOutcomes?: Array<string>;
+  resources?: Array<{
+    label?: string;
+    url?: string;
+    _type: "resource";
+    _key: string;
   }>;
 };
 
@@ -694,6 +702,13 @@ export type GetUserAchievementsQueryResult = Array<{
         _key: string;
         [internalGroqTypeReferenceTo]?: "chapter";
       }>;
+      learningOutcomes?: Array<string>;
+      resources?: Array<{
+        label?: string;
+        url?: string;
+        _type: "resource";
+        _key: string;
+      }>;
     } | null;
   } | null;
 }>;
@@ -750,6 +765,13 @@ export type GetAvailableAchievementsQueryResult = Array<{
       _key: string;
       [internalGroqTypeReferenceTo]?: "chapter";
     }>;
+    learningOutcomes?: Array<string>;
+    resources?: Array<{
+      label?: string;
+      url?: string;
+      _type: "resource";
+      _key: string;
+    }>;
   } | null;
 }>;
 // Variable: getAchievementByIdQuery
@@ -804,6 +826,13 @@ export type GetAchievementByIdQueryResult = {
       _weak?: boolean;
       _key: string;
       [internalGroqTypeReferenceTo]?: "chapter";
+    }>;
+    learningOutcomes?: Array<string>;
+    resources?: Array<{
+      label?: string;
+      url?: string;
+      _type: "resource";
+      _key: string;
     }>;
   } | null;
 } | null;
@@ -1003,6 +1032,13 @@ export type CoursesQueryResult = Array<{
     _key: string;
     [internalGroqTypeReferenceTo]?: "chapter";
   }>;
+  learningOutcomes?: Array<string>;
+  resources?: Array<{
+    label?: string;
+    url?: string;
+    _type: "resource";
+    _key: string;
+  }>;
 }>;
 // Variable: courseQuery
 // Query: *[_type == "course" && slug.current == $slug][0]{    ...,    "slug": slug.current,    }
@@ -1043,6 +1079,13 @@ export type CourseQueryResult = {
     _key: string;
     [internalGroqTypeReferenceTo]?: "chapter";
   }>;
+  learningOutcomes?: Array<string>;
+  resources?: Array<{
+    label?: string;
+    url?: string;
+    _type: "resource";
+    _key: string;
+  }>;
 } | null;
 // Variable: courseByIdQuery
 // Query: *[_type == "course" && _id == $id][0]
@@ -1082,6 +1125,13 @@ export type CourseByIdQueryResult = {
     _weak?: boolean;
     _key: string;
     [internalGroqTypeReferenceTo]?: "chapter";
+  }>;
+  learningOutcomes?: Array<string>;
+  resources?: Array<{
+    label?: string;
+    url?: string;
+    _type: "resource";
+    _key: string;
   }>;
 } | null;
 // Variable: courseContentsQuery
@@ -1177,6 +1227,7 @@ export type LessonQueryResult = {
     [internalGroqTypeReferenceTo]?: "chapter";
   }>;
   content?: string;
+  videoUrl?: string;
 } | null;
 // Variable: chapterQuery
 // Query: *[_type == "chapter" && slug.current == $slug][0]{    ...,      "contents": contents[]->{          _id,          _type,          _createdAt,          _updatedAt,          title,          slug,        }    }
@@ -1287,6 +1338,13 @@ export type EnrollmentQueryResult = {
       _key: string;
       [internalGroqTypeReferenceTo]?: "chapter";
     }>;
+    learningOutcomes?: Array<string>;
+    resources?: Array<{
+      label?: string;
+      url?: string;
+      _type: "resource";
+      _key: string;
+    }>;
   } | null;
   contentsCompleted: Array<{
     _id: string;
@@ -1309,7 +1367,7 @@ export type EnrollmentQueryResult = {
 
 // Source: ./app/features/progress/data/index.ts
 // Variable: getUserProgressDataQuery
-// Query: *[_type == "user" && clerkId == $clerkId][0]{    _id,    username,    firstname,    lastname,    studyStreak,    streakStartDate,    learningGoals,    studyPlan,    level,    onboardingStatus  }
+// Query: *[_type == "user" && clerkId == $clerkId][0]{    _id,    username,    firstname,    lastname,    studyStreak,    streakStartDate,    learningGoals,    studyPlan,    level,    onboardingStatus,    analytics  }
 export type GetUserProgressDataQueryResult = {
   _id: string;
   username: string | null;
@@ -1321,6 +1379,14 @@ export type GetUserProgressDataQueryResult = {
   studyPlan: string | null;
   level: "advanced" | "beginner" | "intermediate" | null;
   onboardingStatus: "completed" | "not_started" | null;
+  analytics: {
+    totalXP?: number;
+    currentLevel?: number;
+    totalStudyTimeMinutes?: number;
+    averageSessionTime?: number;
+    strongestSkills?: Array<string>;
+    improvementAreas?: Array<string>;
+  } | null;
 } | null;
 // Variable: getUserEnrollmentsQuery
 // Query: *[_type == "enrollment" && userEnrolled[0]._ref == $userId]{    _id,    percentComplete,    dateCompleted,    contentsCompleted,    course[0]->{      _id,      title,      "slug": slug.current,      description,      difficulty,      thumbnail,      topics[]->{        _id,        title,        "slug": slug.current      }    }  }
@@ -1719,7 +1785,7 @@ declare module "@sanity/client" {
     "*[_type == \"lesson\" && slug.current == $slug][0]": LessonQueryResult;
     "*[_type == \"chapter\" && slug.current == $slug][0]{\n    ...,\n      \"contents\": contents[]->{\n          _id,\n          _type,\n          _createdAt,\n          _updatedAt,\n          title,\n          slug,\n        }\n    }": ChapterQueryResult;
     "\n    *[_type == \"enrollment\" &&\n      userEnrolled[0]._ref == $userId &&\n      course[0]->.slug.current == $courseSlug][0]{\n      _id,\n      _type,\n      _rev,\n      _createdAt,\n      _updatedAt,\n      \"userEnrolled\": userEnrolled[0]->,\n      \"course\": course[0]->,\n      \"contentsCompleted\": contentsCompleted[]->{\n        _id,\n        _type,\n        _createdAt,\n        _updatedAt,\n        title,\n        slug,\n      },\n      dateCompleted,\n      percentComplete\n    }\n  ": EnrollmentQueryResult;
-    "\n  *[_type == \"user\" && clerkId == $clerkId][0]{\n    _id,\n    username,\n    firstname,\n    lastname,\n    studyStreak,\n    streakStartDate,\n    learningGoals,\n    studyPlan,\n    level,\n    onboardingStatus\n  }\n": GetUserProgressDataQueryResult;
+    "\n  *[_type == \"user\" && clerkId == $clerkId][0]{\n    _id,\n    username,\n    firstname,\n    lastname,\n    studyStreak,\n    streakStartDate,\n    learningGoals,\n    studyPlan,\n    level,\n    onboardingStatus,\n    analytics\n  }\n": GetUserProgressDataQueryResult;
     "\n  *[_type == \"enrollment\" && userEnrolled[0]._ref == $userId]{\n    _id,\n    percentComplete,\n    dateCompleted,\n    contentsCompleted,\n    course[0]->{\n      _id,\n      title,\n      \"slug\": slug.current,\n      description,\n      difficulty,\n      thumbnail,\n      topics[]->{\n        _id,\n        title,\n        \"slug\": slug.current\n      }\n    }\n  }\n": GetUserEnrollmentsQueryResult;
     "\n  *[_type == \"quizAttempt\" && user[0]._ref == $userId] | order(submittedAt desc)[0...5]{\n    _id,\n    score,\n    percentage,\n    totalQuestions,\n    correctCount,\n    submittedAt,\n    status,\n    quiz[0]->{\n      _id,\n      title,\n      \"slug\": slug.current\n    },\n    course[0]->{\n      _id,\n      title,\n      \"slug\": slug.current\n    },\n    chapter[0]->{\n      _id,\n      title\n    }\n  }\n": GetRecentQuizAttemptsQueryResult;
     "\n  *[_type == \"enrollment\" && userEnrolled[0]._ref == $userId && count(contentsCompleted) > 0]{\n    _id,\n    \"recentCompletions\": contentsCompleted[-5..-1][]->{\n      _id,\n      _type,\n      title,\n      \"slug\": slug.current,\n      \"parentChapter\": *[_type == \"chapter\" && references(^._id)][0]{\n        _id,\n        title,\n        \"slug\": slug.current\n      },\n      \"parentCourse\": *[_type == \"chapter\" && references(^._id)][0].course[0]->{\n        _id,\n        title,\n        \"slug\": slug.current\n      }\n    },\n    course[0]->{\n      _id,\n      title,\n      \"slug\": slug.current\n    },\n    percentComplete,\n    dateCompleted\n  }\n": GetRecentlyCompletedContentQueryResult;

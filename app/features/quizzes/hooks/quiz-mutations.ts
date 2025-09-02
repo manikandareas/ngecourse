@@ -4,14 +4,19 @@ import type {
   StartQuizInput,
   SubmitAnswerInput,
 } from '~/features/shared/schemas';
+import { useEventTracking } from '~/hooks/use-event-tracking';
 import { usecaseQuizzes } from '../usecase';
 
 export const useStartQuizMutation = () => {
   const queryClient = useQueryClient();
+  const { startActivity } = useEventTracking();
 
   return useMutation({
     mutationFn: (params: StartQuizInput) => usecaseQuizzes.startQuiz(params),
     onSuccess: (_, variables) => {
+      // Start timing the quiz activity
+      startActivity();
+
       // Invalidate attempts list
       queryClient.invalidateQueries({
         queryKey: ['user-quiz-attempts', variables.userId],
@@ -37,11 +42,28 @@ export const useSubmitAnswerMutation = () => {
 
 export const useFinalizeQuizMutation = () => {
   const queryClient = useQueryClient();
+  const { completeQuiz } = useEventTracking();
 
   return useMutation({
     mutationFn: (params: FinalizeAttemptInput) =>
       usecaseQuizzes.finalizeAttempt(params),
-    onSuccess: (result, variables) => {
+    onSuccess: async (result, variables) => {
+      // Track quiz completion analytics
+      if (result.success && result.quizData) {
+        await completeQuiz(
+          result.quizData.quizId,
+          result.quizData.score || 0,
+          result.quizData.totalQuestions || 1,
+          result.quizData.courseId,
+          {
+            percentage: result.quizData.percentage,
+            attemptNumber: result.quizData.attemptNumber,
+            courseCompleted: result.courseCompleted,
+            durationMs: result.quizData.durationMs,
+          }
+        );
+      }
+
       // Invalidate both attempt and attempts list
       queryClient.invalidateQueries({
         queryKey: ['quiz-attempt', variables.attemptId, variables.userId],

@@ -18,6 +18,7 @@ import { LessonHeader } from '~/features/courses/components/lesson-header';
 import { LessonNavigation } from '~/features/courses/components/lesson-navigation';
 import { dataCourses } from '~/features/courses/data';
 import { dataEnrollment } from '~/features/enrollments/data';
+import { useEventTracking } from '~/hooks/use-event-tracking';
 import { getCurrentSession } from '~/root';
 import type { Route } from './+types/lesson';
 
@@ -54,6 +55,7 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const navigation = useNavigation();
   const location = useLocation();
+  const { startSession, endSession, startActivity } = useEventTracking();
 
   useEffect(() => {
     if (navigation.state === 'loading' && isChatOpen) {
@@ -80,6 +82,50 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
     props.loaderData.currentSession._id,
     lesson?._id as string
   );
+
+  // Session and activity tracking
+  useEffect(() => {
+    let sessionStarted = false;
+
+    const initializeTracking = async () => {
+      // Start session for the course
+      const courseId = lesson?._id; // Using lesson ID as course context
+      if (courseId) {
+        await startSession(courseId);
+        sessionStarted = true;
+
+        // Start activity timing for this specific lesson
+        startActivity();
+      }
+    };
+
+    initializeTracking();
+
+    // Cleanup on unmount or route change
+    return () => {
+      if (sessionStarted) {
+        endSession('navigation');
+      }
+    };
+  }, [lesson?._id, startSession, endSession, startActivity]);
+
+  // Handle page visibility changes to pause/resume tracking
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // Page is hidden, could pause tracking if needed
+      } else {
+        // Page is visible again, resume tracking
+        startActivity();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [startActivity]);
 
   // Focus management for chat
   useEffect(() => {
