@@ -12,6 +12,8 @@ import {
 } from 'react-router';
 import type { Route } from './+types/root';
 import './app.css';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { useState } from 'react';
 import { ErrorFallback } from './components/ui/error-fallback';
 import { Toaster } from './components/ui/sonner';
@@ -91,6 +93,8 @@ export default function App({ loaderData }: Route.ComponentProps) {
         signUpFallbackRedirectUrl={'/onboarding'}
       >
         <Outlet />
+        <Analytics />
+        <SpeedInsights />
       </ClerkProvider>
     </ReactQueryProvider>
   );

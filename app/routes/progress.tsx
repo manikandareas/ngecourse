@@ -172,7 +172,7 @@ export default function ProgressPage(props: Route.ComponentProps) {
                     Continue your learning journey
                   </p>
                 </div>
-                {enrollments && enrollments.length > 6 && (
+                {enrollments && enrollments.length > 4 && (
                   <button
                     className="group flex items-center gap-2 rounded-full border border-accent/20 bg-accent/10 px-4 py-2 font-medium text-accent text-sm transition-all duration-200 hover:scale-105 hover:bg-accent/20"
                     type="button"
@@ -205,9 +205,13 @@ export default function ProgressPage(props: Route.ComponentProps) {
                   ))}
                 </div>
               ) : enrollments && enrollments.length > 0 ? (
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:gap-6">
+                <div className={`grid gap-4 2xl:gap-6 ${
+                    enrollments.length === 1 
+                      ? 'grid-cols-1' 
+                      : 'grid-cols-1 md:grid-cols-2'
+                  }`}>
                   {(enrollments as Enrollment[])
-                    ?.slice(0, 6) // Show up to 6 courses on desktop grid
+                    ?.slice(0, 4) // Show up to 4 courses (2 rows x 2 columns)
                     .map((enrollment) => (
                       <EnrolledCourseCard
                         course={enrollment.course}

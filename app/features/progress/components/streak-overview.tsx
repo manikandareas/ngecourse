@@ -117,9 +117,9 @@ export function StreakOverview({ user, className }: StreakOverviewProps) {
         <div className="tinted-blur-subtle rounded-xl p-4 text-center">
           <Calendar className="mx-auto mb-2 h-5 w-5 text-info" />
           <div className="font-bold text-info text-lg">
-            {Math.floor((analytics?.totalStudyTimeMinutes || 0) / 60)}
+            {analytics?.totalStudyTimeMinutes || 0}
             <span className="ml-1 font-normal text-sm text-text-secondary">
-              hours
+              minutes
             </span>
           </div>
           <p className="text-text-secondary text-xs">Total Time</p>
