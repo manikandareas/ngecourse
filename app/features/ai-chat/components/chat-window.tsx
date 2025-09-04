@@ -32,6 +32,7 @@ import {
   SourcesTrigger,
 } from '~/components/ai-elements/source';
 import { Suggestion, Suggestions } from '~/components/ai-elements/suggestion';
+import { getPublicEnv } from '~/env.public';
 
 interface ChatWindowProps {
   chatHistory: UIMessage[];
@@ -40,8 +41,7 @@ interface ChatWindowProps {
   onClose?: () => void;
 }
 
-const EXTERNAL_SERVICE_URL =
-  import.meta.env.VITE_EXTERNAL_SERVICE_URL || 'http://localhost:4000';
+const EXTERNAL_SERVICE_URL = getPublicEnv(import.meta.env).EXTERNAL_SERVICE_URL;
 
 const suggestions = [
   'Bisakah dijelaskan dengan cerita yang menarik?',

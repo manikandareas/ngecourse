@@ -1,13 +1,14 @@
 import { createClient } from '@sanity/client';
 import imageUrlBuilder from '@sanity/image-url';
 import type { SanityImageSource } from '@sanity/image-url/lib/types/types';
+import { getPublicEnv } from '~/env.public';
 
 export const client = createClient({
-  projectId: import.meta.env.VITE_SANITY_PROJECT_ID,
-  dataset: import.meta.env.VITE_SANITY_DATASET,
+  projectId: getPublicEnv(import.meta.env).SANITY_PROJECT_ID,
+  dataset: getPublicEnv(import.meta.env).SANITY_DATASET,
   useCdn: true,
-  apiVersion: import.meta.env.VITE_SANITY_API_VERSION,
-  token: import.meta.env.VITE_SANITY_SECRET_TOKEN, // Needed for certain operations like updating content, accessing drafts or using draft perspectives
+  apiVersion: getPublicEnv(import.meta.env).SANITY_API_VERSION,
+  token: getPublicEnv(import.meta.env).SANITY_SECRET_TOKEN, // Needed for certain operations like updating content, accessing drafts or using draft perspectives
   perspective: 'published', // Ensure consistency with live client
 });
 

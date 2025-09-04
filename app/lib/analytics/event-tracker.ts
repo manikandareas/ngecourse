@@ -1,3 +1,4 @@
+import { getPublicEnv } from '~/env.public';
 import type {
   EventPayload,
   EventResponse,
@@ -7,7 +8,7 @@ import type {
 
 // Default configuration
 const DEFAULT_CONFIG: EventTrackerConfig = {
-  apiEndpoint: `${import.meta.env.VITE_EXTERNAL_SERVICE_URL || 'http://localhost:3000'}/api/events`,
+  apiEndpoint: `${getPublicEnv(import.meta.env).EXTERNAL_SERVICE_URL}/api/events`,
   maxRetries: 3,
   retryDelayMs: 1000,
   offlineStorageKey: 'ngecourse_analytics_queue',

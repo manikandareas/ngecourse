@@ -1,5 +1,6 @@
 import type { QueryParams, SanityClient } from '@sanity/client';
 import { createClient } from '@sanity/client';
+import { getPublicEnv } from '~/env.public';
 
 /**
  * Custom live content client following Sanity's "Create Your Own Integration" approach
@@ -12,11 +13,11 @@ class SanityLiveClient {
 
   constructor() {
     this.client = createClient({
-      projectId: import.meta.env.VITE_SANITY_PROJECT_ID,
-      dataset: import.meta.env.VITE_SANITY_DATASET,
+      projectId: getPublicEnv(import.meta.env).SANITY_PROJECT_ID,
+      dataset: getPublicEnv(import.meta.env).SANITY_DATASET,
       useCdn: false, // Critical: Must be false for live updates
-      apiVersion: import.meta.env.VITE_SANITY_API_VERSION,
-      token: import.meta.env.VITE_SANITY_SECRET_TOKEN,
+      apiVersion: getPublicEnv(import.meta.env).SANITY_API_VERSION,
+      token: getPublicEnv(import.meta.env).SANITY_SECRET_TOKEN,
       perspective: 'published',
       stega: {
         enabled: false, // Disable for live queries

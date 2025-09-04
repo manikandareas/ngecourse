@@ -38,4 +38,7 @@ export default [
   route('sign-up/*', 'routes/sign-up.tsx'),
   route('/onboarding', 'routes/onboarding.tsx'),
   route('/recommendation', 'routes/recommendation.tsx'),
+
+  // System routes
+  route('/health', 'routes/health.tsx'),
 ] satisfies RouteConfig;

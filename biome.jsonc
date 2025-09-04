@@ -13,13 +13,15 @@
       },
       "style": {
         "useBlockStatements": "off",
-        "noNestedTernary": "off"
+        "noNestedTernary": "off",
+        "noParameterAssign": "off"
       },
       "suspicious": {
         "noConsole": "info"
       },
       "correctness": {
-        "useExhaustiveDependencies": "off"
+        "useExhaustiveDependencies": "off",
+        "noUnusedVariables": "off"
       },
       "complexity": {
         "noExcessiveCognitiveComplexity": "off"

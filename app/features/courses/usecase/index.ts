@@ -1,5 +1,6 @@
 import axios from 'axios';
 import z from 'zod';
+import { getPublicEnv } from '~/env.public';
 
 import {
   createCourseError,
@@ -8,8 +9,7 @@ import {
   UsecaseError,
 } from '~/features/shared/errors';
 
-const EXTERNAL_SERVICE_URL =
-  import.meta.env.VITE_EXTERNAL_SERVICE_URL || 'http://localhost:4000';
+const EXTERNAL_SERVICE_URL = getPublicEnv(import.meta.env).EXTERNAL_SERVICE_URL;
 
 const recommendCourses = async (query: string, token: string) => {
   const querySchema = z.string().min(1, 'Query must not be empty');
