@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigation } from 'react-router';
 import type { ChatMessage } from 'sanity.types';
 import { useMediaQuery } from 'usehooks-ts';
@@ -82,7 +82,6 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
     props.loaderData.currentSession._id,
     lesson?._id as string
   );
-
   // Session and activity tracking
   useEffect(() => {
     let sessionStarted = false;
@@ -151,8 +150,12 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
 
   const toggleChat = () => setIsChatOpen(!isChatOpen);
 
-  const chatMessages =
-    chatHistory?.map((msg) => toUIMessage(msg as unknown as ChatMessage)) || [];
+  const chatMessages = useMemo(() => {
+    return (
+      chatHistory?.map((msg) => toUIMessage(msg as unknown as ChatMessage)) ||
+      []
+    );
+  }, [chatHistory]);
 
   const commonProps = {
     courseSlug: props.params.slug,

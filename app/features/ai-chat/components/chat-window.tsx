@@ -132,7 +132,10 @@ export const ChatWindow = ({
                       switch (part.type) {
                         case 'text':
                           return (
-                            <ResponseComponent key={`${message.id}-${i}`}>
+                            <ResponseComponent
+                              key={`${message.id}-${i}`}
+                              lazyRender={false}
+                            >
                               {part.text}
                             </ResponseComponent>
                           );

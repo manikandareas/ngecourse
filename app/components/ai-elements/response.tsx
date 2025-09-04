@@ -1,6 +1,13 @@
 import 'katex/dist/katex.min.css';
 import type { HTMLAttributes } from 'react';
-import { isValidElement, memo, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  isValidElement,
+  memo,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import ReactMarkdown, { type Options } from 'react-markdown';
 import rehypeKatex from 'rehype-katex';
 import remarkGfm from 'remark-gfm';
@@ -55,15 +62,13 @@ function useHardenedMarkdown() {
         });
     }
 
-    HardenedMarkdownLoadPromise
-      .then(() => {
-        setHardenedMarkdown(() => HardenedMarkdownCache);
-        setIsLoading(false);
-      })
-      .catch(() => {
-        setHardenedMarkdown(() => ReactMarkdown);
-        setIsLoading(false);
-      });
+    HardenedMarkdownLoadPromise.then(() => {
+      setHardenedMarkdown(() => HardenedMarkdownCache);
+      setIsLoading(false);
+    }).catch(() => {
+      setHardenedMarkdown(() => ReactMarkdown);
+      setIsLoading(false);
+    });
   }, []);
 
   return { HardenedMarkdown, isLoading };
@@ -490,12 +495,12 @@ export const ResponseComponent = memo(
 
     return (
       <div
-        ref={ref}
+        aria-busy={lazyRender && !isVisible}
         className={cn(
           'size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0',
           className
         )}
-        aria-busy={lazyRender && !isVisible}
+        ref={ref}
         {...props}
       >
         {content}

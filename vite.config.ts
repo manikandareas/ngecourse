@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
   server: {
     warmup: {
-      clientFiles: ['./app/routes/**/*'],
+      clientFiles: ['./app/**/!(*.server|*.test)*.tsx'],
     },
   },
 });
