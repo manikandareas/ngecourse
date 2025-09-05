@@ -18,11 +18,11 @@ export function CourseListSection({
   onSearchChange,
 }: CourseListSectionProps) {
   return (
-    <section className="glass-card">
+    <section>
       <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
         <div className="space-y-4">
           <div className="inline-flex items-center gap-2 rounded-full border border-hairline bg-white/5 px-3 py-1.5">
-            <BookOpen className="h-3 w-3 text-accent" />
+            <BookOpen className="h-3 w-3 text-green-500" />
             <span className="field-label">All Courses</span>
           </div>
           <div>

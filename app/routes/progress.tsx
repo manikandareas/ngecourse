@@ -1,5 +1,6 @@
 import React from 'react';
 import type { User } from 'sanity.types';
+import { PageBackground } from '~/components/ui/page-background';
 import {
   transformUserAchievementsToDisplay,
   useUserAchievements,
@@ -97,18 +98,18 @@ export default function ProgressPage(props: Route.ComponentProps) {
   // Show full page loading state for initial load
   if (isInitialLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <PageBackground variant="purple-cyan">
         <div className="mx-auto max-w-7xl px-6 py-8 xl:px-0">
           <div className="space-y-8">
             {/* Loading skeleton */}
-            <div className="tinted-blur-subtle animate-pulse rounded-2xl p-8">
+            <div className="glass-card animate-pulse rounded-2xl p-8">
               <div className="space-y-4">
                 <div className="h-8 w-64 rounded bg-white/10" />
                 <div className="grid grid-cols-4 gap-4">
                   {Array.from({ length: 4 }).map((_, i) => (
                     <div
                       className="h-20 rounded bg-white/10"
-                      key={`overview-loading-${i}`}
+                      key={`overview-loading-${i.toString()}`}
                     />
                   ))}
                 </div>
@@ -116,16 +117,16 @@ export default function ProgressPage(props: Route.ComponentProps) {
             </div>
           </div>
         </div>
-      </div>
+      </PageBackground>
     );
   }
 
   // Show error state
   if (hasError) {
     return (
-      <div className="min-h-screen bg-background">
+      <PageBackground variant="purple-cyan">
         <div className="mx-auto max-w-7xl px-6 py-8 xl:px-0">
-          <div className="tinted-blur-subtle rounded-2xl p-8 text-center">
+          <div className="glass-card rounded-2xl p-8 text-center">
             <div className="mb-4 text-6xl">⚠️</div>
             <h2 className="mb-2 font-bold text-text-primary text-xl">
               Unable to load progress data
@@ -143,12 +144,12 @@ export default function ProgressPage(props: Route.ComponentProps) {
             </button>
           </div>
         </div>
-      </div>
+      </PageBackground>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <PageBackground variant="purple-cyan">
       {/* Main Content Container */}
       <div className="mx-auto max-w-7xl px-6 py-8 xl:px-0">
         <div className="space-y-8">
@@ -174,7 +175,7 @@ export default function ProgressPage(props: Route.ComponentProps) {
                 </div>
                 {enrollments && enrollments.length > 4 && (
                   <button
-                    className="group flex items-center gap-2 rounded-full border border-accent/20 bg-accent/10 px-4 py-2 font-medium text-accent text-sm transition-all duration-200 hover:scale-105 hover:bg-accent/20"
+                    className="group flex items-center gap-2 rounded-full border border-accent/20 bg-accent/10 px-4 py-2 font-medium text-muted-foreground text-sm transition-all duration-200 hover:scale-105 hover:bg-accent/20"
                     type="button"
                   >
                     View All ({enrollments.length})
@@ -205,11 +206,13 @@ export default function ProgressPage(props: Route.ComponentProps) {
                   ))}
                 </div>
               ) : enrollments && enrollments.length > 0 ? (
-                <div className={`grid gap-4 2xl:gap-6 ${
-                    enrollments.length === 1 
-                      ? 'grid-cols-1' 
+                <div
+                  className={`grid gap-4 2xl:gap-6 ${
+                    enrollments.length === 1
+                      ? 'grid-cols-1'
                       : 'grid-cols-1 md:grid-cols-2'
-                  }`}>
+                  }`}
+                >
                   {(enrollments as Enrollment[])
                     ?.slice(0, 4) // Show up to 4 courses (2 rows x 2 columns)
                     .map((enrollment) => (
@@ -265,6 +268,6 @@ export default function ProgressPage(props: Route.ComponentProps) {
           </div>
         </div>
       </div>
-    </div>
+    </PageBackground>
   );
 }

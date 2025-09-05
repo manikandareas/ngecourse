@@ -75,9 +75,9 @@ export function Navbar() {
   };
 
   return (
-    <NavbarComp className="mx-auto max-w-6xl px-4 py-2">
+    <NavbarComp className="mx-auto max-w-6xl px-4 py-2 ">
       {/* Desktop Navigation */}
-      <NavBody className="py-3">
+      <NavBody className="py-3 backdrop-blur-md glass-card">
         <NavbarLogo />
         <NavItems items={navItems} />
         <div className="flex items-center gap-3">

@@ -312,7 +312,7 @@ export function CourseFileTree({
   return (
     <div
       className={cn(
-        'glass-card sticky top-0 flex h-screen w-full flex-col',
+        'sticky top-0 flex h-screen w-full flex-col',
         'lg:w-80 xl:w-96',
         className
       )}

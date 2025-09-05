@@ -45,46 +45,41 @@ export default function CoursesPage(props: Route.ComponentProps) {
 
   if (isError) {
     return (
-      <PageBackground>
-        <div className="flex min-h-[50vh] items-center justify-center p-6">
-          <div className="glass-card space-y-6 text-center">
-            <div className="text-6xl">😬</div>
-            <h2 className="font-light text-2xl text-text-primary tracking-tight md:text-3xl">
-              Oops! Something went wrong
-            </h2>
-            <p className="max-w-md text-base/7 text-text-secondary">
-              {error.message}
-            </p>
-            <button
-              className="btn-primary"
-              onClick={() => window.location.reload()}
-              type="button"
-            >
-              Try Again
-            </button>
-          </div>
+      <div className="flex min-h-[50vh] items-center justify-center p-6">
+        <div className="glass-card space-y-6 text-center">
+          <div className="text-6xl">😬</div>
+          <h2 className="font-light text-2xl text-text-primary tracking-tight md:text-3xl">
+            Oops! Something went wrong
+          </h2>
+          <p className="max-w-md text-base/7 text-text-secondary">
+            {error.message}
+          </p>
+          <button
+            className="btn-primary"
+            onClick={() => window.location.reload()}
+            type="button"
+          >
+            Try Again
+          </button>
         </div>
-      </PageBackground>
+      </div>
     );
   }
 
   const handleClearSearch = () => setSearchQuery('');
 
   return (
-    <PageBackground>
-      {/* Main Content */}
-      <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
-        <div className="space-y-20">
-          <RecommendationSection recommendation={recommendation} />
-          <CourseListSection
-            courses={courses}
-            filteredCourses={filteredCourses}
-            onClearSearch={handleClearSearch}
-            onSearchChange={setSearchQuery}
-            searchQuery={searchQuery}
-          />
-        </div>
+    <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+      <div className="space-y-20">
+        <RecommendationSection recommendation={recommendation} />
+        <CourseListSection
+          courses={courses}
+          filteredCourses={filteredCourses}
+          onClearSearch={handleClearSearch}
+          onSearchChange={setSearchQuery}
+          searchQuery={searchQuery}
+        />
       </div>
-    </PageBackground>
+    </div>
   );
 }
