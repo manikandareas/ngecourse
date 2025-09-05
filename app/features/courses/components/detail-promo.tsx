@@ -1,6 +1,7 @@
 import type { CourseContentsQueryResult } from 'sanity.types';
 import { Button } from '~/components/ui/3d-button';
 import { urlFor } from '~/lib/sanity-client';
+import { COURSE_DETAIL_COPY } from '../constants/course-detail-copy';
 
 interface DetailPromoProps {
   course: CourseContentsQueryResult;
@@ -26,23 +27,21 @@ export function DetailPromo({ course }: DetailPromoProps) {
             className="text-center font-light text-2xl leading-tight tracking-tight md:text-left md:text-3xl"
             style={{ color: 'var(--text-primary)' }}
           >
-            Build your portfolio with this course
+            {COURSE_DETAIL_COPY.promo.title}
           </h2>
           <p
             className="text-center text-sm leading-relaxed md:text-left md:text-base"
             style={{ color: 'var(--text-secondary)' }}
           >
-            Build 16 web development projects for your portfolio, ready to apply
-            for junior developer jobs.
+            {COURSE_DETAIL_COPY.promo.subtitle}
           </p>
           <Button
-            aria-label="Enroll in this course for free"
+            aria-label="Daftar kursus gratis sekarang"
             className=" w-full focus-visible:ring-2 md:w-fit"
             type="button"
             variant={'ai'}
           >
-            Enroll Now for{' '}
-            <span className="font-semibold text-amber-200">Free</span>
+            {COURSE_DETAIL_COPY.promo.cta}
           </Button>
         </div>
       </div>

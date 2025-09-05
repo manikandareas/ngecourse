@@ -10,6 +10,7 @@ import { enrollmentQueryOption } from '~/features/enrollments/hooks/get-enrollme
 import { usecaseEnrollments } from '~/features/enrollments/usecase';
 import { urlFor } from '~/lib/sanity-client';
 import { extractYoutubeId } from '~/lib/utils';
+import { COURSE_DETAIL_COPY } from '../constants/course-detail-copy';
 import { CourseBadge } from './course-badge';
 import { DetailCTA } from './detail-cta';
 
@@ -43,24 +44,29 @@ export function DetailHero(props: IDetailHero) {
     },
     onError: (error) => {
       toast.error(
-        `Enrollment failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        COURSE_DETAIL_COPY.error.enrollmentFailed,
+        {
+          description: COURSE_DETAIL_COPY.error.enrollmentFailedDesc
+        }
       );
     },
     onSuccess: (data) => {
       if (data.success) {
         document.getElementById('dialog-close')?.click();
-        toast.success('Successfully enrolled in the course!');
+        toast.success(COURSE_DETAIL_COPY.success.enrolled, {
+          description: COURSE_DETAIL_COPY.success.enrolledDesc
+        });
         return;
       }
 
-      toast.error(`Enrollment failed: ${data.error?.message}`);
+      toast.error(`${COURSE_DETAIL_COPY.error.enrollmentFailed}: ${data.error?.message}`);
     },
   });
 
   const handleEnroll = () => {
     if (!(props.course?.slug?.current && props.userId)) {
-      toast.error('Course slug or user ID is missing.', {
-        description: 'You need to log in to enroll in a course.',
+      toast.error(COURSE_DETAIL_COPY.error.missingData, {
+        description: COURSE_DETAIL_COPY.error.missingDataDesc,
       });
       return;
     }

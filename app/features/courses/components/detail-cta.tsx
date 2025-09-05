@@ -9,6 +9,7 @@ import type {
 } from 'sanity.types';
 import { Button } from '~/components/ui/button';
 import { useContentProgression } from '~/features/courses/hooks/content-progression';
+import { COURSE_DETAIL_COPY } from '../constants/course-detail-copy';
 import DetailEnrollDialog from './detail-enroll-dialog';
 
 type DetailCTAProps = {
@@ -97,8 +98,8 @@ export const DetailCTA: React.FC<DetailCTAProps> = (props) => {
         <Button
           aria-label={
             isCourseCompleted
-              ? 'Review this course'
-              : 'Continue learning this course'
+              ? COURSE_DETAIL_COPY.cta.enrolled.review
+              : COURSE_DETAIL_COPY.cta.enrolled.continue
           }
           onClick={() => {
             if (isCourseCompleted) {
@@ -114,7 +115,7 @@ export const DetailCTA: React.FC<DetailCTAProps> = (props) => {
           size={'lg'}
           type="button"
         >
-          {isCourseCompleted ? 'Review Course' : 'Continue Learning'}
+          {isCourseCompleted ? COURSE_DETAIL_COPY.cta.enrolled.review : COURSE_DETAIL_COPY.cta.enrolled.continue}
           <ArrowRightIcon className="ml-2 size-4 transition-transform group-hover:translate-x-1" />
         </Button>
       ) : (
@@ -132,11 +133,11 @@ export const DetailCTA: React.FC<DetailCTAProps> = (props) => {
           topics={(props.course.topics as Topic[]) || []}
         >
           <Button
-            aria-label="Start learning this course"
+            aria-label={COURSE_DETAIL_COPY.cta.notEnrolled.primary}
             size={'lg'}
             type="button"
           >
-            Start Learning Now
+            {COURSE_DETAIL_COPY.cta.notEnrolled.primary}
             <ArrowRightIcon className="ml-2 size-4 transition-transform group-hover:translate-x-1" />
           </Button>
         </DetailEnrollDialog>

@@ -1,5 +1,6 @@
 import { Check, Goal } from 'lucide-react';
 import { cn } from '~/lib/utils';
+import { COURSE_DETAIL_COPY } from '../constants/course-detail-copy';
 
 export type LearningOutcomesProps = {
   className?: string;
@@ -7,20 +8,11 @@ export type LearningOutcomesProps = {
   items?: string[];
 };
 
-const defaultItems: string[] = [
-  'Build real web development projects for your portfolio.',
-  'Learn modern technologies: JavaScript, React, Node.',
-  'Create production-ready websites and web apps.',
-  'Master frontend development best practices.',
-  'Understand backend fundamentals with Node.',
-  'Gain confidence to apply for junior developer roles.',
-  'Work as a freelance web developer.',
-  'Learn professional developer workflows.',
-];
+const defaultItems: string[] = COURSE_DETAIL_COPY.contents.outcomes.defaultItems;
 
 export function LearningOutcomes({
   className,
-  title = 'You will learn',
+  title = COURSE_DETAIL_COPY.learningOutcomes.title,
   items = defaultItems,
 }: LearningOutcomesProps) {
   return (

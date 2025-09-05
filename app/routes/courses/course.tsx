@@ -5,6 +5,7 @@ import DetailContents from '~/features/courses/components/detail-contents';
 import { DetailHero } from '~/features/courses/components/detail-hero';
 import DetailLoading from '~/features/courses/components/detail-loading';
 import DetailPromo from '~/features/courses/components/detail-promo';
+import { COURSE_DETAIL_COPY } from '~/features/courses/constants/course-detail-copy';
 import { dataCourses } from '~/features/courses/data';
 import { courseQueryOption } from '~/features/courses/hooks/get-course';
 import { dataEnrollment } from '~/features/enrollments/data';
@@ -14,10 +15,10 @@ import type { Route } from './+types/course';
 
 export function meta({ data }: Route.MetaArgs) {
   return [
-    { title: `${data?.course?.title} | Genii` },
+    { title: `${data?.course?.title} ${COURSE_DETAIL_COPY.meta.titleSuffix}` },
     {
       name: 'description',
-      content: data?.course?.description || 'Course detail page of Genii!',
+      content: data?.course?.description || COURSE_DETAIL_COPY.meta.defaultDescription,
     },
   ];
 }
