@@ -2,6 +2,7 @@ import { AlertCircle, ChevronRight, Clock, RefreshCw } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { Button } from '~/components/ui/3d-button';
+import { RECOMMENDATION_COPY } from '~/features/recommendation/constants/copy';
 import { cn } from '~/lib/utils';
 
 interface RecommendationErrorProps {
@@ -16,39 +17,36 @@ interface RecommendationErrorProps {
 const errorConfig = {
   failed: {
     icon: AlertCircle,
-    title: 'Generation Failed',
-    subtitle: 'We encountered an issue creating your recommendations',
-    description:
-      'Our AI had trouble analyzing your preferences. This might be temporary.',
+    title: RECOMMENDATION_COPY.error.failed.title,
+    subtitle: RECOMMENDATION_COPY.error.failed.subtitle,
+    description: RECOMMENDATION_COPY.error.failed.description,
     color: 'text-red-400',
     bgColor: 'bg-red-500/10',
     borderColor: 'border-red-500/20',
   },
   timeout: {
     icon: Clock,
-    title: 'Taking Longer Than Expected',
-    subtitle: 'Your recommendations are still being crafted',
-    description:
-      'Our AI is working hard to find the perfect courses for you. You can wait a bit more or explore courses manually.',
+    title: RECOMMENDATION_COPY.error.timeout.title,
+    subtitle: RECOMMENDATION_COPY.error.timeout.subtitle,
+    description: RECOMMENDATION_COPY.error.timeout.description,
     color: 'text-yellow-400',
     bgColor: 'bg-yellow-500/10',
     borderColor: 'border-yellow-500/20',
   },
   empty: {
     icon: AlertCircle,
-    title: 'No Matches Found',
-    subtitle: "We couldn't find courses matching your specific criteria",
-    description:
-      "Don't worry! This just means we need to expand our search. Let's explore all available courses.",
+    title: RECOMMENDATION_COPY.error.empty.title,
+    subtitle: RECOMMENDATION_COPY.error.empty.subtitle,
+    description: RECOMMENDATION_COPY.error.empty.description,
     color: 'text-blue-400',
     bgColor: 'bg-blue-500/10',
     borderColor: 'border-blue-500/20',
   },
   network: {
     icon: RefreshCw,
-    title: 'Connection Issue',
-    subtitle: 'Unable to reach our recommendation service',
-    description: 'Please check your internet connection and try again.',
+    title: RECOMMENDATION_COPY.error.network.title,
+    subtitle: RECOMMENDATION_COPY.error.network.subtitle,
+    description: RECOMMENDATION_COPY.error.network.description,
     color: 'text-orange-400',
     bgColor: 'bg-orange-500/10',
     borderColor: 'border-orange-500/20',
@@ -69,7 +67,7 @@ export function RecommendationError({
   return (
     <motion.div
       animate={{ opacity: 1, y: 0 }}
-      className={cn('glass-card text-center', className)}
+      className={cn(' text-center', className)}
       initial={{ opacity: 0, y: 20 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
     >
@@ -143,7 +141,7 @@ export function RecommendationError({
               ) : (
                 <>
                   <RefreshCw className="mr-2 size-4" />
-                  Try Again
+                  {RECOMMENDATION_COPY.error.failed.retryButton}
                 </>
               )}
             </Button>
@@ -157,7 +155,11 @@ export function RecommendationError({
               size="lg"
               variant={type === 'empty' ? 'default' : 'secondary'}
             >
-              Browse All Courses
+{type === 'empty' 
+                ? RECOMMENDATION_COPY.error.empty.browseButton 
+                : type === 'timeout'
+                ? RECOMMENDATION_COPY.error.timeout.browseButton
+                : 'Browse All Courses'}
               <ChevronRight className="ml-2 size-4" />
             </Button>
           )}
@@ -170,7 +172,7 @@ export function RecommendationError({
               size="lg"
               variant="secondary"
             >
-              Continue to Dashboard
+{RECOMMENDATION_COPY.error.timeout.waitButton}
               <ChevronRight className="ml-2 size-4" />
             </Button>
           )}
@@ -184,12 +186,12 @@ export function RecommendationError({
           transition={{ delay: 0.8 }}
         >
           <p className="text-text-muted text-xs">
-            Still having issues?{' '}
+            {RECOMMENDATION_COPY.error.failed.supportText}{' '}
             <a
               className="text-accent underline transition-colors hover:text-accent/80"
               href="mailto:support@ngecourse.com"
             >
-              Contact Support
+              {RECOMMENDATION_COPY.error.failed.contactSupport}
             </a>
           </p>
         </motion.div>
@@ -232,9 +234,9 @@ export function TimeoutProgress({
     <div className={cn('space-y-4', className)}>
       <div className="space-y-2 text-center">
         <p className="text-sm text-text-muted">
-          Auto-timeout in{' '}
+          {RECOMMENDATION_COPY.progress.autoTimeoutText}{' '}
           <span className="font-medium text-text-secondary">
-            {remainingTime}s
+            {remainingTime}{RECOMMENDATION_COPY.progress.seconds}
           </span>
         </p>
 

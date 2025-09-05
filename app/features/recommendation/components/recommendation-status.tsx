@@ -1,5 +1,6 @@
 import { AlertCircle, CheckCircle, Loader2, Sparkles } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
+import { RECOMMENDATION_COPY } from '~/features/recommendation/constants/copy';
 import { cn } from '~/lib/utils';
 
 type RecommendationStatus = 'pending' | 'processing' | 'completed' | 'failed';
@@ -16,32 +17,32 @@ const statusConfig = {
     color: 'text-text-secondary',
     bgColor: 'bg-white/5',
     borderColor: 'border-hairline',
-    title: 'Getting Started',
-    subtitle: 'Setting up your personalized recommendations',
+    title: RECOMMENDATION_COPY.loading.pending.title,
+    subtitle: RECOMMENDATION_COPY.loading.pending.subtitle,
   },
   processing: {
     icon: Sparkles,
     color: 'text-accent',
     bgColor: 'bg-accent/10',
     borderColor: 'border-accent/30',
-    title: 'AI at Work',
-    subtitle: 'Crafting your perfect learning journey',
+    title: RECOMMENDATION_COPY.loading.processing.title,
+    subtitle: RECOMMENDATION_COPY.loading.processing.subtitle,
   },
   completed: {
     icon: CheckCircle,
     color: 'text-green-400',
     bgColor: 'bg-green-500/10',
     borderColor: 'border-green-500/30',
-    title: 'Ready to Learn!',
-    subtitle: 'Your personalized courses are here',
+    title: RECOMMENDATION_COPY.status.completed.title,
+    subtitle: RECOMMENDATION_COPY.status.completed.subtitle,
   },
   failed: {
     icon: AlertCircle,
     color: 'text-red-400',
     bgColor: 'bg-red-500/10',
     borderColor: 'border-red-500/30',
-    title: 'Something went wrong',
-    subtitle: "Let's try a different approach",
+    title: RECOMMENDATION_COPY.status.failed.title,
+    subtitle: RECOMMENDATION_COPY.status.failed.subtitle,
   },
 };
 
@@ -127,7 +128,7 @@ export function RecommendationStatus({
             transition={{ delay: 0.6 }}
           >
             <div className="size-2 animate-pulse rounded-full bg-accent" />
-            <span>Live updates active</span>
+            <span>{RECOMMENDATION_COPY.loading.pending.liveIndicator}</span>
           </motion.div>
         )}
       </div>
