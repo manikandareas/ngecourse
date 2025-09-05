@@ -10,6 +10,7 @@ import {
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useMediaQuery } from 'usehooks-ts';
+import { Button } from '~/components/ui/button';
 import {
   Popover,
   PopoverContent,
@@ -148,24 +149,27 @@ export const LessonHeader = ({
       <div className="mx-auto flex w-full items-center justify-between gap-4">
         {/* Left: Structure trigger */}
         <div className="flex min-w-0 flex-1 items-center gap-2">
-          <button
+          <Button
             aria-label="Go back to course"
             className="btn-ghost p-2.5"
             onClick={() => navigate(`/courses/${courseSlug}`)}
+            title="Go back to course"
             type="button"
+            variant={'outline'}
           >
             <ChevronLeft aria-hidden="true" size={16} />
             <span className="sr-only">Go back to course</span>
-          </button>
+          </Button>
           <LessonFileTree course={course} enrollment={enrollment}>
-            <button
+            <Button
               aria-label="Open lesson structure"
-              className="btn-ghost focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+              className=" focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
               type="button"
+              variant="outline"
             >
               <FolderTree aria-hidden="true" size={16} />
               <span className="ml-2 hidden sm:inline">Outline</span>
-            </button>
+            </Button>
           </LessonFileTree>
         </div>
 

@@ -6,6 +6,7 @@ import type {
   CourseContentsQueryResult,
   EnrollmentQueryResult,
 } from 'sanity.types';
+import { Button } from '~/components/ui/button';
 import { CourseCompletionModal } from '~/features/achievements';
 import { enrollmentQueryOption } from '~/features/enrollments/hooks/get-enrollment';
 import { usecaseEnrollments } from '~/features/enrollments/usecase';
@@ -175,25 +176,23 @@ export const LessonNavigation: React.FC<LessonNavigationProps> = ({
 
       <nav className="flex items-center justify-between rounded-2xl border border-hairline bg-white/3 p-6 backdrop-blur-sm">
         {canPrev ? (
-          <button
-            className="btn-ghost disabled:cursor-not-allowed disabled:opacity-50"
+          <Button
+            className="disabled:cursor-not-allowed disabled:opacity-50"
             disabled={!canInteract}
             onClick={handlePrevious}
             type="button"
+            variant="outline"
           >
             <ArrowLeft size={16} />
             <span className="ml-2">Previous</span>
-          </button>
+          </Button>
         ) : (
           <div />
         )}
 
         {shouldShowCompleteButton && (
-          <button
-            className={cn(
-              'btn-primary',
-              'disabled:cursor-not-allowed disabled:opacity-50'
-            )}
+          <Button
+            className={cn('disabled:cursor-not-allowed disabled:opacity-50')}
             disabled={!canInteract || isPending}
             onClick={handleNext}
             type="button"
@@ -206,7 +205,7 @@ export const LessonNavigation: React.FC<LessonNavigationProps> = ({
                   : 'Next'}
             </span>
             <ArrowRight size={16} />
-          </button>
+          </Button>
         )}
       </nav>
     </>
