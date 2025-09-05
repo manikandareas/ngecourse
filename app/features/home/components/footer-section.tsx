@@ -50,10 +50,8 @@ const Footer2 = ({
       links: [
         { text: 'Tentang Kami', url: '#' },
         { text: 'Karir', url: '#' },
-        { text: 'Blog', url: '#' },
-        { text: 'Partner', url: '#' },
+        { text: 'Partner', url: '#partners' },
         { text: 'Kontak', url: '#' },
-        { text: 'Indonesia', url: '#' },
       ],
     },
     {

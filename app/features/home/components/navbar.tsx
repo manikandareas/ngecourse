@@ -7,7 +7,7 @@ import {
 } from '@clerk/react-router';
 import { Ticket } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { Button } from '~/components/ui/3d-button';
+import { Button } from '~/components/ui/button';
 import {
   MobileNav,
   MobileNavHeader,
@@ -99,7 +99,7 @@ export function Navbar() {
               type="button"
             >
               <Ticket className="size-4" />
-              <span className="hidden sm:inline">Feedback</span>
+              <span className="hidden sm:inline">Feedback 🙏🏻</span>
             </button>
             <div className="ml-2">
               <UserButton

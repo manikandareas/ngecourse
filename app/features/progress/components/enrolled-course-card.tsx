@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import { Button } from '~/components/ui/button';
 import { ProgressArc } from '~/components/ui/progress-arc';
 import { urlFor } from '~/lib/sanity-client';
+import { PROGRESS_COPY } from '../constants/copy';
 import {
   formatProgressPercentage,
   getCourseStatusInfo,
@@ -82,7 +83,7 @@ export const EnrolledCourseCard: React.FC<EnrolledCourseCardProps> = ({
         {/* Progress Bar */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-text-secondary">Progress</span>
+            <span className="text-text-secondary">{PROGRESS_COPY.labels.progress}</span>
             <span className="font-medium text-text-primary">
               {formatProgressPercentage(percentComplete)}
             </span>
@@ -122,7 +123,7 @@ export const EnrolledCourseCard: React.FC<EnrolledCourseCardProps> = ({
             variant={status === 'completed' ? 'secondary' : 'default'}
           >
             <Link to={`/courses/${course.slug}`}>
-              {status === 'completed' ? 'Review Course' : 'Continue Learning'}
+              {status === 'completed' ? PROGRESS_COPY.actions.reviewCourse : PROGRESS_COPY.actions.continueLearning}
             </Link>
           </Button>
         </div>

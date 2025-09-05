@@ -1,5 +1,6 @@
 import type React from 'react';
 import type { User } from 'sanity.types';
+import { PROGRESS_COPY } from '../constants/copy';
 import {
   getLevelProgress,
   getStreakStatus,
@@ -57,17 +58,15 @@ export const ProgressOverview: React.FC<ProgressOverviewProps> = ({
         <div className="relative flex items-center justify-between">
           <div className="flex-1">
             <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-accent/15 px-3 py-1 font-medium text-foreground text-sm backdrop-blur-sm">
-              <div className="h-2 w-2 animate-pulse rounded-full bg-accent" />
-              {currentStreak > 0
-                ? `${currentStreak} day streak!`
-                : 'Start your streak'}
+              <div className="h-2 w-2 animate-pulse rounded-full bg-green-400" />
+              {PROGRESS_COPY.motivational.dailyStreak(currentStreak)}
             </div>
             <h1 className="mb-3 font-bold text-3xl text-text-primary leading-tight">
-              Welcome back, {user?.firstname || 'Learner'}!
+              {PROGRESS_COPY.welcome.greeting(user?.firstname || PROGRESS_COPY.welcome.fallbackName)}
               <span className="ml-2 text-2xl">👋</span>
             </h1>
             <p className="max-w-lg text-lg text-text-secondary/90">
-              {streakStatus.message} Ready to continue your learning journey?
+              {PROGRESS_COPY.welcome.motivation}
             </p>
           </div>
 
@@ -82,10 +81,10 @@ export const ProgressOverview: React.FC<ProgressOverviewProps> = ({
                 <div className="font-bold text-lg text-text-primary">
                   Level {levelProgress.current}
                 </div>
-                <div className="font-medium text-accent text-sm">
+                <div className="font-medium text-foreground text-sm">
                   {user?.level || 'Beginner'}
                 </div>
-                <div className="mt-2 text-text-muted text-xs">
+                <div className="mt-2 text-muted-foreground text-xs">
                   Next: {levelProgress.next}
                 </div>
               </div>
@@ -98,25 +97,29 @@ export const ProgressOverview: React.FC<ProgressOverviewProps> = ({
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard
           color={currentStreak > 0 ? 'text-orange-400' : 'text-gray-400'}
-          description={streakStatus.message}
+          description={
+            currentStreak > 0
+              ? PROGRESS_COPY.stats.streak.activeDescription
+              : PROGRESS_COPY.stats.streak.inactiveDescription
+          }
           icon={streakStatus.emoji}
-          title="Study Streak"
-          value={`${currentStreak} days`}
+          title={PROGRESS_COPY.stats.streak.title}
+          value={`${currentStreak} ${PROGRESS_COPY.stats.streak.unit}`}
         />
 
         <StatsCard
           color="text-blue-400"
-          description={`${activityStats?.completedCourses || 0} completed`}
+          description={PROGRESS_COPY.stats.courses.completedSuffix(activityStats?.completedCourses || 0)}
           icon="📚"
-          title="Courses Enrolled"
+          title={PROGRESS_COPY.stats.courses.title}
           value={activityStats?.totalEnrollments || 0}
         />
 
         <StatsCard
           color="text-green-400"
-          description="Lessons and quizzes"
+          description={PROGRESS_COPY.stats.content.description}
           icon="✅"
-          title="Content Completed"
+          title={PROGRESS_COPY.stats.content.title}
           value={activityStats?.totalContentCompleted || 0}
         />
 
@@ -130,9 +133,9 @@ export const ProgressOverview: React.FC<ProgressOverviewProps> = ({
                   : 'text-red-400'
               : 'text-gray-400'
           }
-          description={`${activityStats?.totalQuizAttempts || 0} attempts`}
+          description={PROGRESS_COPY.stats.quiz.attemptsSuffix(activityStats?.totalQuizAttempts || 0)}
           icon="🎯"
-          title="Quiz Average"
+          title={PROGRESS_COPY.stats.quiz.title}
           value={
             activityStats?.averageQuizScore
               ? `${Math.round(activityStats.averageQuizScore)}%`

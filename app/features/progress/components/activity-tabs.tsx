@@ -2,6 +2,7 @@ import { Calendar, Star, TrendingUp } from 'lucide-react';
 import React, { useState } from 'react';
 import type { User } from 'sanity.types';
 import { cn } from '~/lib/utils';
+import { PROGRESS_COPY } from '../constants/copy';
 import { AchievementsBadges } from './achievements-badges';
 import { ActivityFeed } from './activity-feed';
 import { StreakOverview } from './streak-overview';
@@ -24,19 +25,19 @@ const tabs: Array<{
 }> = [
   {
     id: 'streak',
-    label: 'Streak',
+    label: PROGRESS_COPY.tabs.streak,
     icon: TrendingUp,
     color: 'text-orange-400'
   },
   {
     id: 'activity',
-    label: 'Activity',
+    label: PROGRESS_COPY.tabs.activity,
     icon: Calendar,
     color: 'text-blue-400'
   },
   {
     id: 'achievements',
-    label: 'Achievements',
+    label: PROGRESS_COPY.tabs.achievements,
     icon: Star,
     color: 'text-yellow-400'
   }

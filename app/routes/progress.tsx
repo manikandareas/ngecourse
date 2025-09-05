@@ -8,6 +8,7 @@ import {
 import { ActivityTabs } from '~/features/progress/components/activity-tabs';
 import { EnrolledCourseCard } from '~/features/progress/components/enrolled-course-card';
 import { ProgressOverview } from '~/features/progress/components/progress-overview';
+import { PROGRESS_COPY } from '~/features/progress/constants/copy';
 import {
   useRecentActivities,
   useUserEnrollments,
@@ -33,10 +34,10 @@ interface Enrollment {
 
 export function meta() {
   return [
-    { title: 'Genii | Progres Belajar' },
+    { title: PROGRESS_COPY.meta.title },
     {
       name: 'description',
-      content: 'Pantau progres belajar dan raih pencapaian baru setiap hari - karena skill yang terasah adalah investasi terbaik untuk masa depan kamu',
+      content: PROGRESS_COPY.meta.description,
     },
   ];
 }
@@ -129,17 +130,17 @@ export default function ProgressPage(props: Route.ComponentProps) {
           <div className="glass-card rounded-2xl p-8 text-center">
             <div className="mb-4 text-6xl">⚠️</div>
             <h2 className="mb-2 font-bold text-text-primary text-xl">
-              Waduh, Ada Gangguan Nih!
+              {PROGRESS_COPY.errors.networkError.title}
             </h2>
             <p className="mb-6 text-text-secondary">
-              Data progres kamu lagi sulit dimuat. Tenang, coba muat ulang halaman ini atau tunggu sebentar ya!
+              {PROGRESS_COPY.errors.networkError.description}
             </p>
             <button
               className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-accent/90"
               onClick={() => window.location.reload()}
               type="button"
             >
-              Muat Ulang
+              {PROGRESS_COPY.errors.networkError.retryButton}
             </button>
           </div>
         </div>
@@ -148,124 +149,123 @@ export default function ProgressPage(props: Route.ComponentProps) {
   }
 
   return (
-    <PageBackground variant="purple-cyan">
-      {/* Main Content Container */}
-      <div className="mx-auto max-w-7xl px-6 py-8 xl:px-0">
-        <div className="space-y-8">
-          {/* Progress Overview Section */}
-          <ProgressOverview
-            activityStats={activityStats}
-            isLoading={progressActivityLoading}
-            user={(userData as User) ?? null}
-          />
+    <div className="mx-auto max-w-7xl px-6 py-8 xl:px-0">
+      <div className="space-y-8">
+        {/* Progress Overview Section */}
+        <ProgressOverview
+          activityStats={activityStats}
+          isLoading={progressActivityLoading}
+          user={(userData as User) ?? null}
+        />
 
-          {/* Main Content Grid - Enhanced Responsive */}
-          <div className="grid grid-cols-1 gap-8 xl:grid-cols-5 xl:gap-12">
-            {/* Left Column - Courses (3/5 width on xl) */}
-            <div className="space-y-8 xl:col-span-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="mb-2 font-bold text-2xl text-text-primary">
-                    Kelas yang Sedang Dijalani
-                  </h2>
-                  <p className="text-sm text-text-secondary">
-                    Lanjutkan perjalanan belajar kamu
-                  </p>
-                </div>
-                {enrollments && enrollments.length > 4 && (
-                  <button
-                    className="group flex items-center gap-2 rounded-full border border-accent/20 bg-accent/10 px-4 py-2 font-medium text-muted-foreground text-sm transition-all duration-200 hover:scale-105 hover:bg-accent/20"
-                    type="button"
-                  >
-                    Lihat Semua ({enrollments.length})
-                    <div className="transition-transform duration-200 group-hover:translate-x-0.5">
-                      →
-                    </div>
-                  </button>
-                )}
+        {/* Main Content Grid - Enhanced Responsive */}
+        <div className="grid grid-cols-1 gap-8 xl:grid-cols-5 xl:gap-12">
+          {/* Left Column - Courses (3/5 width on xl) */}
+          <div className="space-y-8 xl:col-span-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="mb-2 font-bold text-2xl text-text-primary">
+                  {PROGRESS_COPY.sections.enrolledCourses.title}
+                </h2>
+                <p className="max-w-xl text-sm text-text-secondary">
+                  {PROGRESS_COPY.sections.enrolledCourses.description}
+                </p>
               </div>
-
-              {enrollmentsLoading ? (
-                <div className="space-y-4">
-                  {Array.from({ length: 3 }).map((_, i) => (
-                    <div
-                      className="group relative animate-pulse overflow-hidden rounded-2xl border border-white/5 bg-white/[0.02] p-6 backdrop-blur-xl"
-                      key={`loading-course-${i.toString()}`}
-                    >
-                      <div className="flex gap-4">
-                        <div className="h-16 w-16 rounded-xl bg-white/10" />
-                        <div className="flex-1 space-y-3">
-                          <div className="h-5 w-3/4 rounded-lg bg-white/10" />
-                          <div className="h-3 w-full rounded bg-white/10" />
-                          <div className="h-2 w-1/2 rounded bg-white/10" />
-                        </div>
-                        <div className="h-12 w-12 rounded-full bg-white/5" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : enrollments && enrollments.length > 0 ? (
-                <div
-                  className={`grid gap-4 2xl:gap-6 ${
-                    enrollments.length === 1
-                      ? 'grid-cols-1'
-                      : 'grid-cols-1 md:grid-cols-2'
-                  }`}
+              {enrollments && enrollments.length > 4 && (
+                <button
+                  className="group flex items-center gap-2 rounded-full border border-accent/20 bg-accent/10 px-4 py-2 font-medium text-muted-foreground text-sm transition-all duration-200 hover:scale-105 hover:bg-accent/20"
+                  type="button"
                 >
-                  {(enrollments as Enrollment[])
-                    ?.slice(0, 4) // Show up to 4 courses (2 rows x 2 columns)
-                    .map((enrollment) => (
-                      <EnrolledCourseCard
-                        course={enrollment.course}
-                        dateCompleted={enrollment.dateCompleted}
-                        key={enrollment._id}
-                        percentComplete={enrollment.percentComplete || 0}
-                      />
-                    ))}
-                </div>
-              ) : (
-                <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.02] to-white/[0.05] p-12 text-center backdrop-blur-xl">
-                  {/* Background decoration */}
-                  <div className="-right-6 -top-6 absolute h-24 w-24 rounded-full bg-accent/5 blur-2xl" />
-                  <div className="-bottom-6 -left-6 absolute h-20 w-20 rounded-full bg-purple-500/5 blur-xl" />
-
-                  <div className="relative">
-                    <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-accent/20 to-purple-500/20 text-4xl backdrop-blur-sm">
-                      📚
-                    </div>
-                    <h3 className="mb-3 font-bold text-text-primary text-xl">
-                      Skill Baru = Peluang Baru!
-                    </h3>
-                    <p className="mx-auto mb-8 max-w-sm text-text-secondary/90 leading-relaxed">
-                      Ribuan kelas siap upgrade kemampuan kamu. Buat kamu yang mau maju bareng industri - mulai hari ini, rasakan bedanya besok!
-                    </p>
-                    <a
-                      className="group inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-accent to-accent/90 px-6 py-3 font-medium text-white transition-all duration-200 hover:scale-105 hover:shadow-accent/25 hover:shadow-lg"
-                      href="/courses"
-                    >
-                      Jelajahi Kelas
-                      <div className="transition-transform duration-200 group-hover:translate-x-1">
-                        →
-                      </div>
-                    </a>
+                  {PROGRESS_COPY.sections.enrolledCourses.viewAllButton(
+                    enrollments.length
+                  )}
+                  <div className="transition-transform duration-200 group-hover:translate-x-0.5">
+                    →
                   </div>
-                </div>
+                </button>
               )}
             </div>
 
-            {/* Right Column - Activity Tabs (2/5 width on xl) */}
-            <div className="xl:col-span-2">
-              <ActivityTabs
-                achievements={achievementsForDisplay}
-                isLoading={progressActivityLoading || achievementsLoading}
-                recentlyCompleted={recentlyCompleted || []}
-                recentQuizAttempts={recentQuizAttempts || []}
-                user={(userData as User) ?? null}
-              />
-            </div>
+            {enrollmentsLoading ? (
+              <div className="space-y-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div
+                    className="group relative animate-pulse overflow-hidden rounded-2xl border border-white/5 bg-white/[0.02] p-6 backdrop-blur-xl"
+                    key={`loading-course-${i.toString()}`}
+                  >
+                    <div className="flex gap-4">
+                      <div className="h-16 w-16 rounded-xl bg-white/10" />
+                      <div className="flex-1 space-y-3">
+                        <div className="h-5 w-3/4 rounded-lg bg-white/10" />
+                        <div className="h-3 w-full rounded bg-white/10" />
+                        <div className="h-2 w-1/2 rounded bg-white/10" />
+                      </div>
+                      <div className="h-12 w-12 rounded-full bg-white/5" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : enrollments && enrollments.length > 0 ? (
+              <div
+                className={`grid gap-4 2xl:gap-6 ${
+                  enrollments.length === 1
+                    ? 'grid-cols-1'
+                    : 'grid-cols-1 md:grid-cols-2'
+                }`}
+              >
+                {(enrollments as Enrollment[])
+                  ?.slice(0, 4) // Show up to 4 courses (2 rows x 2 columns)
+                  .map((enrollment) => (
+                    <EnrolledCourseCard
+                      course={enrollment.course}
+                      dateCompleted={enrollment.dateCompleted}
+                      key={enrollment._id}
+                      percentComplete={enrollment.percentComplete || 0}
+                    />
+                  ))}
+              </div>
+            ) : (
+              <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.02] to-white/[0.05] p-12 text-center backdrop-blur-xl">
+                {/* Background decoration */}
+                <div className="-right-6 -top-6 absolute h-24 w-24 rounded-full bg-accent/5 blur-2xl" />
+                <div className="-bottom-6 -left-6 absolute h-20 w-20 rounded-full bg-purple-500/5 blur-xl" />
+
+                <div className="relative">
+                  <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-accent/20 to-purple-500/20 text-4xl backdrop-blur-sm">
+                    📚
+                  </div>
+                  <h3 className="mb-3 font-bold text-text-primary text-xl">
+                    {PROGRESS_COPY.emptyStates.noCourses.title}
+                  </h3>
+                  <p className="mx-auto mb-8 max-w-sm text-text-secondary/90 leading-relaxed">
+                    {PROGRESS_COPY.emptyStates.noCourses.description}
+                  </p>
+                  <a
+                    className="group inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-accent to-accent/90 px-6 py-3 font-medium text-white transition-all duration-200 hover:scale-105 hover:shadow-accent/25 hover:shadow-lg"
+                    href="/courses"
+                  >
+                    {PROGRESS_COPY.emptyStates.noCourses.ctaButton}
+                    <div className="transition-transform duration-200 group-hover:translate-x-1">
+                      →
+                    </div>
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right Column - Activity Tabs (2/5 width on xl) */}
+          <div className="xl:col-span-2">
+            <ActivityTabs
+              achievements={achievementsForDisplay}
+              isLoading={progressActivityLoading || achievementsLoading}
+              recentlyCompleted={recentlyCompleted || []}
+              recentQuizAttempts={recentQuizAttempts || []}
+              user={(userData as User) ?? null}
+            />
           </div>
         </div>
       </div>
-    </PageBackground>
+    </div>
   );
 }

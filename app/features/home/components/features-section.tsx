@@ -26,7 +26,7 @@ export default function FeaturesSection() {
             <span className="text-muted-foreground">
               Belajar Tech Skill Bareng
             </span>{' '}
-            AI Companion Kamu
+            Genii AI Partner Kamu
           </motion.h2>
           <div className="mt-12 grid gap-12 sm:grid-cols-2">
             {/* Feature 1 */}
