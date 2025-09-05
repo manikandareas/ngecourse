@@ -1,4 +1,6 @@
+import { SignUpButton } from '@clerk/react-router';
 import { Pyramid } from 'lucide-react';
+import { Link } from 'react-router';
 
 interface MenuItem {
   title: string;
@@ -36,12 +38,11 @@ const Footer2 = ({
     {
       title: 'Belajar',
       links: [
-        { text: 'Course', url: '#' },
+        { text: 'Course', url: '/courses' },
         { text: 'AI Tutor', url: '#' },
         { text: 'Tes Kemampuan', url: '#' },
         { text: 'Project', url: '#' },
-        { text: 'Progress', url: '#' },
-        { text: 'Sertifikat', url: '#' },
+        { text: 'Progress', url: '/progress' },
       ],
     },
     {
@@ -66,9 +67,8 @@ const Footer2 = ({
     {
       title: 'Sosial',
       links: [
-        { text: 'LinkedIn', url: '#' },
-        { text: 'Twitter', url: '#' },
-        { text: 'Instagram', url: '#' },
+        { text: 'LinkedIn', url: 'https://www.linkedin.com/in/vitomanik' },
+        { text: 'Github', url: 'https://github.com/manikandareas' },
       ],
     },
   ],
@@ -90,12 +90,14 @@ const Footer2 = ({
               </div>
               <p className="mt-4 font-bold">{tagline}</p>
               <div className="mt-6">
-                <a
-                  className="inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 font-medium text-primary-foreground text-sm transition-colors hover:bg-primary/90"
-                  href="/"
-                >
-                  Mulai Gratis
-                </a>
+                <SignUpButton mode="modal">
+                  <button
+                    className="inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 font-medium text-primary-foreground text-sm transition-colors hover:bg-primary/90"
+                    type="button"
+                  >
+                    Mulai Gratis
+                  </button>
+                </SignUpButton>
               </div>
             </div>
             {menuItems.map((section, sectionIdx) => (
@@ -107,7 +109,7 @@ const Footer2 = ({
                       className="font-medium hover:text-primary"
                       key={linkIdx.toString()}
                     >
-                      <a href={link.url}>{link.text}</a>
+                      <Link to={link.url}>{link.text}</Link>
                     </li>
                   ))}
                 </ul>
@@ -122,7 +124,7 @@ const Footer2 = ({
                   className="underline hover:text-primary"
                   key={linkIdx.toString()}
                 >
-                  <a href={link.url}>{link.text}</a>
+                  <Link to={link.url}>{link.text}</Link>
                 </li>
               ))}
             </ul>

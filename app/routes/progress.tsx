@@ -33,10 +33,10 @@ interface Enrollment {
 
 export function meta() {
   return [
-    { title: 'Genii | Progress' },
+    { title: 'Genii | Progres Belajar' },
     {
       name: 'description',
-      content: 'Track your learning progress and achievements',
+      content: 'Pantau progres belajar dan raih pencapaian baru setiap hari - karena skill yang terasah adalah investasi terbaik untuk masa depan kamu',
     },
   ];
 }
@@ -129,18 +129,17 @@ export default function ProgressPage(props: Route.ComponentProps) {
           <div className="glass-card rounded-2xl p-8 text-center">
             <div className="mb-4 text-6xl">⚠️</div>
             <h2 className="mb-2 font-bold text-text-primary text-xl">
-              Unable to load progress data
+              Waduh, Ada Gangguan Nih!
             </h2>
             <p className="mb-6 text-text-secondary">
-              There was an issue loading your progress. Please refresh the page
-              or try again later.
+              Data progres kamu lagi sulit dimuat. Tenang, coba muat ulang halaman ini atau tunggu sebentar ya!
             </p>
             <button
               className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-accent/90"
               onClick={() => window.location.reload()}
               type="button"
             >
-              Refresh Page
+              Muat Ulang
             </button>
           </div>
         </div>
@@ -167,10 +166,10 @@ export default function ProgressPage(props: Route.ComponentProps) {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="mb-2 font-bold text-2xl text-text-primary">
-                    My Courses
+                    Kelas yang Sedang Dijalani
                   </h2>
                   <p className="text-sm text-text-secondary">
-                    Continue your learning journey
+                    Lanjutkan perjalanan belajar kamu
                   </p>
                 </div>
                 {enrollments && enrollments.length > 4 && (
@@ -178,7 +177,7 @@ export default function ProgressPage(props: Route.ComponentProps) {
                     className="group flex items-center gap-2 rounded-full border border-accent/20 bg-accent/10 px-4 py-2 font-medium text-muted-foreground text-sm transition-all duration-200 hover:scale-105 hover:bg-accent/20"
                     type="button"
                   >
-                    View All ({enrollments.length})
+                    Lihat Semua ({enrollments.length})
                     <div className="transition-transform duration-200 group-hover:translate-x-0.5">
                       →
                     </div>
@@ -235,17 +234,16 @@ export default function ProgressPage(props: Route.ComponentProps) {
                       📚
                     </div>
                     <h3 className="mb-3 font-bold text-text-primary text-xl">
-                      Ready to Start Learning?
+                      Skill Baru = Peluang Baru!
                     </h3>
                     <p className="mx-auto mb-8 max-w-sm text-text-secondary/90 leading-relaxed">
-                      Discover amazing courses and start building new skills
-                      today. Your learning journey awaits!
+                      Ribuan kelas siap upgrade kemampuan kamu. Buat kamu yang mau maju bareng industri - mulai hari ini, rasakan bedanya besok!
                     </p>
                     <a
                       className="group inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-accent to-accent/90 px-6 py-3 font-medium text-white transition-all duration-200 hover:scale-105 hover:shadow-accent/25 hover:shadow-lg"
                       href="/courses"
                     >
-                      Browse Courses
+                      Jelajahi Kelas
                       <div className="transition-transform duration-200 group-hover:translate-x-1">
                         →
                       </div>
