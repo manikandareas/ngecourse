@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { PageBackground } from '~/components/ui/page-background';
 import { CourseListSection } from '~/features/courses/components/course-list-section';
 import CourseLoading from '~/features/courses/components/course-loading';
 import { RecommendationSection } from '~/features/courses/components/recommendation-section';
+import { COURSES_COPY } from '~/features/courses/constants/copy';
 import { useCourses } from '~/features/courses/hooks/get-courses';
 import { useRecommendation } from '~/features/recommendation/hooks/get-recommendation';
 import { getCurrentSession } from '~/root';
@@ -10,8 +10,8 @@ import type { Route } from './+types/courses';
 
 export function meta() {
   return [
-    { title: 'Courses | Genii' },
-    { name: 'description', content: 'Courses page of Genii!' },
+    { title: COURSES_COPY.meta.title },
+    { name: 'description', content: COURSES_COPY.meta.description },
   ];
 }
 
@@ -28,7 +28,7 @@ export async function loader(args: Route.LoaderArgs) {
 }
 
 export default function CoursesPage(props: Route.ComponentProps) {
-  const { data: courses, isPending, isError, error } = useCourses();
+  const { data: courses, isPending, isError } = useCourses();
   const { data: recommendation } = useRecommendation(props.loaderData.userId);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -49,17 +49,17 @@ export default function CoursesPage(props: Route.ComponentProps) {
         <div className="glass-card space-y-6 text-center">
           <div className="text-6xl">😬</div>
           <h2 className="font-light text-2xl text-text-primary tracking-tight md:text-3xl">
-            Oops! Something went wrong
+            {COURSES_COPY.error.title}
           </h2>
           <p className="max-w-md text-base/7 text-text-secondary">
-            {error.message}
+            {COURSES_COPY.error.description}
           </p>
           <button
             className="btn-primary"
             onClick={() => window.location.reload()}
             type="button"
           >
-            Try Again
+            {COURSES_COPY.error.retryButton}
           </button>
         </div>
       </div>
@@ -73,7 +73,6 @@ export default function CoursesPage(props: Route.ComponentProps) {
       <div className="space-y-20">
         <RecommendationSection recommendation={recommendation} />
         <CourseListSection
-          courses={courses}
           filteredCourses={filteredCourses}
           onClearSearch={handleClearSearch}
           onSearchChange={setSearchQuery}

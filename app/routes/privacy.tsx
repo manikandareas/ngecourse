@@ -1,4 +1,5 @@
 import { PageBackground } from '~/components/ui/page-background';
+import siteConfig from '~/siteConfig';
 
 export function meta() {
   return [
@@ -157,8 +158,8 @@ export default function PrivacyPage() {
               <p className="text-text-secondary leading-relaxed">
                 Anda dapat meminta akses, koreksi, penghapusan, portabilitas,
                 atau membatasi pemrosesan. Hubungi kami di{' '}
-                <strong>[email kontak]</strong>. Untuk penghapusan akun, Anda
-                juga dapat menggunakan pengaturan akun di aplikasi (Clerk).
+                <strong>{siteConfig.email}</strong>. Untuk penghapusan akun,
+                Anda juga dapat menggunakan pengaturan akun di aplikasi (Clerk).
               </p>
             </section>
 
@@ -212,7 +213,7 @@ export default function PrivacyPage() {
               </h2>
               <p className="text-text-secondary leading-relaxed">
                 Untuk pertanyaan tentang kebijakan privasi ini, hubungi kami di{' '}
-                <strong>[email kontak]</strong>.
+                <strong>{siteConfig.email}</strong>.
               </p>
             </section>
           </div>
