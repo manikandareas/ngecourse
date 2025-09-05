@@ -64,10 +64,14 @@ export const addProgressionDataSchema = z.object({
 export const saveOnboardingSchema = z.object({
   learningGoals: z
     .array(z.string())
-    .min(1, 'At least one learning goal is required'),
-  studyReason: z.string().min(1, 'Study reason is required'),
-  studyPlan: z.string().min(1, 'Study plan is required'),
+    .min(1, 'At least one focus area is required'),
+  goal: z
+    .string()
+    .min(1, 'Personal learning goal is required')
+    .max(120, 'Goal must be 120 characters or less'),
   level: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
+  languagePreference: z.enum(['id', 'en', 'mix']),
+  explanationStyle: z.string().min(1, 'Please select an explanation style'),
 });
 
 /**
@@ -87,7 +91,9 @@ export const submitAnswerSchema = z.object({
   userId: z.string().min(1, 'User ID is required'),
   attemptId: z.string().min(1, 'Attempt ID is required'),
   questionIndex: z.number().min(0, 'Question index must be non-negative'),
-  selectedOptionIndex: z.number().min(0, 'Selected option index must be non-negative'),
+  selectedOptionIndex: z
+    .number()
+    .min(0, 'Selected option index must be non-negative'),
 });
 
 /**
@@ -96,12 +102,16 @@ export const submitAnswerSchema = z.object({
 export const finalizeAttemptSchema = z.object({
   userId: z.string().min(1, 'User ID is required'),
   attemptId: z.string().min(1, 'Attempt ID is required'),
-  answers: z.array(z.object({
-    questionIndex: z.number().min(0),
-    selectedOptionIndex: z.number().min(0),
-    isOutcome: z.enum(['correct', 'incorrect']),
-    timeTakenMs: z.number().min(0),
-  })).optional(),
+  answers: z
+    .array(
+      z.object({
+        questionIndex: z.number().min(0),
+        selectedOptionIndex: z.number().min(0),
+        isOutcome: z.enum(['correct', 'incorrect']),
+        timeTakenMs: z.number().min(0),
+      })
+    )
+    .optional(),
   correctCount: z.number().min(0).optional(),
 });
 

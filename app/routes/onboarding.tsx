@@ -1,10 +1,22 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
+import confetti from 'canvas-confetti';
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Code,
+  Palette,
+  Target,
+  Zap,
+} from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
 import { type Control, useForm } from 'react-hook-form';
 import { redirect, useNavigate } from 'react-router';
 import { z } from 'zod';
 import { Button } from '~/components/ui/button';
+import { FocusSelectionCards } from '~/components/ui/focus-selection-cards';
 import {
   Form,
   FormControl,
@@ -13,8 +25,10 @@ import {
   FormLabel,
   FormMessage,
 } from '~/components/ui/form';
-import { Input } from '~/components/ui/input';
-import { ToggleGroup, ToggleGroupItem } from '~/components/ui/toggle-group';
+import { GoalSelectionCards } from '~/components/ui/goal-selection-cards';
+import { LanguageStyleCards } from '~/components/ui/language-style-cards';
+import { LevelSelectionCards } from '~/components/ui/level-selection-cards';
+import { ONBOARDING_COPY } from '~/features/shared/constants/onboarding-copy';
 import type { SaveOnboardingInput } from '~/features/shared/schemas';
 import { usecaseUser } from '~/features/users/usecase';
 import { cn } from '~/lib/utils';
@@ -23,8 +37,8 @@ import type { Route } from './+types/onboarding';
 
 export function meta() {
   return [
-    { title: 'Genii | Onboarding' },
-    { name: 'description', content: 'Welcome to Genii!' },
+    { title: ONBOARDING_COPY.meta.title },
+    { name: 'description', content: ONBOARDING_COPY.meta.description },
   ];
 }
 
@@ -50,10 +64,16 @@ export async function loader(args: Route.LoaderArgs) {
 const formSchema = z.object({
   learningGoals: z
     .array(z.string())
-    .min(1, 'Please select at least one learning goal.'),
-  studyReason: z.string().min(1, 'Please select a reason for studying.'),
-  studyPlan: z.string(),
+    .min(1, ONBOARDING_COPY.validation.focusRequired), // as focus
+  goal: z
+    .string()
+    .min(1, ONBOARDING_COPY.validation.goalRequired)
+    .max(120, ONBOARDING_COPY.validation.goalTooLong),
   level: z.enum(['beginner', 'intermediate', 'advanced']),
+  languagePreference: z.enum(['id', 'en', 'mix'], {
+    error: ONBOARDING_COPY.validation.languageRequired,
+  }),
+  explanationStyle: z.string().min(1, ONBOARDING_COPY.validation.styleRequired),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -61,26 +81,23 @@ type FormData = z.infer<typeof formSchema>;
 const steps = [
   {
     id: 1,
-    name: 'What do you want to learn?',
-    description:
-      'This will help us tailor your learning experience. Be as specific or general as you like',
+    name: ONBOARDING_COPY.steps.focus.name,
+    description: ONBOARDING_COPY.steps.focus.description,
   },
   {
     id: 2,
-    name: 'Why are you learning this?',
-    description:
-      "Understanding your 'why' help us personalize your journey and keep you motivated.",
+    name: ONBOARDING_COPY.steps.goal.name,
+    description: ONBOARDING_COPY.steps.goal.description,
   },
   {
     id: 3,
-    name: 'What level are you at?',
-    description: 'Help us understand your current knowledge level.',
+    name: ONBOARDING_COPY.steps.level.name,
+    description: ONBOARDING_COPY.steps.level.description,
   },
   {
     id: 4,
-    name: 'How often do you plan to use Nalar?',
-    description:
-      'Undestanding your style help us make Nalar a better learning companion for you.',
+    name: ONBOARDING_COPY.steps.preferences.name,
+    description: ONBOARDING_COPY.steps.preferences.description,
   },
 ];
 
@@ -96,7 +113,21 @@ export default function LearningGoalsPage(props: Route.ComponentProps) {
     }) => usecaseUser.saveOnboarding(userId, props.loaderData.token, data),
     onSuccess: (data) => {
       if (data.success) {
-        navigate('/recommendation');
+        try {
+          confetti({
+            particleCount: 120,
+            spread: 70,
+            startVelocity: 30,
+            scalar: 0.9,
+            origin: { y: 0.7 },
+          });
+        } catch {
+          // no-op if confetti fails
+        }
+        // brief delay so users can see the celebration
+        setTimeout(() => {
+          navigate('/recommendation');
+        }, 250);
       }
     },
   });
@@ -107,9 +138,10 @@ export default function LearningGoalsPage(props: Route.ComponentProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       learningGoals: [],
-      studyReason: '',
-      studyPlan: 'weekly',
+      goal: '',
       level: 'beginner',
+      languagePreference: 'id',
+      explanationStyle: 'simple',
     },
   });
 
@@ -122,11 +154,11 @@ export default function LearningGoalsPage(props: Route.ComponentProps) {
       case 0:
         return ['learningGoals'];
       case 1:
-        return ['studyReason'];
+        return ['goal'];
       case 2:
         return ['level'];
       case 3:
-        return ['studyPlan'];
+        return ['languagePreference', 'explanationStyle'];
       default:
         return [];
     }
@@ -138,11 +170,13 @@ export default function LearningGoalsPage(props: Route.ComponentProps) {
       case 0:
         return (values.learningGoals?.length ?? 0) > 0;
       case 1:
-        return (values.studyReason?.length ?? 0) > 0;
+        return (values.goal?.length ?? 0) > 0 && values.goal.length <= 120;
       case 2:
         return Boolean(values.level);
       case 3:
-        return Boolean(values.studyPlan);
+        return (
+          Boolean(values.languagePreference) && Boolean(values.explanationStyle)
+        );
       default:
         return true;
     }
@@ -163,20 +197,20 @@ export default function LearningGoalsPage(props: Route.ComponentProps) {
     }
   }
 
-  const nextStep = async () => {
+  const nextStep = () => {
     const fields = getFieldsForStep(currentStep);
-    const isValid = await form.trigger(fields);
-
-    if (isValid && isStepValid(currentStep)) {
-      setCurrentStep((prev) => (prev < steps.length - 1 ? prev + 1 : prev));
-    }
+    form.trigger(fields).then((isValid) => {
+      if (isValid && isStepValid(currentStep)) {
+        setCurrentStep((prev) => (prev < steps.length - 1 ? prev + 1 : prev));
+      }
+    });
   };
 
   const prevStep = () => setCurrentStep((prev) => (prev > 0 ? prev - 1 : prev));
 
   return (
     <div className="relative flex min-h-screen items-center justify-center px-4 py-8">
-      <div className="w-full max-w-2xl">
+      <div className=" w-full max-w-2xl">
         {/* Step Progress Header */}
         <div className="mb-8 text-center">
           <div className="mb-4 flex items-center justify-center space-x-2">
@@ -186,27 +220,29 @@ export default function LearningGoalsPage(props: Route.ComponentProps) {
               const stepValid = isStepValid(index);
 
               return (
-                <div
+                <button
+                  aria-label={`Go to step ${index + 1}: ${step.name}`}
                   className={cn(
                     'flex size-8 items-center justify-center rounded-full font-medium text-sm transition-all duration-300',
                     stepComplete
-                      ? 'bg-green-500 text-white shadow-lg'
+                      ? 'bg-green-500 text-white'
                       : stepCurrent
                         ? stepValid
-                          ? 'bg-accent text-white shadow-lg'
-                          : 'bg-accent/70 text-white shadow-lg'
+                          ? 'bg-accent text-white'
+                          : 'bg-accent/70 text-white'
                         : 'border border-hairline bg-white/5 text-text-muted'
                   )}
                   key={step.id}
+                  onClick={() => {
+                    if (index <= currentStep) setCurrentStep(index);
+                  }}
+                  type="button"
                 >
                   {stepComplete ? '✓' : index + 1}
-                </div>
+                </button>
               );
             })}
           </div>
-          <p className="text-sm text-text-muted">
-            Step {currentStep + 1} of {steps.length}
-          </p>
         </div>
 
         {/* Main Content Card */}
@@ -221,48 +257,24 @@ export default function LearningGoalsPage(props: Route.ComponentProps) {
           </div>
           <Form {...form}>
             <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
-              <div className="relative overflow-hidden">
-                <div
-                  className="flex transition-transform duration-300 ease-out"
-                  style={{ transform: `translateX(-${currentStep * 100}%)` }}
-                >
-                  {/* Step 0 - Learning Goals */}
-                  <div className="w-full flex-shrink-0">
-                    <LearningGoals control={form.control} />
-                  </div>
-
-                  {/* Step 1 - Study Reason */}
-                  <div className="w-full flex-shrink-0">
-                    <StudyReason control={form.control} />
-                  </div>
-
-                  {/* Step 2 - Level */}
-                  <div className="w-full flex-shrink-0">
-                    <Level control={form.control} />
-                  </div>
-
-                  {/* Step 3 - Study Plan */}
-                  <div className="w-full flex-shrink-0">
-                    <StudyPlan control={form.control} />
-                  </div>
-                </div>
+              <div className="relative">
+                <AnimatePresence initial={false} mode="wait">
+                  <motion.div
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -32 }}
+                    initial={{ opacity: 0, x: 32 }}
+                    key={currentStep}
+                    transition={{ duration: 0.25, ease: 'easeOut' }}
+                  >
+                    {currentStep === 0 && <Focus control={form.control} />}
+                    {currentStep === 1 && <Goal control={form.control} />}
+                    {currentStep === 2 && <Level control={form.control} />}
+                    {currentStep === 3 && (
+                      <LanguageAndStyle control={form.control} />
+                    )}
+                  </motion.div>
+                </AnimatePresence>
               </div>
-
-              {/* Validation Error Message */}
-              {!isCurrentStepValid && (
-                <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-center">
-                  <p className="field-error text-sm">
-                    {currentStep === 0 &&
-                      'Please select at least one learning goal to continue.'}
-                    {currentStep === 1 &&
-                      'Please select your motivation to continue.'}
-                    {currentStep === 2 &&
-                      'Please select your current level to continue.'}
-                    {currentStep === 3 &&
-                      'Please select your usage style to continue.'}
-                  </p>
-                </div>
-              )}
 
               <div className="flex justify-between pt-6">
                 {currentStep > 0 ? (
@@ -273,7 +285,8 @@ export default function LearningGoalsPage(props: Route.ComponentProps) {
                     type="button"
                     variant={'secondary'}
                   >
-                    Back
+                    <ChevronLeft aria-hidden="true" className="mr-2 size-4" />
+                    {ONBOARDING_COPY.actions.back}
                   </Button>
                 ) : (
                   <span />
@@ -285,12 +298,25 @@ export default function LearningGoalsPage(props: Route.ComponentProps) {
                     size="lg"
                     type="button"
                   >
-                    Next
+                    {ONBOARDING_COPY.actions.next}
+                    <ChevronRight aria-hidden="true" className="ml-2 size-4" />
                   </Button>
                 )}
                 {currentStep === steps.length - 1 && (
-                  <Button disabled={isPending} size="lg" type="submit">
-                    {isPending ? 'Saving...' : 'Finish Setup'}
+                  <Button
+                    aria-label="Finish onboarding setup"
+                    disabled={isPending}
+                    size="lg"
+                    type="submit"
+                  >
+                    {isPending ? (
+                      ONBOARDING_COPY.actions.saving
+                    ) : (
+                      <>
+                        {ONBOARDING_COPY.actions.finishSetup}
+                        <Check aria-hidden="true" className="ml-2 size-4" />
+                      </>
+                    )}
                   </Button>
                 )}
               </div>
@@ -302,20 +328,7 @@ export default function LearningGoalsPage(props: Route.ComponentProps) {
   );
 }
 
-function LearningGoals({ control }: { control: Control<FormData> }) {
-  const learningGoalOptions = [
-    'Web Development',
-    'Mobile App Development',
-    'Data Science & Analytics',
-    'Artificial Intelligence',
-    'Cybersecurity',
-    'Cloud Computing',
-    'DevOps & Automation',
-    'UI/UX Design',
-    'Blockchain & Cryptocurrency',
-    'Internet of Things (IoT)',
-  ];
-
+function Focus({ control }: { control: Control<FormData> }) {
   return (
     <FormField
       control={control}
@@ -323,35 +336,56 @@ function LearningGoals({ control }: { control: Control<FormData> }) {
       render={({ field }) => (
         <FormItem className="space-y-6">
           <FormLabel className="field-label font-medium text-base">
-            Learning Goals
+            {ONBOARDING_COPY.labels.focusAreas}
           </FormLabel>
           <FormControl className="w-full">
-            <div className="w-full space-y-6">
-              <Input
-                className="glass-input"
-                placeholder="e.g., Web Development, Machine Learning"
-                readOnly
-                value={field.value.join(', ')}
+            <FocusSelectionCards
+              onValueChange={field.onChange}
+              selectedValues={field.value}
+            />
+          </FormControl>
+        </FormItem>
+      )}
+    />
+  );
+}
+
+function Goal({ control }: { control: Control<FormData> }) {
+  // Learning goals from copy constants
+  const learningGoals = ONBOARDING_COPY.learningGoals.map((goal) => ({
+    ...goal,
+    icon:
+      goal.id === 'web-development' ? (
+        <Code className="h-5 w-5" />
+      ) : goal.id === 'ui-design' ? (
+        <Palette className="h-5 w-5" />
+      ) : goal.id === 'data-science' ? (
+        <Target className="h-5 w-5" />
+      ) : goal.id === 'mobile-development' ? (
+        <Zap className="h-5 w-5" />
+      ) : (
+        <Code className="h-5 w-5" />
+      ),
+  }));
+
+  return (
+    <FormField
+      control={control}
+      name="goal"
+      render={({ field }) => (
+        <FormItem className="space-y-6">
+          <FormLabel className="field-label font-medium text-base">
+            {ONBOARDING_COPY.labels.learningGoal}
+          </FormLabel>
+          <FormControl className="w-full">
+            <div className="space-y-4">
+              {/* Interactive Goal Selection Cards */}
+              <GoalSelectionCards
+                goals={learningGoals}
+                maxSelections={1}
+                onValueChange={field.onChange}
+                selectedValue={field.value}
               />
-              <div>
-                <p className="field-help mb-3">Popular choices:</p>
-                <ToggleGroup
-                  className="grid w-full grid-cols-1 gap-3 md:grid-cols-2"
-                  onValueChange={field.onChange}
-                  type="multiple"
-                  value={field.value}
-                >
-                  {learningGoalOptions.map((option) => (
-                    <ToggleGroupItem
-                      className="justify-start rounded-xl border border-hairline bg-white/5 px-4 py-3 text-left font-medium text-text-primary transition-all duration-200 hover:border-strong hover:bg-white/10 data-[state=on]:border-accent data-[state=on]:bg-accent/20 data-[state=on]:text-accent"
-                      key={option}
-                      value={option}
-                    >
-                      {option}
-                    </ToggleGroupItem>
-                  ))}
-                </ToggleGroup>
-              </div>
             </div>
           </FormControl>
           <FormMessage className="field-error" />
@@ -361,117 +395,26 @@ function LearningGoals({ control }: { control: Control<FormData> }) {
   );
 }
 
-function StudyReason({ control }: { control: Control<FormData> }) {
-  const motivationOptions = [
-    { value: 'career-switch', label: 'Career Switch to Tech' },
-    { value: 'skill-upgrade', label: 'Upgrade Current Tech Skills' },
-    { value: 'certification', label: 'Professional Certification' },
-    { value: 'freelancing', label: 'Freelancing & Side Projects' },
-    { value: 'entrepreneurship', label: 'Tech Entrepreneurship' },
-    { value: 'personal-projects', label: 'Building Personal Projects' },
-  ];
+function LanguageAndStyle({ control }: { control: Control<FormData> }) {
   return (
     <FormField
       control={control}
-      name="studyReason"
-      render={({ field }) => (
+      name="languagePreference"
+      render={({ field: languageField }) => (
         <FormItem className="space-y-6">
-          <FormLabel className="field-label font-medium text-base">
-            Select your motivation
-          </FormLabel>
           <FormControl className="w-full">
-            <ToggleGroup
-              className="grid w-full grid-cols-1 gap-3"
-              onValueChange={field.onChange}
-              type="single"
-              value={field.value}
-            >
-              {motivationOptions.map((option) => (
-                <ToggleGroupItem
-                  className="justify-start rounded-xl border border-hairline bg-white/5 px-4 py-3 text-left font-medium text-text-primary transition-all duration-200 hover:border-strong hover:bg-white/10 data-[state=on]:border-accent data-[state=on]:bg-accent/20 data-[state=on]:text-accent"
-                  key={option.value}
-                  value={option.value}
-                >
-                  {option.label}
-                </ToggleGroupItem>
-              ))}
-            </ToggleGroup>
-          </FormControl>
-          <FormMessage className="field-error" />
-        </FormItem>
-      )}
-    />
-  );
-}
-
-function StudyPlan({ control }: { control: Control<FormData> }) {
-  const studyPlanOptions = [
-    {
-      value: 'intensive',
-      label: 'Intensive Learning',
-      description: 'Dedicated full-time learning schedule',
-    },
-    {
-      value: 'structured',
-      label: 'Structured Learning',
-      description: 'Regular weekly sessions with clear goals',
-    },
-    {
-      value: 'project-based',
-      label: 'Project-Based Learning',
-      description: 'Learning through hands-on projects and building',
-    },
-    {
-      value: 'flexible',
-      label: 'Flexible Learning',
-      description: 'Learning as my schedule allows with varied topics',
-    },
-  ];
-  return (
-    <FormField
-      control={control}
-      name="studyPlan"
-      render={({ field }) => (
-        <FormItem className="space-y-6">
-          <FormLabel className="field-label font-medium text-base">
-            Choose your usage style
-          </FormLabel>
-          <FormControl className="w-full">
-            <ToggleGroup
-              className="grid w-full grid-cols-1 gap-3"
-              onValueChange={field.onChange}
-              type="single"
-              value={field.value}
-            >
-              {studyPlanOptions.map((option) => (
-                <ToggleGroupItem
-                  className="flex h-auto flex-col items-start justify-start rounded-xl border border-hairline bg-white/5 p-4 text-left transition-all duration-200 hover:border-strong hover:bg-white/10 data-[state=on]:border-accent data-[state=on]:bg-accent/20"
-                  key={option.value}
-                  value={option.value}
-                >
-                  <span
-                    className={cn(
-                      'mb-1 font-semibold text-base transition-colors',
-                      field.value === option.value
-                        ? 'text-accent'
-                        : 'text-text-primary'
-                    )}
-                  >
-                    {option.label}
-                  </span>
-                  <p
-                    className={cn(
-                      'text-sm leading-relaxed transition-colors',
-                      field.value === option.value
-                        ? 'text-accent/80'
-                        : 'text-text-muted'
-                    )}
-                  >
-                    {option.description}
-                  </p>
-                </ToggleGroupItem>
-              ))}
-            </ToggleGroup>
+            <FormField
+              control={control}
+              name="explanationStyle"
+              render={({ field: styleField }) => (
+                <LanguageStyleCards
+                  onLanguageChange={languageField.onChange}
+                  onStyleChange={styleField.onChange}
+                  selectedLanguage={languageField.value}
+                  selectedStyle={styleField.value}
+                />
+              )}
+            />
           </FormControl>
           <FormMessage className="field-error" />
         </FormItem>
@@ -481,26 +424,6 @@ function StudyPlan({ control }: { control: Control<FormData> }) {
 }
 
 function Level({ control }: { control: Control<FormData> }) {
-  const levelOptions = [
-    {
-      value: 'beginner',
-      label: 'I completly new to it',
-      description:
-        'Starting from scratch with little to no prior knowledge (pre-high school level)',
-    },
-    {
-      value: 'intermediate',
-      label: 'I have some basic understanding',
-      description:
-        'Familiar with fundamentals but need to build deeper knowledge (high school level)',
-    },
-    {
-      value: 'advanced',
-      label: 'I have a some experience/knowledge',
-      description:
-        'Looking to expand on existing skills and fill knowledge gaps (graduate/professional level)',
-    },
-  ];
   return (
     <FormField
       control={control}
@@ -508,44 +431,13 @@ function Level({ control }: { control: Control<FormData> }) {
       render={({ field }) => (
         <FormItem className="space-y-6">
           <FormLabel className="field-label font-medium text-base">
-            Select your current level
+            {ONBOARDING_COPY.labels.currentLevel}
           </FormLabel>
           <FormControl className="w-full">
-            <ToggleGroup
-              className="grid w-full grid-cols-1 gap-3"
+            <LevelSelectionCards
               onValueChange={field.onChange}
-              type="single"
-              value={field.value}
-            >
-              {levelOptions.map((option) => (
-                <ToggleGroupItem
-                  className="flex h-auto flex-col items-start justify-start rounded-xl border border-hairline bg-white/5 p-4 text-left transition-all duration-200 hover:border-strong hover:bg-white/10 data-[state=on]:border-accent data-[state=on]:bg-accent/20"
-                  key={option.value}
-                  value={option.value}
-                >
-                  <span
-                    className={cn(
-                      'mb-1 font-semibold text-base transition-colors',
-                      field.value === option.value
-                        ? 'text-accent'
-                        : 'text-text-primary'
-                    )}
-                  >
-                    {option.label}
-                  </span>
-                  <p
-                    className={cn(
-                      'text-wrap text-sm leading-relaxed transition-colors',
-                      field.value === option.value
-                        ? 'text-accent/80'
-                        : 'text-text-muted'
-                    )}
-                  >
-                    {option.description}
-                  </p>
-                </ToggleGroupItem>
-              ))}
-            </ToggleGroup>
+              selectedValue={field.value}
+            />
           </FormControl>
           <FormMessage className="field-error" />
         </FormItem>

@@ -13,6 +13,29 @@
  */
 
 // Source: schema.json
+export type EmailNotification = {
+  _id: string;
+  _type: "emailNotification";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  user?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "user";
+  };
+  type?: "welcome" | "achievement" | "courseCompletion" | "weeklyDigest";
+  subject?: string;
+  content?: string;
+  sentAt?: string;
+  deliveryStatus?: "sent" | "delivered" | "opened" | "failed";
+  resendId?: string;
+  metadata?: {
+    data?: string;
+  };
+};
+
 export type ChatMessage = {
   _id: string;
   _type: "chatMessage";
@@ -443,6 +466,7 @@ export type Course = {
     _type: "resource";
     _key: string;
   }>;
+  resourcesDigest?: string;
 };
 
 export type Topic = {
@@ -476,7 +500,9 @@ export type User = {
   level?: "beginner" | "intermediate" | "advanced";
   studyStreak?: number;
   streakStartDate?: number;
-  delivery_preference?: string;
+  explanationStyle?: string;
+  languagePreference?: "id" | "en" | "mix";
+  goal?: string;
   analytics?: {
     totalXP?: number;
     currentLevel?: number;
@@ -484,6 +510,19 @@ export type User = {
     averageSessionTime?: number;
     strongestSkills?: Array<string>;
     improvementAreas?: Array<string>;
+  };
+  emailPreferences?: {
+    welcomeEmail?: boolean;
+    achievementEmails?: boolean;
+    courseCompletionEmails?: boolean;
+    weeklyDigest?: boolean;
+    unsubscribedAt?: string;
+  };
+  lastEmailSent?: string;
+  emailStats?: {
+    totalSent?: number;
+    totalOpened?: number;
+    lastOpenedAt?: string;
   };
 };
 
@@ -640,7 +679,7 @@ export type SanityAssetSourceData = {
   url?: string;
 };
 
-export type AllSanitySchemaTypes = ChatMessage | ChatSession | UserAchievement | Achievement | LearningSession | Recommendation | Enrollment | QuizAttempt | Quiz | Lesson | Chapter | Course | Topic | User | Color | RgbaColor | HsvaColor | HslaColor | Markdown | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
+export type AllSanitySchemaTypes = EmailNotification | ChatMessage | ChatSession | UserAchievement | Achievement | LearningSession | Recommendation | Enrollment | QuizAttempt | Quiz | Lesson | Chapter | Course | Topic | User | Color | RgbaColor | HsvaColor | HslaColor | Markdown | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./app/features/achievements/data/index.ts
 // Variable: getUserAchievementsQuery
@@ -709,6 +748,7 @@ export type GetUserAchievementsQueryResult = Array<{
         _type: "resource";
         _key: string;
       }>;
+      resourcesDigest?: string;
     } | null;
   } | null;
 }>;
@@ -772,6 +812,7 @@ export type GetAvailableAchievementsQueryResult = Array<{
       _type: "resource";
       _key: string;
     }>;
+    resourcesDigest?: string;
   } | null;
 }>;
 // Variable: getAchievementByIdQuery
@@ -834,6 +875,7 @@ export type GetAchievementByIdQueryResult = {
       _type: "resource";
       _key: string;
     }>;
+    resourcesDigest?: string;
   } | null;
 } | null;
 // Variable: getUserAchievementRecordQuery
@@ -1039,6 +1081,7 @@ export type CoursesQueryResult = Array<{
     _type: "resource";
     _key: string;
   }>;
+  resourcesDigest?: string;
 }>;
 // Variable: courseQuery
 // Query: *[_type == "course" && slug.current == $slug][0]{    ...,    "slug": slug.current,    }
@@ -1086,6 +1129,7 @@ export type CourseQueryResult = {
     _type: "resource";
     _key: string;
   }>;
+  resourcesDigest?: string;
 } | null;
 // Variable: courseByIdQuery
 // Query: *[_type == "course" && _id == $id][0]
@@ -1133,6 +1177,7 @@ export type CourseByIdQueryResult = {
     _type: "resource";
     _key: string;
   }>;
+  resourcesDigest?: string;
 } | null;
 // Variable: courseContentsQuery
 // Query: *[_type == "course" && slug.current == $slug][0]{      _id,      _type,      _createdAt,      _updatedAt,      title,      slug,      description,      price,      level,      thumbnail,      trailer,      difficulty,      "chapters": chapters[]->{        _id,        _type,        _createdAt,        _updatedAt,        title,        slug,        description,        "contents": contents[]->{          _id,          _type,          _createdAt,          _updatedAt,          title,          slug,          _type == "lesson" => {            content          },          _type == "quiz" => {            description,            questions          }        }      },      "topics": topics[]->{        _id,        _type,        _createdAt,        _updatedAt,        title,        slug,        description,        icon,        color      }    }
@@ -1291,7 +1336,9 @@ export type EnrollmentQueryResult = {
     level?: "advanced" | "beginner" | "intermediate";
     studyStreak?: number;
     streakStartDate?: number;
-    delivery_preference?: string;
+    explanationStyle?: string;
+    languagePreference?: "en" | "id" | "mix";
+    goal?: string;
     analytics?: {
       totalXP?: number;
       currentLevel?: number;
@@ -1299,6 +1346,19 @@ export type EnrollmentQueryResult = {
       averageSessionTime?: number;
       strongestSkills?: Array<string>;
       improvementAreas?: Array<string>;
+    };
+    emailPreferences?: {
+      welcomeEmail?: boolean;
+      achievementEmails?: boolean;
+      courseCompletionEmails?: boolean;
+      weeklyDigest?: boolean;
+      unsubscribedAt?: string;
+    };
+    lastEmailSent?: string;
+    emailStats?: {
+      totalSent?: number;
+      totalOpened?: number;
+      lastOpenedAt?: string;
     };
   } | null;
   course: {
@@ -1345,6 +1405,7 @@ export type EnrollmentQueryResult = {
       _type: "resource";
       _key: string;
     }>;
+    resourcesDigest?: string;
   } | null;
   contentsCompleted: Array<{
     _id: string;
@@ -1696,7 +1757,9 @@ export type FindByEmailQueryResult = {
   level?: "advanced" | "beginner" | "intermediate";
   studyStreak?: number;
   streakStartDate?: number;
-  delivery_preference?: string;
+  explanationStyle?: string;
+  languagePreference?: "en" | "id" | "mix";
+  goal?: string;
   analytics?: {
     totalXP?: number;
     currentLevel?: number;
@@ -1704,6 +1767,19 @@ export type FindByEmailQueryResult = {
     averageSessionTime?: number;
     strongestSkills?: Array<string>;
     improvementAreas?: Array<string>;
+  };
+  emailPreferences?: {
+    welcomeEmail?: boolean;
+    achievementEmails?: boolean;
+    courseCompletionEmails?: boolean;
+    weeklyDigest?: boolean;
+    unsubscribedAt?: string;
+  };
+  lastEmailSent?: string;
+  emailStats?: {
+    totalSent?: number;
+    totalOpened?: number;
+    lastOpenedAt?: string;
   };
 } | null;
 // Variable: findByClerkIdQuery
@@ -1726,7 +1802,9 @@ export type FindByClerkIdQueryResult = {
   level?: "advanced" | "beginner" | "intermediate";
   studyStreak?: number;
   streakStartDate?: number;
-  delivery_preference?: string;
+  explanationStyle?: string;
+  languagePreference?: "en" | "id" | "mix";
+  goal?: string;
   analytics?: {
     totalXP?: number;
     currentLevel?: number;
@@ -1734,6 +1812,19 @@ export type FindByClerkIdQueryResult = {
     averageSessionTime?: number;
     strongestSkills?: Array<string>;
     improvementAreas?: Array<string>;
+  };
+  emailPreferences?: {
+    welcomeEmail?: boolean;
+    achievementEmails?: boolean;
+    courseCompletionEmails?: boolean;
+    weeklyDigest?: boolean;
+    unsubscribedAt?: string;
+  };
+  lastEmailSent?: string;
+  emailStats?: {
+    totalSent?: number;
+    totalOpened?: number;
+    lastOpenedAt?: string;
   };
 } | null;
 // Variable: findByUsernameQuery
@@ -1756,7 +1847,9 @@ export type FindByUsernameQueryResult = {
   level?: "advanced" | "beginner" | "intermediate";
   studyStreak?: number;
   streakStartDate?: number;
-  delivery_preference?: string;
+  explanationStyle?: string;
+  languagePreference?: "en" | "id" | "mix";
+  goal?: string;
   analytics?: {
     totalXP?: number;
     currentLevel?: number;
@@ -1764,6 +1857,19 @@ export type FindByUsernameQueryResult = {
     averageSessionTime?: number;
     strongestSkills?: Array<string>;
     improvementAreas?: Array<string>;
+  };
+  emailPreferences?: {
+    welcomeEmail?: boolean;
+    achievementEmails?: boolean;
+    courseCompletionEmails?: boolean;
+    weeklyDigest?: boolean;
+    unsubscribedAt?: string;
+  };
+  lastEmailSent?: string;
+  emailStats?: {
+    totalSent?: number;
+    totalOpened?: number;
+    lastOpenedAt?: string;
   };
 } | null;
 

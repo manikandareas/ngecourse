@@ -176,149 +176,145 @@ export default function RecommendationPage(props: Route.ComponentProps) {
   }, [status]);
 
   return (
-    <PageBackground className="overflow-x-hidden" variant="purple-cyan">
-      <div className="relative flex min-h-screen items-center">
-        <div className="mx-auto w-full max-w-6xl px-6 py-8 xl:px-0">
-          <div className="container mx-auto space-y-8">
-            {/* Loading States */}
-            {(status === 'pending' || status === 'processing') && (
-              <div className="space-y-8">
-                <RecommendationStatus message={message} status={status} />
+    <div className="relative flex min-h-screen items-center overflow-x-hidden">
+      <div className="mx-auto w-full max-w-6xl px-6 py-8 xl:px-0">
+        <div className="container mx-auto space-y-8">
+          {/* Loading States */}
+          {(status === 'pending' || status === 'processing') && (
+            <div className="space-y-8">
+              <RecommendationStatus message={message} status={status} />
 
-                <ProgressDots className="flex justify-center" status={status} />
+              <ProgressDots className="flex justify-center" status={status} />
 
-                {/* Show timeout warning after extended processing */}
-                {status === 'processing' && timeoutCount > 0 && (
-                  <RecommendationError
-                    onBrowseCourses={handleBrowseCourses}
-                    onSkip={handleSkip}
-                    type="timeout"
-                  />
-                )}
-
-                {/* Loading skeleton */}
-                <LoadingCourseCards count={2} />
-              </div>
-            )}
-
-            {/* Error States */}
-            {status === 'failed' && (
-              <RecommendationError
-                onBrowseCourses={handleBrowseCourses}
-                onRetry={handleRetry}
-                type={recommendationError ? 'network' : 'failed'}
-              />
-            )}
-
-            {/* Empty Results */}
-            {status === 'completed' &&
-              (!data?.courses || data.courses.length === 0) && (
+              {/* Show timeout warning after extended processing */}
+              {status === 'processing' && timeoutCount > 0 && (
                 <RecommendationError
                   onBrowseCourses={handleBrowseCourses}
-                  type="empty"
+                  onSkip={handleSkip}
+                  type="timeout"
                 />
               )}
 
-            {/* Success State with Recommendations */}
-            {status === 'completed' &&
-              data?.courses &&
-              data.courses.length > 0 && (
-                <>
-                  <div className="space-y-4 text-center">
-                    <motion.h1
-                      animate={{ opacity: 1, y: 0 }}
-                      className="font-light text-3xl text-text-primary leading-[1.1] tracking-tight md:text-5xl"
-                      initial={{ opacity: 0, y: 20 }}
-                      transition={{ delay: confetti.isComplete ? 0.5 : 0 }}
-                    >
-                      Your Learning Journey Awaits!
-                    </motion.h1>
-                    <motion.p
-                      animate={{ opacity: 1, y: 0 }}
-                      className="mx-auto max-w-2xl text-base/7 text-text-secondary"
-                      initial={{ opacity: 0, y: 20 }}
-                      transition={{ delay: confetti.isComplete ? 0.6 : 0.1 }}
-                    >
-                      {data.reason
-                        ? data.reason
-                        : "We've curated these courses specifically for your learning goals and experience level."}
-                    </motion.p>
-                  </div>
+              {/* Loading skeleton */}
+              <LoadingCourseCards count={2} />
+            </div>
+          )}
 
-                  <motion.div
+          {/* Error States */}
+          {status === 'failed' && (
+            <RecommendationError
+              onBrowseCourses={handleBrowseCourses}
+              onRetry={handleRetry}
+              type={recommendationError ? 'network' : 'failed'}
+            />
+          )}
+
+          {/* Empty Results */}
+          {status === 'completed' &&
+            (!data?.courses || data.courses.length === 0) && (
+              <RecommendationError
+                onBrowseCourses={handleBrowseCourses}
+                type="empty"
+              />
+            )}
+
+          {/* Success State with Recommendations */}
+          {status === 'completed' &&
+            data?.courses &&
+            data.courses.length > 0 && (
+              <>
+                <div className="space-y-4 text-center">
+                  <motion.h1
                     animate={{ opacity: 1, y: 0 }}
+                    className="font-light text-3xl text-text-primary leading-[1.1] tracking-tight md:text-5xl"
                     initial={{ opacity: 0, y: 20 }}
-                    transition={{ delay: confetti.isComplete ? 0.7 : 0.2 }}
+                    transition={{ delay: confetti.isComplete ? 0.5 : 0 }}
                   >
-                    <Carousel className="w-full" setApi={setApi}>
-                      <CarouselContent>
-                        {data.courses.map((course, index: number) => (
-                          <CarouselItem
-                            className="lg:basis-1/2"
-                            key={course._id}
+                    Your Learning Journey Awaits!
+                  </motion.h1>
+                  <motion.p
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mx-auto max-w-2xl text-base/7 text-text-secondary"
+                    initial={{ opacity: 0, y: 20 }}
+                    transition={{ delay: confetti.isComplete ? 0.6 : 0.1 }}
+                  >
+                    {data.reason
+                      ? data.reason
+                      : "We've curated these courses specifically for your learning goals and experience level."}
+                  </motion.p>
+                </div>
+
+                <motion.div
+                  animate={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  transition={{ delay: confetti.isComplete ? 0.7 : 0.2 }}
+                >
+                  <Carousel className="w-full" setApi={setApi}>
+                    <CarouselContent className="gap-4">
+                      {data.courses.map((course, index: number) => (
+                        <CarouselItem
+                          className="rounded-md bg-card p-4 lg:basis-1/2"
+                          key={course._id}
+                        >
+                          <CourseCardEntrance
+                            delay={
+                              confetti.isComplete
+                                ? 0.8 + index * 0.1
+                                : 0.3 + index * 0.1
+                            }
+                            isVisible={true}
                           >
-                            <CourseCardEntrance
-                              delay={
-                                confetti.isComplete
-                                  ? 0.8 + index * 0.1
-                                  : 0.3 + index * 0.1
+                            <RecommendationCard
+                              description={course.description as string}
+                              difficulty={
+                                course.difficulty === 'beginner' ||
+                                course.difficulty === 'intermediate' ||
+                                course.difficulty === 'advanced'
+                                  ? course.difficulty
+                                  : 'beginner' // Fallback for invalid/null values
                               }
-                              isVisible={true}
-                            >
-                              <RecommendationCard
-                                description={course.description as string}
-                                difficulty={
-                                  course.difficulty === 'beginner' ||
-                                  course.difficulty === 'intermediate' ||
-                                  course.difficulty === 'advanced'
-                                    ? course.difficulty
-                                    : 'beginner' // Fallback for invalid/null values
-                                }
-                                duration="TBD" // TODO: Add duration to course data
-                                image={
-                                  urlFor(
-                                    course.thumbnail ?? ''
-                                  )?.url() as string
-                                }
-                                isLoading={isPending}
-                                lessonsCount={0} // TODO: Add lessons count to course data
-                                onEnroll={() =>
-                                  handleEnroll(course.slug as string)
-                                }
-                                slug={course.slug as string}
-                                title={course.title as string}
-                                topics={course.topics ?? []}
-                              />
-                            </CourseCardEntrance>
-                          </CarouselItem>
-                        ))}
-                      </CarouselContent>
-                    </Carousel>
-                  </motion.div>
-                </>
-              )}
+                              duration="TBD" // TODO: Add duration to course data
+                              image={
+                                urlFor(course.thumbnail ?? '')?.url() as string
+                              }
+                              isLoading={isPending}
+                              lessonsCount={0} // TODO: Add lessons count to course data
+                              onEnroll={() =>
+                                handleEnroll(course.slug as string)
+                              }
+                              slug={course.slug as string}
+                              title={course.title as string}
+                              topics={course.topics ?? []}
+                            />
+                          </CourseCardEntrance>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                  </Carousel>
+                </motion.div>
+              </>
+            )}
 
-            {/* Bottom Navigation */}
-            <motion.div
-              animate={{ opacity: 1 }}
-              className="flex items-center justify-between pt-8"
-              initial={{ opacity: 0 }}
-              transition={{ delay: 0.8 }}
-            >
-              <NavbarLogo />
-              <Button onClick={handleSkip} type="button" variant="secondary">
-                Skip for now <ArrowRight />
-              </Button>
-            </motion.div>
-          </div>
+          {/* Bottom Navigation */}
+          <motion.div
+            animate={{ opacity: 1 }}
+            className="flex items-center justify-between pt-8"
+            initial={{ opacity: 0 }}
+            transition={{ delay: 0.8 }}
+          >
+            <NavbarLogo />
+            <Button onClick={handleSkip} type="button" variant="secondary">
+              Skip for now <ArrowRight />
+            </Button>
+          </motion.div>
         </div>
-
-        {/* Success Celebration */}
-        <SuccessCelebration
-          onComplete={confetti.handleComplete}
-          trigger={confetti.shouldCelebrate}
-        />
       </div>
-    </PageBackground>
+
+      {/* Success Celebration */}
+      <SuccessCelebration
+        onComplete={confetti.handleComplete}
+        trigger={confetti.shouldCelebrate}
+      />
+    </div>
   );
 }

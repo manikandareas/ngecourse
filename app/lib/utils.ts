@@ -33,26 +33,25 @@ export const extractYoutubeId = (url: string) => {
 
 export function generateCourseRecommendationPrompt(formData: {
   learningGoals: string[];
-  studyReason: string;
-  studyPlan: string;
+  goal: string;
   level: 'beginner' | 'intermediate' | 'advanced';
+  languagePreference: 'id' | 'en' | 'mix';
+  explanationStyle: string;
 }): string {
-  // Map study reason values to descriptive text
-  const studyReasonMap: Record<string, string> = {
-    'career-switch': 'switching to a tech career',
-    'skill-upgrade': 'upgrading current tech skills',
-    certification: 'obtaining professional certification',
-    freelancing: 'working on freelancing and side projects',
-    entrepreneurship: 'tech entrepreneurship',
-    'personal-projects': 'building personal projects',
+  // Map language preference values to descriptive text
+  const languageMap: Record<string, string> = {
+    id: 'Indonesian language',
+    en: 'English language',
+    mix: 'mixed Indonesian and English languages',
   };
 
-  // Map study plan values to descriptive text
-  const studyPlanMap: Record<string, string> = {
-    intensive: 'intensive full-time learning schedule',
-    structured: 'structured learning with regular weekly sessions',
-    'project-based': 'project-based learning through hands-on building',
-    flexible: 'flexible learning that adapts to their schedule',
+  // Map explanation style values to descriptive text
+  const explanationStyleMap: Record<string, string> = {
+    simple: 'simple and direct explanations',
+    detailed: 'detailed and comprehensive explanations with examples',
+    visual:
+      'visual and interactive learning with diagrams and hands-on approach',
+    conversational: 'conversational and friendly explanations',
   };
 
   // Map level values to descriptive text
@@ -63,11 +62,11 @@ export function generateCourseRecommendationPrompt(formData: {
   };
 
   // Generate the prompt
-  const prompt = `Recommend courses for someone interested in learning ${formData.learningGoals.join(', ')}.
-They are ${studyReasonMap[formData.studyReason] || formData.studyReason}.
-They prefer a ${studyPlanMap[formData.studyPlan] || formData.studyPlan} approach.
+  const prompt = `Recommend courses for someone focused on learning ${formData.learningGoals.join(', ')}.
+Their specific learning goal is: "${formData.goal}".
 Their current knowledge level is ${levelMap[formData.level] || formData.level}.
-Suggest relevant courses that match these learning preferences and goals.`;
+They prefer content in ${languageMap[formData.languagePreference] || formData.languagePreference} with ${explanationStyleMap[formData.explanationStyle] || formData.explanationStyle}.
+Suggest relevant courses that match these learning preferences, goals, and preferred learning style.`;
 
   return prompt;
 }
