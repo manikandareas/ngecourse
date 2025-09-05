@@ -1,6 +1,5 @@
 import { useQueries } from '@tanstack/react-query';
 import type { EnrollmentQueryResult } from 'sanity.types';
-import { PageBackground } from '~/components/ui/page-background';
 import DetailContents from '~/features/courses/components/detail-contents';
 import { DetailHero } from '~/features/courses/components/detail-hero';
 import DetailLoading from '~/features/courses/components/detail-loading';
@@ -18,7 +17,8 @@ export function meta({ data }: Route.MetaArgs) {
     { title: `${data?.course?.title} ${COURSE_DETAIL_COPY.meta.titleSuffix}` },
     {
       name: 'description',
-      content: data?.course?.description || COURSE_DETAIL_COPY.meta.defaultDescription,
+      content:
+        data?.course?.description || COURSE_DETAIL_COPY.meta.defaultDescription,
     },
   ];
 }
@@ -63,21 +63,19 @@ export default function CourseDetailPage(props: Route.ComponentProps) {
   }
 
   return (
-    <PageBackground variant="purple-cyan">
-      <div className="relative mx-auto w-full max-w-6xl space-y-24 px-6 py-16 xl:px-0">
-        <DetailHero
-          course={courseQuery.data}
-          enrollment={enrollmentQuery.data as EnrollmentQueryResult}
-          userId={props.loaderData.currentSession?._id}
-        />
+    <div className="relative mx-auto w-full max-w-6xl space-y-36 px-6 py-16 xl:px-0">
+      <DetailHero
+        course={courseQuery.data}
+        enrollment={enrollmentQuery.data as EnrollmentQueryResult}
+        userId={props.loaderData.currentSession?._id}
+      />
 
-        <DetailContents
-          course={courseQuery.data}
-          enrollment={enrollmentQuery.data ?? null}
-        />
+      <DetailContents
+        course={courseQuery.data}
+        enrollment={enrollmentQuery.data ?? null}
+      />
 
-        <DetailPromo course={courseQuery.data} />
-      </div>
-    </PageBackground>
+      <DetailPromo course={courseQuery.data} />
+    </div>
   );
 }

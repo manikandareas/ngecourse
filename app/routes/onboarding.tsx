@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { type Control, useForm } from 'react-hook-form';
 import { redirect, useNavigate } from 'react-router';
 import { z } from 'zod';
-import { Button } from '~/components/ui/3d-button';
+import { Button } from '~/components/ui/button';
 import {
   Form,
   FormControl,
@@ -14,7 +14,6 @@ import {
   FormMessage,
 } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
-import { PageBackground } from '~/components/ui/page-background';
 import { ToggleGroup, ToggleGroupItem } from '~/components/ui/toggle-group';
 import type { SaveOnboardingInput } from '~/features/shared/schemas';
 import { usecaseUser } from '~/features/users/usecase';
@@ -176,135 +175,130 @@ export default function LearningGoalsPage(props: Route.ComponentProps) {
   const prevStep = () => setCurrentStep((prev) => (prev > 0 ? prev - 1 : prev));
 
   return (
-    <PageBackground variant="purple-cyan">
-      <div className="relative flex min-h-screen items-center justify-center px-4 py-8">
-        <div className="w-full max-w-2xl">
-          {/* Step Progress Header */}
-          <div className="mb-8 text-center">
-            <div className="mb-4 flex items-center justify-center space-x-2">
-              {steps.map((step, index) => {
-                const stepComplete = index < currentStep;
-                const stepCurrent = index === currentStep;
-                const stepValid = isStepValid(index);
+    <div className="relative flex min-h-screen items-center justify-center px-4 py-8">
+      <div className="w-full max-w-2xl">
+        {/* Step Progress Header */}
+        <div className="mb-8 text-center">
+          <div className="mb-4 flex items-center justify-center space-x-2">
+            {steps.map((step, index) => {
+              const stepComplete = index < currentStep;
+              const stepCurrent = index === currentStep;
+              const stepValid = isStepValid(index);
 
-                return (
-                  <div
-                    className={cn(
-                      'flex size-8 items-center justify-center rounded-full font-medium text-sm transition-all duration-300',
-                      stepComplete
-                        ? 'bg-green-500 text-white shadow-lg'
-                        : stepCurrent
-                          ? stepValid
-                            ? 'bg-accent text-white shadow-lg'
-                            : 'bg-accent/70 text-white shadow-lg'
-                          : 'border border-hairline bg-white/5 text-text-muted'
-                    )}
-                    key={step.id}
-                  >
-                    {stepComplete ? '✓' : index + 1}
-                  </div>
-                );
-              })}
-            </div>
-            <p className="text-sm text-text-muted">
-              Step {currentStep + 1} of {steps.length}
+              return (
+                <div
+                  className={cn(
+                    'flex size-8 items-center justify-center rounded-full font-medium text-sm transition-all duration-300',
+                    stepComplete
+                      ? 'bg-green-500 text-white shadow-lg'
+                      : stepCurrent
+                        ? stepValid
+                          ? 'bg-accent text-white shadow-lg'
+                          : 'bg-accent/70 text-white shadow-lg'
+                        : 'border border-hairline bg-white/5 text-text-muted'
+                  )}
+                  key={step.id}
+                >
+                  {stepComplete ? '✓' : index + 1}
+                </div>
+              );
+            })}
+          </div>
+          <p className="text-sm text-text-muted">
+            Step {currentStep + 1} of {steps.length}
+          </p>
+        </div>
+
+        {/* Main Content Card */}
+        <div className=" space-y-8">
+          <div className="space-y-4 text-center">
+            <h1 className="font-light text-3xl text-text-primary leading-[1.1] tracking-tight md:text-4xl">
+              {steps[currentStep].name}
+            </h1>
+            <p className="mx-auto max-w-md text-base/7 text-text-secondary">
+              {steps[currentStep].description}
             </p>
           </div>
+          <Form {...form}>
+            <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
+              <div className="relative overflow-hidden">
+                <div
+                  className="flex transition-transform duration-300 ease-out"
+                  style={{ transform: `translateX(-${currentStep * 100}%)` }}
+                >
+                  {/* Step 0 - Learning Goals */}
+                  <div className="w-full flex-shrink-0">
+                    <LearningGoals control={form.control} />
+                  </div>
 
-          {/* Main Content Card */}
-          <div className="glass-card space-y-8">
-            <div className="space-y-4 text-center">
-              <h1 className="font-light text-3xl text-text-primary leading-[1.1] tracking-tight md:text-4xl">
-                {steps[currentStep].name}
-              </h1>
-              <p className="mx-auto max-w-md text-base/7 text-text-secondary">
-                {steps[currentStep].description}
-              </p>
-            </div>
-            <Form {...form}>
-              <form
-                className="space-y-8"
-                onSubmit={form.handleSubmit(onSubmit)}
-              >
-                <div className="relative overflow-hidden">
-                  <div
-                    className="flex transition-transform duration-300 ease-out"
-                    style={{ transform: `translateX(-${currentStep * 100}%)` }}
+                  {/* Step 1 - Study Reason */}
+                  <div className="w-full flex-shrink-0">
+                    <StudyReason control={form.control} />
+                  </div>
+
+                  {/* Step 2 - Level */}
+                  <div className="w-full flex-shrink-0">
+                    <Level control={form.control} />
+                  </div>
+
+                  {/* Step 3 - Study Plan */}
+                  <div className="w-full flex-shrink-0">
+                    <StudyPlan control={form.control} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Validation Error Message */}
+              {!isCurrentStepValid && (
+                <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-center">
+                  <p className="field-error text-sm">
+                    {currentStep === 0 &&
+                      'Please select at least one learning goal to continue.'}
+                    {currentStep === 1 &&
+                      'Please select your motivation to continue.'}
+                    {currentStep === 2 &&
+                      'Please select your current level to continue.'}
+                    {currentStep === 3 &&
+                      'Please select your usage style to continue.'}
+                  </p>
+                </div>
+              )}
+
+              <div className="flex justify-between pt-6">
+                {currentStep > 0 ? (
+                  <Button
+                    disabled={isPending}
+                    onClick={prevStep}
+                    size="lg"
+                    type="button"
+                    variant={'secondary'}
                   >
-                    {/* Step 0 - Learning Goals */}
-                    <div className="w-full flex-shrink-0">
-                      <LearningGoals control={form.control} />
-                    </div>
-
-                    {/* Step 1 - Study Reason */}
-                    <div className="w-full flex-shrink-0">
-                      <StudyReason control={form.control} />
-                    </div>
-
-                    {/* Step 2 - Level */}
-                    <div className="w-full flex-shrink-0">
-                      <Level control={form.control} />
-                    </div>
-
-                    {/* Step 3 - Study Plan */}
-                    <div className="w-full flex-shrink-0">
-                      <StudyPlan control={form.control} />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Validation Error Message */}
-                {!isCurrentStepValid && (
-                  <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-center">
-                    <p className="field-error text-sm">
-                      {currentStep === 0 &&
-                        'Please select at least one learning goal to continue.'}
-                      {currentStep === 1 &&
-                        'Please select your motivation to continue.'}
-                      {currentStep === 2 &&
-                        'Please select your current level to continue.'}
-                      {currentStep === 3 &&
-                        'Please select your usage style to continue.'}
-                    </p>
-                  </div>
+                    Back
+                  </Button>
+                ) : (
+                  <span />
                 )}
-
-                <div className="flex justify-between pt-6">
-                  {currentStep > 0 ? (
-                    <Button
-                      disabled={isPending}
-                      onClick={prevStep}
-                      size="lg"
-                      type="button"
-                      variant={'secondary'}
-                    >
-                      Back
-                    </Button>
-                  ) : (
-                    <span />
-                  )}
-                  {currentStep < steps.length - 1 && (
-                    <Button
-                      disabled={!isCurrentStepValid || isPending}
-                      onClick={nextStep}
-                      size="lg"
-                      type="button"
-                    >
-                      Next
-                    </Button>
-                  )}
-                  {currentStep === steps.length - 1 && (
-                    <Button disabled={isPending} size="lg" type="submit">
-                      {isPending ? 'Saving...' : 'Finish Setup'}
-                    </Button>
-                  )}
-                </div>
-              </form>
-            </Form>
-          </div>
+                {currentStep < steps.length - 1 && (
+                  <Button
+                    disabled={!isCurrentStepValid || isPending}
+                    onClick={nextStep}
+                    size="lg"
+                    type="button"
+                  >
+                    Next
+                  </Button>
+                )}
+                {currentStep === steps.length - 1 && (
+                  <Button disabled={isPending} size="lg" type="submit">
+                    {isPending ? 'Saving...' : 'Finish Setup'}
+                  </Button>
+                )}
+              </div>
+            </form>
+          </Form>
         </div>
       </div>
-    </PageBackground>
+    </div>
   );
 }
 
