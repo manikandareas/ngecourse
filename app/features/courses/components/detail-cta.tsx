@@ -7,7 +7,7 @@ import type {
   EnrollmentQueryResult,
   Topic,
 } from 'sanity.types';
-import { Button } from '~/components/ui/3d-button';
+import { Button } from '~/components/ui/button';
 import { useContentProgression } from '~/features/courses/hooks/content-progression';
 import DetailEnrollDialog from './detail-enroll-dialog';
 

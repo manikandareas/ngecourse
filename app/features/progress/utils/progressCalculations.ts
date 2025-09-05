@@ -1,3 +1,5 @@
+import { PROGRESS_COPY } from '../constants/copy';
+
 export const calculateStudyStreak = (
   streakStartDate?: number,
   currentDate: Date = new Date()
@@ -21,25 +23,25 @@ export const getStreakStatus = (
   if (streak === 0)
     return {
       status: 'none',
-      message: 'Start your learning journey!',
-      emoji: '🚀',
+      message: PROGRESS_COPY.streakStatus.none.message,
+      emoji: PROGRESS_COPY.streakStatus.none.emoji,
     };
   if (streak < 7)
     return {
       status: 'building',
-      message: 'Building momentum!',
-      emoji: '🌱',
+      message: PROGRESS_COPY.streakStatus.building.message,
+      emoji: PROGRESS_COPY.streakStatus.building.emoji,
     };
   if (streak < 30)
     return {
       status: 'strong',
-      message: 'Strong streak!',
-      emoji: '🔥',
+      message: PROGRESS_COPY.streakStatus.strong.message,
+      emoji: PROGRESS_COPY.streakStatus.strong.emoji,
     };
   return {
     status: 'champion',
-    message: 'Learning champion!',
-    emoji: '👑',
+    message: PROGRESS_COPY.streakStatus.champion.message,
+    emoji: PROGRESS_COPY.streakStatus.champion.emoji,
   };
 };
 
@@ -152,7 +154,7 @@ export const getCourseStatusInfo = (
   if (percentComplete === 0) {
     return {
       status: 'not-started',
-      statusText: 'Not Started',
+      statusText: PROGRESS_COPY.status.notStarted,
       statusColor: 'text-gray-400',
     };
   }
@@ -160,14 +162,14 @@ export const getCourseStatusInfo = (
   if (percentComplete === 100 && dateCompleted) {
     return {
       status: 'completed',
-      statusText: 'Completed',
+      statusText: PROGRESS_COPY.status.completed,
       statusColor: 'text-green-400',
     };
   }
 
   return {
     status: 'in-progress',
-    statusText: 'In Progress',
+    statusText: PROGRESS_COPY.status.inProgress,
     statusColor: 'text-blue-400',
   };
 };

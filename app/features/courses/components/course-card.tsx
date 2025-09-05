@@ -30,14 +30,14 @@ export const CourseCard = (props: CoursesQueryResult[number]) => {
         </div>
 
         {/* Content Container */}
-        <div className="flex flex-1 flex-col space-y-4 p-6">
+        <div className="flex flex-1 flex-col space-y-4 px-2 py-6">
           {/* Title */}
           <h3 className="line-clamp-2 font-medium text-text-primary text-xl tracking-tight transition-colors duration-200">
             {props.title}
           </h3>
 
           {/* Description */}
-          <p className="line-clamp-3 flex-1 text-sm text-text-secondary leading-relaxed">
+          <p className="line-clamp-3 flex-1 text-muted-foreground text-sm leading-relaxed">
             {props.description}
           </p>
 
