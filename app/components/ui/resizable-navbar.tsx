@@ -89,7 +89,7 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
       }}
       className={cn(
         'relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start rounded-2xl px-6 py-4 lg:flex',
-        visible ? 'glass-card border border-border-strong' : 'bg-transparent',
+        visible ? 'border border-border-strong' : 'bg-transparent',
         className
       )}
       style={{
@@ -160,7 +160,7 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
       }}
       className={cn(
         'relative z-50 mx-auto flex w-full max-w-[calc(100vw-1rem)] flex-col items-center justify-between rounded-2xl px-4 py-4 lg:hidden',
-        visible ? 'tinted-blur border border-border-strong' : 'bg-transparent',
+        visible ? ' border border-border-strong' : 'bg-transparent',
         className
       )}
       transition={{
@@ -199,7 +199,7 @@ export const MobileNavMenu = React.forwardRef<HTMLElement, MobileNavMenuProps>(
             animate={{ opacity: 1, y: 0, scale: 1 }}
             aria-label="Mobile navigation menu"
             className={cn(
-              'glass-card-strong absolute inset-x-0 top-20 z-50 flex w-full flex-col items-start justify-start gap-6 text-text-primary',
+              'absolute inset-x-0 top-20 z-50 flex w-full flex-col items-start justify-start gap-6 text-text-primary',
               className
             )}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
