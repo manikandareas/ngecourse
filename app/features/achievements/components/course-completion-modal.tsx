@@ -1,5 +1,6 @@
 import { Trophy, X } from 'lucide-react';
 import type React from 'react';
+import { QUIZ_RESULT_COPY } from '~/features/quizzes/constants/quiz-result-copy';
 import type { Achievement } from '../types';
 
 interface CourseCompletionModalProps {
@@ -46,13 +47,12 @@ export const CourseCompletionModal: React.FC<CourseCompletionModalProps> = ({
         <div className="p-8">
           {/* Celebration Header */}
           <div className="mb-6 text-center">
-            <div className="mb-4 text-6xl">🎉</div>
+            <div className="mb-4 text-6xl">{QUIZ_RESULT_COPY.completion.celebration.emoji}</div>
             <h2 className="mb-2 font-bold text-2xl text-text-primary">
-              Course Completed!
+              {QUIZ_RESULT_COPY.completion.celebration.title}
             </h2>
             <p className="text-text-secondary">
-              Congratulations on completing{' '}
-              <span className="font-medium text-accent">{courseTitle}</span>
+              {QUIZ_RESULT_COPY.completion.celebration.subtitle(courseTitle)}
             </p>
           </div>
 
@@ -64,7 +64,7 @@ export const CourseCompletionModal: React.FC<CourseCompletionModalProps> = ({
                   <div className="font-bold text-lg text-text-primary">
                     {completionStats.totalTime}
                   </div>
-                  <div className="text-text-muted text-xs">Time Spent</div>
+                  <div className="text-text-muted text-xs">{QUIZ_RESULT_COPY.completion.stats.timeSpent}</div>
                 </div>
               )}
               {completionStats.completedLessons && (
@@ -72,7 +72,7 @@ export const CourseCompletionModal: React.FC<CourseCompletionModalProps> = ({
                   <div className="font-bold text-lg text-text-primary">
                     {completionStats.completedLessons}
                   </div>
-                  <div className="text-text-muted text-xs">Lessons</div>
+                  <div className="text-text-muted text-xs">{QUIZ_RESULT_COPY.completion.stats.lessonsCompleted}</div>
                 </div>
               )}
               {completionStats.averageQuizScore && (
@@ -80,7 +80,7 @@ export const CourseCompletionModal: React.FC<CourseCompletionModalProps> = ({
                   <div className="font-bold text-lg text-text-primary">
                     {Math.round(completionStats.averageQuizScore)}%
                   </div>
-                  <div className="text-text-muted text-xs">Avg Score</div>
+                  <div className="text-text-muted text-xs">{QUIZ_RESULT_COPY.completion.stats.averageScore}</div>
                 </div>
               )}
             </div>
@@ -91,7 +91,7 @@ export const CourseCompletionModal: React.FC<CourseCompletionModalProps> = ({
             <div className="mb-6">
               <h3 className="mb-3 flex items-center gap-2 font-medium text-text-primary">
                 <Trophy className="h-4 w-4 text-yellow-400" />
-                New Achievements
+                {QUIZ_RESULT_COPY.completion.achievements.title}
               </h3>
               <div className="space-y-2">
                 {earnedAchievements.map((achievement) => (
@@ -126,7 +126,7 @@ export const CourseCompletionModal: React.FC<CourseCompletionModalProps> = ({
               onClick={onClose}
               type="button"
             >
-              Continue Learning
+              {QUIZ_RESULT_COPY.completion.actions.continueLearning}
             </button>
             <button
               className="rounded-lg border border-hairline px-4 py-3 font-medium text-sm text-text-primary transition-colors hover:bg-white/5"
@@ -135,7 +135,7 @@ export const CourseCompletionModal: React.FC<CourseCompletionModalProps> = ({
               }}
               type="button"
             >
-              View Progress
+              {QUIZ_RESULT_COPY.completion.actions.viewProgress}
             </button>
           </div>
         </div>

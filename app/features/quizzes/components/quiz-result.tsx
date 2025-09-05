@@ -18,6 +18,7 @@ import {
   useAchievementNotifications,
 } from '~/features/achievements';
 import { useUserEnrollments } from '~/features/progress/hooks/useProgressData';
+import { QUIZ_RESULT_COPY } from '~/features/quizzes/constants/quiz-result-copy';
 import { cn } from '~/lib/utils';
 
 interface QuizResultProps {
@@ -69,18 +70,11 @@ export function QuizResultPage({ attempt, userId }: QuizResultProps) {
     ? Math.round(attempt.durationMs / 1000 / 60)
     : 0;
 
-  const getScoreColor = (p: number) => {
-    if (p >= 90) return 'text-green-400';
-    if (p >= 70) return 'text-blue-400';
-    if (p >= 50) return 'text-yellow-400';
-    return 'text-red-400';
-  };
-
-  const getScoreMessage = (p: number) => {
-    if (p >= 90) return 'Excellent work!';
-    if (p >= 70) return 'Great job!';
-    if (p >= 50) return 'Good effort!';
-    return 'Keep practicing!';
+  const getScoreData = (p: number) => {
+    if (p >= 90) return QUIZ_RESULT_COPY.performance.outstanding;
+    if (p >= 70) return QUIZ_RESULT_COPY.performance.excellent;
+    if (p >= 50) return QUIZ_RESULT_COPY.performance.good;
+    return QUIZ_RESULT_COPY.performance.needsWork;
   };
 
   // Check for course completion when enrollments data is available
@@ -117,10 +111,10 @@ export function QuizResultPage({ attempt, userId }: QuizResultProps) {
       <div className="flex min-h-screen items-center justify-center">
         <div className="glass-card max-w-md text-center">
           <h1 className="font-semibold text-2xl text-gray-100">
-            Results Not Available
+            {QUIZ_RESULT_COPY.states.inProgress.title}
           </h1>
           <p className="mt-2 text-gray-400">
-            This quiz has not been completed yet.
+            {QUIZ_RESULT_COPY.states.inProgress.description}
           </p>
           <Button
             className="mt-4"
@@ -131,7 +125,7 @@ export function QuizResultPage({ attempt, userId }: QuizResultProps) {
             }
             variant="outline"
           >
-            Back to Quiz
+            {QUIZ_RESULT_COPY.states.inProgress.cta}
           </Button>
         </div>
       </div>
@@ -166,9 +160,9 @@ export function QuizResultPage({ attempt, userId }: QuizResultProps) {
                 variant="ghost"
               >
                 <ArrowLeft className="size-4" />
-                Back to Quiz
+                {QUIZ_RESULT_COPY.sections.header.backButton}
               </Button>
-              <Badge variant="outline">Quiz Results</Badge>
+              <Badge variant="outline">{QUIZ_RESULT_COPY.sections.header.badge}</Badge>
             </div>
           </div>
 
@@ -177,21 +171,24 @@ export function QuizResultPage({ attempt, userId }: QuizResultProps) {
             <div className="space-y-6 text-center">
               <div className="space-y-2">
                 <Trophy
-                  className={cn('mx-auto size-16', getScoreColor(percentage))}
+                  className={cn('mx-auto size-16', getScoreData(percentage).color)}
                 />
                 <h1 className="font-bold text-3xl text-gray-100">
-                  {quiz?.title}
+                  {QUIZ_RESULT_COPY.sections.scoreDisplay.title(quiz?.title || 'Quiz')}
                 </h1>
                 <p
                   className={cn(
                     'font-bold text-5xl',
-                    getScoreColor(percentage)
+                    getScoreData(percentage).color
                   )}
                 >
-                  {percentage}%
+                  {percentage}{QUIZ_RESULT_COPY.sections.scoreDisplay.scoreSuffix}
                 </p>
                 <p className="text-gray-300 text-xl">
-                  {getScoreMessage(percentage)}
+                  {getScoreData(percentage).message}
+                </p>
+                <p className="mt-2 text-gray-400 text-sm">
+                  {getScoreData(percentage).description}
                 </p>
               </div>
 
@@ -199,28 +196,28 @@ export function QuizResultPage({ attempt, userId }: QuizResultProps) {
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-2 text-gray-400">
                     <Target className="size-4" />
-                    <span>Score</span>
+                    <span>{QUIZ_RESULT_COPY.sections.stats.expertise.label}</span>
                   </div>
                   <p className="font-semibold text-gray-100 text-lg">
-                    {correctCount} / {totalQuestions}
+                    {QUIZ_RESULT_COPY.sections.stats.expertise.format(correctCount, totalQuestions)}
                   </p>
                 </div>
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-2 text-gray-400">
                     <Clock className="size-4" />
-                    <span>Time</span>
+                    <span>{QUIZ_RESULT_COPY.sections.stats.duration.label}</span>
                   </div>
                   <p className="font-semibold text-gray-100 text-lg">
-                    {duration} min
+                    {QUIZ_RESULT_COPY.sections.stats.duration.format(duration)}
                   </p>
                 </div>
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-2 text-gray-400">
                     <RotateCcw className="size-4" />
-                    <span>Attempt</span>
+                    <span>{QUIZ_RESULT_COPY.sections.stats.attempt.label}</span>
                   </div>
                   <p className="font-semibold text-gray-100 text-lg">
-                    #{attempt.attemptNumber}
+                    {QUIZ_RESULT_COPY.sections.stats.attempt.format(attempt.attemptNumber)}
                   </p>
                 </div>
               </div>
@@ -232,8 +229,11 @@ export function QuizResultPage({ attempt, userId }: QuizResultProps) {
           {/* Detailed Results */}
           <div className="glass-card">
             <h2 className="mb-6 font-semibold text-2xl text-gray-100">
-              Question Review
+              {QUIZ_RESULT_COPY.sections.breakdown.title}
             </h2>
+            <p className="mb-6 text-gray-400 text-sm">
+              {QUIZ_RESULT_COPY.sections.breakdown.subtitle}
+            </p>
             <div className="space-y-6">
               {questions.map((question, questionIndex) => {
                 const answer = answers.find(
@@ -289,7 +289,7 @@ export function QuizResultPage({ attempt, userId }: QuizResultProps) {
                                   )}
                                   variant="outline"
                                 >
-                                  Your Answer
+                                  {QUIZ_RESULT_COPY.questionReview.badges.userChoice}
                                 </Badge>
                               )}
                               {isCorrectChoice && (
@@ -297,7 +297,7 @@ export function QuizResultPage({ attempt, userId }: QuizResultProps) {
                                   className="border-green-500/50 text-green-400 text-xs"
                                   variant="outline"
                                 >
-                                  Correct
+                                  {QUIZ_RESULT_COPY.questionReview.badges.expertAnswer}
                                 </Badge>
                               )}
                             </div>
@@ -315,7 +315,7 @@ export function QuizResultPage({ attempt, userId }: QuizResultProps) {
                     {question.explanation && (
                       <div className="rounded-lg border border-blue-500/30 bg-blue-500/5 p-4">
                         <h4 className="mb-2 font-medium text-blue-400">
-                          Explanation
+                          {QUIZ_RESULT_COPY.questionReview.insight.title}
                         </h4>
                         <p className="text-gray-300 text-sm">
                           {question.explanation}
@@ -340,7 +340,7 @@ export function QuizResultPage({ attempt, userId }: QuizResultProps) {
                 variant="outline"
               >
                 <ArrowLeft className="size-4" />
-                Back to Quiz
+                {QUIZ_RESULT_COPY.actions.secondary.backToOverview}
               </Button>
               <Button
                 onClick={() =>
@@ -350,7 +350,7 @@ export function QuizResultPage({ attempt, userId }: QuizResultProps) {
                 }
               >
                 <RotateCcw className="size-4" />
-                Take Again
+                {QUIZ_RESULT_COPY.actions.primary.retake}
               </Button>
             </div>
           </div>

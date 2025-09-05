@@ -17,6 +17,7 @@ import {
   PopoverTrigger,
 } from '~/components/ui/popover';
 import { Separator } from '~/components/ui/separator';
+import { LESSON_COPY } from '~/features/courses/constants/lesson-copy';
 import { enrollmentQueryOption } from '~/features/enrollments/hooks/get-enrollment';
 import { courseQueryOption } from '../hooks/get-course';
 import { LessonFileTree } from './lesson-file-tree';
@@ -150,25 +151,25 @@ export const LessonHeader = ({
         {/* Left: Structure trigger */}
         <div className="flex min-w-0 flex-1 items-center gap-2">
           <Button
-            aria-label="Go back to course"
+            aria-label={LESSON_COPY.accessibility.backButton}
             className="btn-ghost p-2.5"
             onClick={() => navigate(`/courses/${courseSlug}`)}
-            title="Go back to course"
+            title={LESSON_COPY.header.backToCourse.title}
             type="button"
             variant={'outline'}
           >
             <ChevronLeft aria-hidden="true" size={16} />
-            <span className="sr-only">Go back to course</span>
+            <span className="sr-only">{LESSON_COPY.header.backToCourse.label}</span>
           </Button>
           <LessonFileTree course={course} enrollment={enrollment}>
             <Button
-              aria-label="Open lesson structure"
+              aria-label={LESSON_COPY.accessibility.outlineButton}
               className=" focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
               type="button"
               variant="outline"
             >
               <FolderTree aria-hidden="true" size={16} />
-              <span className="ml-2 hidden sm:inline">Outline</span>
+              <span className="ml-2 hidden sm:inline">{LESSON_COPY.header.outline.label}</span>
             </Button>
           </LessonFileTree>
         </div>
@@ -179,7 +180,7 @@ export const LessonHeader = ({
             {title}
           </h1>
           <p className="mt-1 hidden truncate text-text-muted text-xs sm:block">
-            {course?.title ? `Course: ${course.title}` : 'Lesson'}
+            {course?.title ? `${LESSON_COPY.progress.courseInfo.replace('{{courseTitle}}', course.title)}` : LESSON_COPY.progress.current}
           </p>
         </div>
 
@@ -189,7 +190,7 @@ export const LessonHeader = ({
             /* Desktop: Only fullscreen button (chat handled by FAB) */
             <button
               aria-label={
-                isMaximized ? 'Exit full screen' : 'Enter full screen'
+                isMaximized ? LESSON_COPY.header.fullscreen.exit : LESSON_COPY.header.fullscreen.enter
               }
               className="btn-ghost p-2.5"
               onClick={() => {
@@ -205,7 +206,7 @@ export const LessonHeader = ({
                 <Maximize aria-hidden="true" size={16} />
               )}
               <span className="sr-only">
-                {isMaximized ? 'Exit full screen' : 'Enter full screen'}
+                {isMaximized ? LESSON_COPY.header.fullscreen.exitTitle : LESSON_COPY.header.fullscreen.enterTitle}
               </span>
             </button>
           ) : (
@@ -213,12 +214,12 @@ export const LessonHeader = ({
             <Popover>
               <PopoverTrigger asChild>
                 <button
-                  aria-label="Open menu"
+                  aria-label={LESSON_COPY.header.menu.open}
                   className="btn-ghost p-2.5"
                   type="button"
                 >
                   <MoreVertical aria-hidden="true" size={16} />
-                  <span className="sr-only">Open menu</span>
+                  <span className="sr-only">{LESSON_COPY.header.menu.open}</span>
                 </button>
               </PopoverTrigger>
               <PopoverContent
@@ -235,7 +236,7 @@ export const LessonHeader = ({
                       >
                         <Sparkles aria-hidden="true" size={16} />
                         <span className="ml-2">
-                          {isChatOpen ? 'Close Chat' : 'Ask Genii'}
+                          {isChatOpen ? LESSON_COPY.chat.buttons.close : LESSON_COPY.chat.buttons.open}
                         </span>
                       </button>
 
@@ -258,7 +259,7 @@ export const LessonHeader = ({
                       <Maximize aria-hidden="true" size={16} />
                     )}
                     <span className="ml-2">
-                      {isMaximized ? 'Exit Full Screen' : 'Full Screen'}
+                      {isMaximized ? LESSON_COPY.header.fullscreen.exit : LESSON_COPY.header.fullscreen.enter}
                     </span>
                   </button>
                 </div>

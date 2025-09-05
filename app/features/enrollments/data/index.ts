@@ -20,15 +20,18 @@ const enrollCourse = async (data: EnrollCourse) => {
     }
 
     return await client.create({
+      _key: crypto.randomUUID(),
       _type: 'enrollment',
       userEnrolled: [
         {
+          _key: crypto.randomUUID(),
           _type: 'reference',
           _ref: data.userId,
         },
       ],
       course: [
         {
+          _key: crypto.randomUUID(),
           _type: 'reference',
           _ref: data.courseId,
         },
@@ -87,6 +90,7 @@ type AddProgression = {
 
 const addProgression = async (data: AddProgression) => {
   const contentsCompletedRefs = data.contentsCompleted.map((id) => ({
+    _key: crypto.randomUUID(),
     _type: 'reference' as const,
     _ref: id,
   }));

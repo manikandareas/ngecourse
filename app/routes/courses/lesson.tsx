@@ -15,6 +15,7 @@ import {
 import { useChatHistory } from '~/features/ai-chat/hooks/get-chat-history';
 import { LessonHeader } from '~/features/courses/components/lesson-header';
 import { LessonNavigation } from '~/features/courses/components/lesson-navigation';
+import { LESSON_COPY } from '~/features/courses/constants/lesson-copy';
 import { dataCourses } from '~/features/courses/data';
 import { dataEnrollment } from '~/features/enrollments/data';
 import { useEventTracking } from '~/hooks/use-event-tracking';
@@ -23,10 +24,10 @@ import type { Route } from './+types/lesson';
 
 export function meta({ data }: Route.MetaArgs) {
   return [
-    { title: `${data?.lesson.title} | Genii` },
+    { title: `${data?.lesson.title} ${LESSON_COPY.meta.titleSuffix}` },
     {
       name: 'description',
-      content: data?.lesson.content || 'Lesson detail page of Genii!',
+      content: data?.lesson.content || LESSON_COPY.meta.fallbackDescription,
     },
   ];
 }
@@ -172,11 +173,23 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
   );
 
   if (!lesson || isPending) {
-    return <div>Loading...</div>;
+    return <div>{LESSON_COPY.states.loading}</div>;
   }
 
   if (isError) {
-    return <div>Could not load courses 😬: {error.message}</div>;
+    return (
+      <div className="flex flex-col items-center justify-center p-8 text-center">
+        <h2 className="mb-2 font-semibold text-lg text-text-primary">
+          {LESSON_COPY.states.error.title}
+        </h2>
+        <p className="mb-4 text-text-secondary">
+          {LESSON_COPY.states.error.message}
+        </p>
+        <button onClick={() => window.location.reload()} type="button">
+          {LESSON_COPY.states.error.retry}
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -193,7 +206,7 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
         <ChatSideTrigger
           isOpen={isChatOpen}
           onClick={toggleChat}
-          text="Butuh Bantuan?"
+          text={LESSON_COPY.chat.sideTrigger.default}
         />
       )}
 
@@ -236,7 +249,9 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
                   <div className="flex h-full items-center justify-center p-4">
                     <div className="text-center">
                       <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
-                      <p className="text-text-secondary">Loading chat...</p>
+                      <p className="text-text-secondary">
+                        {LESSON_COPY.states.chatLoading}
+                      </p>
                     </div>
                   </div>
                 ) : (
@@ -244,10 +259,10 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
                     {/* Mobile Chat Header */}
                     <div className="mb-4 flex items-center justify-between border-hairline border-b pb-4">
                       <h2 className="font-semibold text-lg text-text-primary">
-                        Ask Genii
+                        {LESSON_COPY.chat.window.mobileHeader}
                       </h2>
                       <button
-                        aria-label="Close chat"
+                        aria-label={LESSON_COPY.accessibility.chatClose}
                         className="btn-ghost p-2"
                         onClick={() => setIsChatOpen(false)}
                         type="button"
