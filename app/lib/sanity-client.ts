@@ -6,7 +6,7 @@ import { getPublicEnv } from '~/env.public';
 export const client = createClient({
   projectId: getPublicEnv(import.meta.env).SANITY_PROJECT_ID,
   dataset: getPublicEnv(import.meta.env).SANITY_DATASET,
-  useCdn: true,
+  useCdn: false,
   apiVersion: getPublicEnv(import.meta.env).SANITY_API_VERSION,
   token: getPublicEnv(import.meta.env).SANITY_SECRET_TOKEN, // Needed for certain operations like updating content, accessing drafts or using draft perspectives
   perspective: 'published', // Ensure consistency with live client
