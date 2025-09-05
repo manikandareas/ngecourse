@@ -12,6 +12,7 @@ import {
   DialogTrigger,
 } from '~/components/ui/dialog';
 import { Separator } from '~/components/ui/separator';
+import { COURSE_DETAIL_COPY } from '../constants/course-detail-copy';
 import { CourseBadge } from './course-badge';
 
 interface IDetailEnrollDialogProps {
@@ -61,7 +62,7 @@ const DetailEnrollDialog = ({
         <DialogHeader className="space-y-4">
           <div className="space-y-2">
             <DialogTitle className="font-bold text-2xl tracking-tight">
-              Enroll in {title}
+              {COURSE_DETAIL_COPY.enrollDialog.title}
             </DialogTitle>
             <div className="flex items-center gap-2">
               <CourseBadge difficulty={difficulty || 'beginner'} />
@@ -69,6 +70,9 @@ const DetailEnrollDialog = ({
                 {difficulty} Level
               </span>
             </div>
+            <p className="text-muted-foreground text-sm">
+              {COURSE_DETAIL_COPY.enrollDialog.subtitle}
+            </p>
           </div>
 
           <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-muted">
@@ -76,21 +80,21 @@ const DetailEnrollDialog = ({
           </div>
 
           <div className="grid grid-cols-2 gap-4 py-2">
-            <CourseFeature icon={Clock} text={duration} />
-            <CourseFeature icon={BookOpen} text={`${lessonsCount} lessons`} />
+            <CourseFeature icon={Clock} text={COURSE_DETAIL_COPY.enrollDialog.features.duration(duration)} />
+            <CourseFeature icon={BookOpen} text={COURSE_DETAIL_COPY.enrollDialog.features.lessons(lessonsCount)} />
             <CourseFeature
               icon={Award}
-              text={topics.map((topic) => topic.title).join(', ')}
+              text={topics.length > 0 ? topics.map((topic) => topic.title).join(', ') : COURSE_DETAIL_COPY.enrollDialog.features.topics}
             />
-            <CourseFeature icon={InfinityIcon} text="Lifetime Access" />
+            <CourseFeature icon={InfinityIcon} text={COURSE_DETAIL_COPY.enrollDialog.features.access} />
           </div>
 
           <Separator className="my-2" />
 
           <div className="space-y-2">
-            <h4 className="font-medium">About This Course</h4>
+            <h4 className="font-medium">{COURSE_DETAIL_COPY.enrollDialog.aboutTitle}</h4>
             <DialogDescription className="text-foreground/80">
-              {description}
+              {COURSE_DETAIL_COPY.enrollDialog.aboutDescription}
             </DialogDescription>
           </div>
         </DialogHeader>
@@ -105,10 +109,10 @@ const DetailEnrollDialog = ({
           >
             {isLoading ? (
               <>
-                Processing enrollment <Loader2 className="animate-spin" />
+                {COURSE_DETAIL_COPY.enrollDialog.ctaProcessing} <Loader2 className="animate-spin" />
               </>
             ) : (
-              'Enroll Now - Free'
+              COURSE_DETAIL_COPY.enrollDialog.ctaPrimary
             )}
           </Button>
         </DialogFooter>
