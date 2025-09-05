@@ -42,24 +42,23 @@ export function DetailHero(props: IDetailHero) {
         )
       );
     },
-    onError: (error) => {
-      toast.error(
-        COURSE_DETAIL_COPY.error.enrollmentFailed,
-        {
-          description: COURSE_DETAIL_COPY.error.enrollmentFailedDesc
-        }
-      );
+    onError: () => {
+      toast.error(COURSE_DETAIL_COPY.error.enrollmentFailed, {
+        description: COURSE_DETAIL_COPY.error.enrollmentFailedDesc,
+      });
     },
     onSuccess: (data) => {
       if (data.success) {
         document.getElementById('dialog-close')?.click();
         toast.success(COURSE_DETAIL_COPY.success.enrolled, {
-          description: COURSE_DETAIL_COPY.success.enrolledDesc
+          description: COURSE_DETAIL_COPY.success.enrolledDesc,
         });
         return;
       }
 
-      toast.error(`${COURSE_DETAIL_COPY.error.enrollmentFailed}: ${data.error?.message}`);
+      toast.error(
+        `${COURSE_DETAIL_COPY.error.enrollmentFailed}: ${data.error?.message}`
+      );
     },
   });
 
