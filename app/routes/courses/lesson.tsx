@@ -7,7 +7,6 @@ import { ChatCloseButton } from '~/components/ui/chat-close-button';
 import { ChatSideTrigger } from '~/components/ui/chat-side-trigger';
 import { Drawer, DrawerContent } from '~/components/ui/drawer';
 import { MarkdownRenderer } from '~/components/ui/markdown-renderer';
-import { PageBackground } from '~/components/ui/page-background';
 import { Separator } from '~/components/ui/separator';
 import {
   ChatWindow,
@@ -207,7 +206,7 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
           <main
             className={'mx-auto w-full max-w-5xl transition-all duration-300'}
           >
-            <article className="glass-card">{lessonContent}</article>
+            <article>{lessonContent}</article>
           </main>
 
           {isChatOpen && !chatHistoryPending && (
