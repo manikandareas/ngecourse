@@ -1,16 +1,23 @@
-import { Clock, Users } from 'lucide-react';
+import { ArrowRight, Clock, Users } from 'lucide-react';
 import { Link } from 'react-router';
-import type { CoursesQueryResult } from 'sanity.types';
+import type { CoursesQueryResult, Topic } from 'sanity.types';
+import { Button } from '~/components/ui/button';
 import { urlFor } from '~/lib/sanity-client';
 import { CourseBadge } from './course-badge';
+import DetailEnrollDialog from './detail-enroll-dialog';
 
-export const CourseCard = (props: CoursesQueryResult[number]) => {
+type CourseCardProps = CoursesQueryResult[number] & {
+  withEnrollButton?: boolean;
+  onEnroll?: () => void;
+};
+
+export const CourseCard = (props: CourseCardProps) => {
   const imageUrl = props.thumbnail ? urlFor(props.thumbnail)?.url() : '';
 
   return (
     <Link
       className="group block h-full rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
-      to={`/courses/${props.slug}`}
+      to={props.withEnrollButton ? '#' : `/courses/${props.slug}`}
     >
       <div className="glass-content group hover:-translate-y-1 relative flex h-full flex-col overflow-hidden transition-all duration-200">
         {/* Image Container with Overlay */}
@@ -54,23 +61,45 @@ export const CourseCard = (props: CoursesQueryResult[number]) => {
           </div>
 
           {/* Topics */}
-          {props.topics && props.topics.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {props.topics.slice(0, 3).map((topic) => (
-                <span
-                  className="inline-flex items-center rounded-full border border-hairline bg-white/5 px-2 py-1 text-text-secondary text-xs transition-colors hover:bg-white/10"
-                  key={topic._id}
-                >
-                  {topic.title}
-                </span>
-              ))}
-              {props.topics.length > 3 && (
-                <span className="inline-flex items-center rounded-full border border-hairline bg-white/5 px-2 py-1 text-text-muted text-xs">
-                  +{props.topics.length - 3} more
-                </span>
-              )}
-            </div>
-          )}
+          <div className="flex items-center justify-between">
+            {props.topics && props.topics.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {props.topics.slice(0, 3).map((topic) => (
+                  <span
+                    className="inline-flex items-center rounded-full border border-hairline bg-white/5 px-2 py-1 text-text-secondary text-xs transition-colors hover:bg-white/10"
+                    key={topic._id}
+                  >
+                    {topic.title}
+                  </span>
+                ))}
+                {props.topics.length > 3 && (
+                  <span className="inline-flex items-center rounded-full border border-hairline bg-white/5 px-2 py-1 text-text-muted text-xs">
+                    +{props.topics.length - 3} more
+                  </span>
+                )}
+              </div>
+            )}
+
+            {props.withEnrollButton && props.onEnroll && (
+              <DetailEnrollDialog
+                description={props.description || ''}
+                difficulty={props.difficulty || 'beginner'}
+                duration="TBD"
+                id={props._id}
+                image={urlFor(props.thumbnail ?? '')?.url() as string}
+                isLoading={false}
+                lessonsCount={8}
+                onEnroll={props.onEnroll}
+                slug={props.slug as string}
+                title={props.title as string}
+                topics={props.topics as Topic[]}
+              >
+                <Button className="z-50" type="button">
+                  Enroll <ArrowRight />
+                </Button>
+              </DetailEnrollDialog>
+            )}
+          </div>
         </div>
       </div>
     </Link>

@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { RECOMMENDATION_COPY } from '~/features/recommendation/constants/copy';
 import { cn } from '~/lib/utils';
 
 interface LoadingCourseCardsProps {
@@ -27,7 +28,7 @@ function LoadingCourseCard({ delay = 0 }: LoadingCourseCardProps) {
   return (
     <motion.div
       animate={{ opacity: 1, y: 0 }}
-      className="glass-card overflow-hidden"
+      className="max-h-[20rem] overflow-hidden"
       initial={{ opacity: 0, y: 20 }}
       transition={{ delay, duration: 0.5 }}
     >
@@ -128,7 +129,7 @@ export function LoadingProgressIndicator() {
           />
         ))}
       </div>
-      <span className="field-help ml-3">Analyzing your preferences...</span>
+      <span className="field-help ml-3">{RECOMMENDATION_COPY.loading.pending.message}</span>
     </motion.div>
   );
 }

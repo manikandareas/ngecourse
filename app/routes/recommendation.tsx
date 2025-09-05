@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
+import type { CoursesQueryResult } from 'sanity.types';
 import { toast } from 'sonner';
 import { Button } from '~/components/ui/3d-button';
 import {
@@ -11,13 +12,12 @@ import {
   CarouselContent,
   CarouselItem,
 } from '~/components/ui/carousel';
-import { PageBackground } from '~/components/ui/page-background';
 import { NavbarLogo } from '~/components/ui/resizable-navbar';
+import { CourseCard } from '~/features/courses/components/course-card';
 import { enrollmentQueryOption } from '~/features/enrollments/hooks/get-enrollment';
 import { usecaseEnrollments } from '~/features/enrollments/usecase';
 import { RecommendationError } from '~/features/recommendation/components/error-states';
 import { LoadingCourseCards } from '~/features/recommendation/components/loading-course-cards';
-import { RecommendationCard } from '~/features/recommendation/components/recommendation-card';
 import {
   ProgressDots,
   RecommendationStatus,
@@ -27,17 +27,18 @@ import {
   SuccessCelebration,
   useConfettiCelebration,
 } from '~/features/recommendation/components/success-celebration';
+import { RECOMMENDATION_COPY } from '~/features/recommendation/constants/copy';
 import { recommendationQuery } from '~/features/recommendation/data';
 import { useLiveRecommendationData } from '~/features/recommendation/hooks/use-live-recommendation';
 import type { RecommendationData } from '~/features/recommendation/types';
-import { client, urlFor } from '~/lib/sanity-client';
+import { client } from '~/lib/sanity-client';
 import { getCurrentSession } from '~/root';
 import type { Route } from './+types/recommendation';
 
 export function meta() {
   return [
-    { title: 'Genii | Recommendation' },
-    { name: 'description', content: 'Recommendation course for you' },
+    { title: RECOMMENDATION_COPY.meta.title },
+    { name: 'description', content: RECOMMENDATION_COPY.meta.description },
   ];
 }
 
@@ -230,7 +231,7 @@ export default function RecommendationPage(props: Route.ComponentProps) {
                     initial={{ opacity: 0, y: 20 }}
                     transition={{ delay: confetti.isComplete ? 0.5 : 0 }}
                   >
-                    Your Learning Journey Awaits!
+                    {RECOMMENDATION_COPY.success.title}
                   </motion.h1>
                   <motion.p
                     animate={{ opacity: 1, y: 0 }}
@@ -240,7 +241,7 @@ export default function RecommendationPage(props: Route.ComponentProps) {
                   >
                     {data.reason
                       ? data.reason
-                      : "We've curated these courses specifically for your learning goals and experience level."}
+                      : RECOMMENDATION_COPY.success.fallbackDescription}
                   </motion.p>
                 </div>
 
@@ -252,10 +253,7 @@ export default function RecommendationPage(props: Route.ComponentProps) {
                   <Carousel className="w-full" setApi={setApi}>
                     <CarouselContent className="gap-4">
                       {data.courses.map((course, index: number) => (
-                        <CarouselItem
-                          className="rounded-md bg-card p-4 lg:basis-1/2"
-                          key={course._id}
-                        >
+                        <CarouselItem className="lg:basis-1/2" key={course._id}>
                           <CourseCardEntrance
                             delay={
                               confetti.isComplete
@@ -264,27 +262,12 @@ export default function RecommendationPage(props: Route.ComponentProps) {
                             }
                             isVisible={true}
                           >
-                            <RecommendationCard
-                              description={course.description as string}
-                              difficulty={
-                                course.difficulty === 'beginner' ||
-                                course.difficulty === 'intermediate' ||
-                                course.difficulty === 'advanced'
-                                  ? course.difficulty
-                                  : 'beginner' // Fallback for invalid/null values
-                              }
-                              duration="TBD" // TODO: Add duration to course data
-                              image={
-                                urlFor(course.thumbnail ?? '')?.url() as string
-                              }
-                              isLoading={isPending}
-                              lessonsCount={0} // TODO: Add lessons count to course data
+                            <CourseCard
+                              {...(course as CoursesQueryResult[number])}
                               onEnroll={() =>
                                 handleEnroll(course.slug as string)
                               }
-                              slug={course.slug as string}
-                              title={course.title as string}
-                              topics={course.topics ?? []}
+                              withEnrollButton
                             />
                           </CourseCardEntrance>
                         </CarouselItem>
@@ -304,7 +287,7 @@ export default function RecommendationPage(props: Route.ComponentProps) {
           >
             <NavbarLogo />
             <Button onClick={handleSkip} type="button" variant="secondary">
-              Skip for now <ArrowRight />
+              {RECOMMENDATION_COPY.cta.skipButton} <ArrowRight />
             </Button>
           </motion.div>
         </div>
