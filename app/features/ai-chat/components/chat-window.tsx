@@ -33,6 +33,7 @@ import {
 } from '~/components/ai-elements/source';
 import { Suggestion, Suggestions } from '~/components/ai-elements/suggestion';
 import { getPublicEnv } from '~/env.public';
+import { LESSON_COPY } from '~/features/courses/constants/lesson-copy';
 
 interface ChatWindowProps {
   chatHistory: UIMessage[];
@@ -43,11 +44,7 @@ interface ChatWindowProps {
 
 const EXTERNAL_SERVICE_URL = getPublicEnv(import.meta.env).EXTERNAL_SERVICE_URL;
 
-const suggestions = [
-  'Bisakah dijelaskan dengan cerita yang menarik?',
-  'Boleh ditambah contoh kode yang lebih banyak?',
-  'Ada contoh penggunaan di dunia nyata tidak?',
-];
+const suggestions = LESSON_COPY.chat.window.suggestions;
 
 export const ChatWindow = ({
   lessonId,
@@ -185,7 +182,7 @@ export const ChatWindow = ({
                   variant={webSearch ? 'default' : 'ghost'}
                 >
                   <GlobeIcon size={16} />
-                  <span>Search</span>
+                  <span>{LESSON_COPY.chat.window.searchButton}</span>
                 </PromptInputButton>
               </PromptInputTools>
               <PromptInputSubmit disabled={!input} status={status} />

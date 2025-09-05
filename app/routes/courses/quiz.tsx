@@ -1,16 +1,16 @@
-import { useLoaderData } from 'react-router';
-import { PageBackground } from '~/components/ui/page-background';
 import { QuizPage } from '~/features/quizzes/components/quiz-page';
+import { QUIZ_COPY } from '~/features/quizzes/constants/copy';
 import { dataQuizzes } from '~/features/quizzes/data';
 import { getCurrentSession } from '~/root';
 import type { Route } from './+types/quiz';
 
 export function meta({ data }: Route.MetaArgs) {
+  const quizTitle = data?.quiz?.title || 'Quiz';
   return [
-    { title: `${data?.quiz?.title || 'Quiz'} | Genii` },
+    { title: QUIZ_COPY.meta.title(quizTitle) },
     {
       name: 'description',
-      content: data?.quiz?.description || 'Quiz page of Genii!',
+      content: data?.quiz?.description || QUIZ_COPY.meta.description(quizTitle),
     },
   ];
 }
@@ -48,12 +48,8 @@ export async function loader(args: Route.LoaderArgs) {
   };
 }
 
-export default function QuizRoute() {
-  const data = useLoaderData<typeof loader>();
+export default function QuizRoute(props: Route.ComponentProps) {
+  const data = props.loaderData;
 
-  return (
-    <PageBackground variant="purple-cyan">
-      <QuizPage {...data} />
-    </PageBackground>
-  );
+  return <QuizPage {...data} />;
 }

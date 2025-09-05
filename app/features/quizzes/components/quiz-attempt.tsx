@@ -7,6 +7,8 @@ import { Button } from '~/components/ui/button';
 import { Progress } from '~/components/ui/progress';
 import { cn } from '~/lib/utils';
 import { useFinalizeQuizMutation } from '../hooks/quiz-mutations';
+import { QUIZ_COPY } from '../constants/copy';
+import { QUIZ_ATTEMPT_COPY } from '../constants/quiz-attempt-copy';
 
 interface QuizAttemptProps {
   attempt: QuizAttempt & {
@@ -88,7 +90,9 @@ export function QuizAttemptPage({ attempt, userId }: QuizAttemptProps) {
 
   const quiz = attempt.quiz;
   const questions = quiz?.questions || [];
-  const answeredQuestions = (attempt.answers ?? []) as NonNullable<QuizAttempt['answers']>;
+  const answeredQuestions = (attempt.answers ?? []) as NonNullable<
+    QuizAttempt['answers']
+  >;
   const totalQuestions = questions.length;
 
   // Initialize client state based on existing server answers
@@ -227,10 +231,10 @@ export function QuizAttemptPage({ attempt, userId }: QuizAttemptProps) {
       <div className="flex min-h-screen items-center justify-center">
         <div className="glass-card max-w-md text-center">
           <h1 className="font-semibold text-2xl text-gray-100">
-            Quiz Not Available
+            {QUIZ_COPY.errors.quizNotFound.title}
           </h1>
           <p className="mt-2 text-gray-400">
-            This quiz attempt is not available or has been completed.
+            {QUIZ_ATTEMPT_COPY.errors.notFound.description}
           </p>
           <Button
             className="mt-4"
@@ -241,7 +245,7 @@ export function QuizAttemptPage({ attempt, userId }: QuizAttemptProps) {
             }
             variant="outline"
           >
-            Back to Quiz
+            {QUIZ_ATTEMPT_COPY.navigation.backToQuiz}
           </Button>
         </div>
       </div>
@@ -252,7 +256,7 @@ export function QuizAttemptPage({ attempt, userId }: QuizAttemptProps) {
     <div aria-live="polite" className="min-h-screen">
       <div className="space-y-6">
         {/* Header with Progress */}
-        <div className="tinted-blur sticky top-0 z-10 mx-auto w-full max-w-3xl border-hairline border-b px-4 py-4 shadow-soft sm:px-6">
+        <div className="sticky top-0 z-10 mx-auto w-full max-w-3xl rounded-b-xl border-hairline border-b bg-white/5 px-4 py-4 shadow-soft backdrop-blur sm:px-6">
           <div className="mx-auto max-w-3xl space-y-3 sm:space-y-4">
             <div className="flex items-center justify-between gap-3">
               <Button
@@ -266,8 +270,8 @@ export function QuizAttemptPage({ attempt, userId }: QuizAttemptProps) {
                 variant="ghost"
               >
                 <ArrowLeft className="size-4" />
-                <span className="hidden sm:inline">Back to Quiz</span>
-                <span className="sm:hidden">Back</span>
+                <span className="hidden sm:inline">{QUIZ_ATTEMPT_COPY.navigation.backToQuiz}</span>
+                <span className="sm:hidden">{QUIZ_ATTEMPT_COPY.navigation.mobile.back}</span>
               </Button>
               <Badge
                 className="border-hairline bg-white/5 text-text-secondary text-xs sm:text-sm"
@@ -280,10 +284,10 @@ export function QuizAttemptPage({ attempt, userId }: QuizAttemptProps) {
             <div className="space-y-2 sm:space-y-3">
               <div className="flex items-center justify-between text-xs sm:text-sm">
                 <span className="font-medium text-text-secondary">
-                  Quiz Progress
+                  {QUIZ_ATTEMPT_COPY.progress.title}
                 </span>
                 <span className="font-medium text-text-primary">
-                  {Math.round(progressPercentage)}% Complete
+                  {QUIZ_ATTEMPT_COPY.progress.completionText(progressPercentage)}
                 </span>
               </div>
               <Progress
@@ -337,7 +341,7 @@ export function QuizAttemptPage({ attempt, userId }: QuizAttemptProps) {
                                 : 'outline'
                           }
                         >
-                          Question {questionIndex + 1}
+                          {QUIZ_ATTEMPT_COPY.activeQuiz.questionLabel(questionIndex + 1)}
                         </Badge>
                         {questionState === 'completed' && (
                           <CheckCircle className="size-5 text-green-500" />
@@ -431,7 +435,7 @@ export function QuizAttemptPage({ attempt, userId }: QuizAttemptProps) {
                         disabled={selectedOption === undefined}
                         onClick={() => handleAnswerSubmit(questionIndex)}
                       >
-                        Continue
+                        {QUIZ_ATTEMPT_COPY.activeQuiz.nextButton}
                       </Button>
                     )}
 
@@ -443,8 +447,8 @@ export function QuizAttemptPage({ attempt, userId }: QuizAttemptProps) {
                       onClick={handleFinalizeQuiz}
                     >
                       {finalizeQuizMutation.isPending
-                        ? 'Submitting...'
-                        : 'Submit Quiz'}
+                        ? QUIZ_ATTEMPT_COPY.activeQuiz.submitting
+                        : QUIZ_ATTEMPT_COPY.activeQuiz.submitButton}
                       <Flag className="size-4" />
                     </Button>
                   )}
@@ -476,7 +480,7 @@ export function QuizAttemptPage({ attempt, userId }: QuizAttemptProps) {
                                 : 'text-red-400'
                             )}
                           >
-                            {clientAnswer?.isCorrect ? 'Correct!' : 'Incorrect'}
+                            {clientAnswer?.isCorrect ? QUIZ_ATTEMPT_COPY.feedback.correct.title : QUIZ_ATTEMPT_COPY.feedback.incorrect.title}
                           </p>
                           {question.explanation && (
                             <p className="text-gray-300 text-xs leading-relaxed sm:text-sm">
@@ -486,8 +490,8 @@ export function QuizAttemptPage({ attempt, userId }: QuizAttemptProps) {
                           {isShowingFeedback && (
                             <p className="text-gray-500 text-xs">
                               {questionIndex < questions.length - 1
-                                ? 'Next question will appear shortly...'
-                                : 'Preparing final submission...'}
+                                ? QUIZ_ATTEMPT_COPY.feedback.transition.nextQuestion
+                                : QUIZ_ATTEMPT_COPY.feedback.transition.finalSubmission}
                             </p>
                           )}
                         </div>

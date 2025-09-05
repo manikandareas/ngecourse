@@ -1,5 +1,6 @@
 import { forwardRef } from 'react';
 import { cn } from '~/lib/utils';
+import { LESSON_COPY } from '~/features/courses/constants/lesson-copy';
 
 interface ChatSideTriggerProps {
   isOpen: boolean;
@@ -10,7 +11,7 @@ interface ChatSideTriggerProps {
 }
 
 export const ChatSideTrigger = forwardRef<HTMLButtonElement, ChatSideTriggerProps>(
-  ({ isOpen, onClick, text = 'Butuh Bantuan?', disabled = false, className }, ref) => {
+  ({ isOpen, onClick, text = LESSON_COPY.chat.sideTrigger.default, disabled = false, className }, ref) => {
     // Don't render when chat is open
     if (isOpen) return null;
 
@@ -45,7 +46,7 @@ export const ChatSideTrigger = forwardRef<HTMLButtonElement, ChatSideTriggerProp
           'animate-in slide-in-from-right-full duration-300 fill-mode-forwards',
           className
         )}
-        aria-label="Open AI Chat Assistant"
+        aria-label={LESSON_COPY.accessibility.chatTrigger}
       >
         {/* Vertical text */}
         <span 

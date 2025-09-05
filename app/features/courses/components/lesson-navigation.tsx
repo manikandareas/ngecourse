@@ -8,6 +8,7 @@ import type {
 } from 'sanity.types';
 import { Button } from '~/components/ui/button';
 import { CourseCompletionModal } from '~/features/achievements';
+import { LESSON_COPY } from '~/features/courses/constants/lesson-copy';
 import { enrollmentQueryOption } from '~/features/enrollments/hooks/get-enrollment';
 import { usecaseEnrollments } from '~/features/enrollments/usecase';
 import type { ProgressionInput } from '~/features/shared/schemas';
@@ -182,9 +183,11 @@ export const LessonNavigation: React.FC<LessonNavigationProps> = ({
             onClick={handlePrevious}
             type="button"
             variant="outline"
+            aria-label={LESSON_COPY.accessibility.previousButton}
+            title={LESSON_COPY.navigation.previous.title}
           >
             <ArrowLeft size={16} />
-            <span className="ml-2">Previous</span>
+            <span className="ml-2">{LESSON_COPY.navigation.previous.label}</span>
           </Button>
         ) : (
           <div />
@@ -196,13 +199,29 @@ export const LessonNavigation: React.FC<LessonNavigationProps> = ({
             disabled={!canInteract || isPending}
             onClick={handleNext}
             type="button"
+            aria-label={
+              isFinalContent 
+                ? LESSON_COPY.accessibility.completeButton 
+                : shouldShowComplete 
+                  ? LESSON_COPY.accessibility.completeButton
+                  : LESSON_COPY.accessibility.nextButton
+            }
+            title={
+              isFinalContent
+                ? LESSON_COPY.navigation.complete.courseTitle
+                : shouldShowComplete
+                  ? LESSON_COPY.navigation.complete.lessonTitle
+                  : LESSON_COPY.navigation.next.title
+            }
           >
             <span className="mr-2">
-              {isFinalContent
-                ? 'Complete Course'
-                : shouldShowComplete
-                  ? 'Complete and Next'
-                  : 'Next'}
+              {isPending
+                ? LESSON_COPY.navigation.complete.inProgress
+                : isFinalContent
+                  ? LESSON_COPY.navigation.complete.course
+                  : shouldShowComplete
+                    ? LESSON_COPY.navigation.complete.lesson
+                    : LESSON_COPY.navigation.next.label}
             </span>
             <ArrowRight size={16} />
           </Button>
