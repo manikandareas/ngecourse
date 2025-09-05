@@ -13,6 +13,8 @@ const enrollCourse = async (data: EnrollCourse) => {
       data.userId,
       data.courseId
     );
+
+    console.log('existingEnrollment', existingEnrollment);
     if (existingEnrollment) {
       throw new Error('User already enrolled in this course');
     }
