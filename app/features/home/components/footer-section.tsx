@@ -74,12 +74,12 @@ const Footer2 = ({
   ],
   copyright = '© 2025 Genii. Belajar AI-powered untuk masa depan tech Indonesia.',
   bottomLinks = [
-    { text: 'Syarat & Ketentuan', url: '#' },
-    { text: 'Kebijakan Privasi', url: '#' },
+    { text: 'Syarat & Ketentuan', url: '/terms' },
+    { text: 'Kebijakan Privasi', url: '/privacy' },
   ],
 }: Footer2Props) => {
   return (
-    <section className="border-t bg-background py-32 dark:bg-background-dark">
+    <section className="border-t bg-background py-32">
       <div className="container mx-auto max-w-6xl">
         <footer>
           <div className="grid grid-cols-2 gap-8 lg:grid-cols-6">

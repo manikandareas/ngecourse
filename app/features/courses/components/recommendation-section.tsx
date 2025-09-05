@@ -4,6 +4,7 @@ import type {
   RecommendationQueryResult,
 } from 'sanity.types';
 import { AnimatedShinyText } from '~/components/ui/animated-shiny-text';
+import { COURSES_COPY } from '../constants/copy';
 import { CourseCard } from './course-card';
 
 interface RecommendationSectionProps {
@@ -22,15 +23,15 @@ export function RecommendationSection({
       <div className="space-y-6 text-center">
         <div className="group mx-auto w-fit rounded-full border border-accent/30 bg-accent/5 px-4 py-2 backdrop-blur-sm transition-all hover:border-accent/50 hover:bg-accent/10">
           <AnimatedShinyText className="inline-flex items-center justify-center text-accent transition ease-out hover:text-accent/90">
-            <span>✨ Curated For You</span>
+            <span>{COURSES_COPY.recommendation.badge}</span>
             <ArrowRightIcon className="ml-1 size-3 animate-bounce-x transition-transform duration-300 ease-in-out will-change-transform group-hover:translate-x-0.5" />
           </AnimatedShinyText>
         </div>
         <h2 className="font-light text-3xl text-text-primary leading-[1.1] tracking-tight sm:text-4xl">
-          Personalized Learning Path
+          {COURSES_COPY.recommendation.title}
         </h2>
         <p className="mx-auto max-w-4xl text-base/7 text-text-secondary">
-          {recommendation?.reason}
+          {recommendation?.reason || COURSES_COPY.recommendation.subtitle}
         </p>
       </div>
 

@@ -1,9 +1,9 @@
 import { BookOpen, SearchIcon } from 'lucide-react';
 import type { CoursesQueryResult } from 'sanity.types';
+import { COURSES_COPY } from '../constants/copy';
 import { CourseCard } from './course-card';
 
 interface CourseListSectionProps {
-  courses: CoursesQueryResult;
   filteredCourses: CoursesQueryResult;
   searchQuery: string;
   onClearSearch: () => void;
@@ -11,7 +11,6 @@ interface CourseListSectionProps {
 }
 
 export function CourseListSection({
-  courses,
   filteredCourses,
   searchQuery,
   onClearSearch,
@@ -19,50 +18,33 @@ export function CourseListSection({
 }: CourseListSectionProps) {
   return (
     <section>
-      <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex flex-col gap-8">
         <div className="space-y-4">
           <div className="inline-flex items-center gap-2 rounded-full border border-hairline bg-white/5 px-3 py-1.5">
             <BookOpen className="h-3 w-3 text-green-500" />
-            <span className="field-label">All Courses</span>
+            <span className="field-label">{COURSES_COPY.courseList.badge}</span>
           </div>
-          <div>
+          <div className="mb-6">
             <h2 className="font-light text-3xl text-text-primary tracking-tight sm:text-4xl">
               {searchQuery
-                ? `Search Results (${filteredCourses.length})`
-                : 'Explore All Courses'}
+                ? COURSES_COPY.courseList.titles.search(filteredCourses.length)
+                : COURSES_COPY.courseList.titles.default}
             </h2>
-            <p className="mt-2 text-base/7 text-text-secondary">
+            <p className="mt-2 max-w-4xl text-base/7 text-text-secondary">
               {searchQuery
-                ? `Found ${filteredCourses.length} courses matching "${searchQuery}"`
-                : 'Discover our complete collection of expert-led courses'}
+                ? COURSES_COPY.courseList.descriptions.search(
+                    filteredCourses.length,
+                    searchQuery
+                  )
+                : COURSES_COPY.courseList.descriptions.default}
             </p>
           </div>
-        </div>
-
-        {/* Stats and Search */}
-        <div className="space-y-4">
-          <div className="hidden items-center gap-8 lg:flex">
-            <div className="text-center">
-              <div className="font-medium text-2xl text-text-primary">
-                {courses?.length || 0}
-              </div>
-              <div className="field-help">Total Courses</div>
-            </div>
-            <div className="text-center">
-              <div className="font-medium text-2xl text-text-primary">12k+</div>
-              <div className="field-help">Students</div>
-            </div>
-            <div className="text-center">
-              <div className="font-medium text-2xl text-text-primary">4.8</div>
-              <div className="field-help">Avg Rating</div>
-            </div>
-          </div>
-          <div className="relative">
+          <div className="relative max-w-md">
             <SearchIcon className="-translate-y-1/2 absolute top-1/2 left-3 z-10 size-5 text-text-muted" />
             <input
               className="glass-input h-12 pl-10 text-base"
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Search courses..."
+              placeholder={COURSES_COPY.courseList.searchPlaceholder}
               type="text"
               value={searchQuery}
             />
@@ -85,13 +67,13 @@ export function CourseListSection({
             🔍
           </div>
           <h3 className="mb-3 font-light text-text-primary text-xl tracking-tight">
-            No courses found
+            {COURSES_COPY.emptyStates.noSearchResults.title}
           </h3>
           <p className="mb-6 text-text-secondary">
-            Try adjusting your search terms or browse all courses
+            {COURSES_COPY.emptyStates.noSearchResults.description}
           </p>
           <button className="btn-ghost" onClick={onClearSearch} type="button">
-            Clear Search
+            {COURSES_COPY.emptyStates.noSearchResults.clearButton}
           </button>
         </div>
       )}
@@ -102,10 +84,10 @@ export function CourseListSection({
             📚
           </div>
           <h3 className="mb-3 font-light text-text-primary text-xl tracking-tight">
-            No courses available
+            {COURSES_COPY.emptyStates.noCourses.title}
           </h3>
           <p className="text-text-secondary">
-            Check back soon for new courses!
+            {COURSES_COPY.emptyStates.noCourses.description}
           </p>
         </div>
       )}

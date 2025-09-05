@@ -1,4 +1,5 @@
 import { PageBackground } from '~/components/ui/page-background';
+import siteConfig from '~/siteConfig';
 
 export function meta() {
   return [
@@ -202,7 +203,7 @@ export default function TermsPage() {
               </h2>
               <p className="text-text-secondary leading-relaxed">
                 Pertanyaan tentang Syarat Layanan ini dapat ditujukan ke{' '}
-                <strong>[email kontak]</strong>.
+                <strong>{siteConfig.email}</strong>.
               </p>
             </section>
           </div>
