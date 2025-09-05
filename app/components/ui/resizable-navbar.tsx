@@ -89,7 +89,7 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
       }}
       className={cn(
         'relative z-[60] mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start rounded-2xl px-6 py-4 lg:flex',
-        visible ? 'tinted-blur border border-border-strong' : 'bg-transparent',
+        visible ? 'glass-card border border-border-strong' : 'bg-transparent',
         className
       )}
       style={{

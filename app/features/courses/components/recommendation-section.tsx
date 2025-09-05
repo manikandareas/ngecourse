@@ -18,7 +18,7 @@ export function RecommendationSection({
   }
 
   return (
-    <section className="glass-card">
+    <section>
       <div className="space-y-6 text-center">
         <div className="group mx-auto w-fit rounded-full border border-accent/30 bg-accent/5 px-4 py-2 backdrop-blur-sm transition-all hover:border-accent/50 hover:bg-accent/10">
           <AnimatedShinyText className="inline-flex items-center justify-center text-accent transition ease-out hover:text-accent/90">

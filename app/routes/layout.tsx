@@ -1,13 +1,13 @@
 import { Outlet } from 'react-router';
+import { Footer2 } from '~/features/home/components/footer-section';
 import { Navbar } from '~/features/home/components/navbar';
-import { AppFooter } from '~/features/shared/components/footer';
 
 export default function HomeLayout() {
   return (
-    <div className="relative">
+    <div className="relative min-h-screen bg-background">
       <Navbar />
       <Outlet />
-      <AppFooter />
+      <Footer2 />
     </div>
   );
 }

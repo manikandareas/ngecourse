@@ -56,7 +56,7 @@ export const ProgressOverview: React.FC<ProgressOverviewProps> = ({
 
         <div className="relative flex items-center justify-between">
           <div className="flex-1">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-accent/15 px-3 py-1 font-medium text-accent text-sm backdrop-blur-sm">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-accent/15 px-3 py-1 font-medium text-foreground text-sm backdrop-blur-sm">
               <div className="h-2 w-2 animate-pulse rounded-full bg-accent" />
               {currentStreak > 0
                 ? `${currentStreak} day streak!`
