@@ -7,6 +7,7 @@ import {
 } from '@clerk/react-router';
 import { Ticket } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router';
 import { Button } from '~/components/ui/button';
 import {
   MobileNav,
@@ -116,7 +117,7 @@ export function Navbar() {
       </NavBody>
 
       {/* Mobile Navigation */}
-      <MobileNav>
+      <MobileNav className="backdrop-blur-md">
         <MobileNavHeader>
           <NavbarLogo />
           <MobileNavToggle
@@ -127,23 +128,24 @@ export function Navbar() {
         </MobileNavHeader>
 
         <MobileNavMenu
+          className="z-50 overflow-hidden rounded-b-md bg-background/95 p-4"
           isOpen={isMobileMenuOpen}
           onClose={closeMobileMenu}
           ref={mobileMenuRef}
         >
           <nav
             aria-label="Mobile navigation"
-            className="flex w-full flex-col gap-4"
+            className=" flex w-full flex-col gap-4"
           >
             {navItems.map((item, idx) => (
-              <a
+              <Link
                 className="relative rounded-lg px-3 py-2.5 font-medium text-base text-text-secondary transition-all duration-150 hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
-                href={item.link}
                 key={`mobile-link-${idx.toString()}`}
                 onClick={closeMobileMenu}
+                to={item.link}
               >
                 <span className="block">{item.name}</span>
-              </a>
+              </Link>
             ))}
           </nav>
 
