@@ -26,6 +26,7 @@ interface NavItemsProps {
     name: string;
     link: string;
     isAuthRequired?: boolean;
+    upcoming?: boolean;
   }[];
   className?: string;
   onItemClick?: () => void;
@@ -125,6 +126,31 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
         if (item.isAuthRequired && !isSignedIn) {
           return null;
         }
+        if (item.upcoming) {
+          return (
+            <button
+              className="relative rounded-full px-4 py-2.5 text-text-secondary transition-colors duration-150 hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+              disabled
+              key={`link-${idx.toString()}`}
+              onBlur={() => setFocused(null)}
+              onFocus={() => setFocused(idx)}
+              onMouseEnter={() => setHovered(idx)}
+              type="button"
+            >
+              {(hovered === idx || focused === idx) && (
+                <motion.div
+                  className="absolute inset-0 h-full w-full rounded-full border border-border-hairline bg-white/10"
+                  layoutId={focused === idx ? 'focused' : 'hovered'}
+                  transition={{ duration: 0.15, ease: 'easeOut' }}
+                />
+              )}
+
+              <span className="relative z-20 text-muted-foreground">
+                {item.name}
+              </span>
+            </button>
+          );
+        }
         return (
           <Link
             className="relative rounded-full px-4 py-2.5 text-text-secondary transition-colors duration-150 hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
@@ -142,6 +168,7 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
                 transition={{ duration: 0.15, ease: 'easeOut' }}
               />
             )}
+
             <span className="relative z-20">{item.name}</span>
           </Link>
         );

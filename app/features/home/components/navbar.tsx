@@ -36,8 +36,9 @@ export function Navbar() {
       isAuthRequired: true,
     },
     {
-      name: 'Community',
+      name: 'Community (Upcoming)',
       link: '/threads',
+      upcoming: true,
     },
   ];
 
