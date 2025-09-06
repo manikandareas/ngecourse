@@ -33,10 +33,6 @@ export async function getCurrentSession(args: LoaderFunctionArgs) {
 
   const currentSession = await usecaseUser.getCurrentUser(userId);
 
-  if (!currentSession) {
-    return null;
-  }
-
   return {
     ...currentSession,
     clerkId: userId,

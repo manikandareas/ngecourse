@@ -7,6 +7,7 @@ import {
   UsecaseError,
 } from '~/features/shared/errors';
 import {
+  type CreateUserInput,
   type SaveOnboardingInput,
   saveOnboardingSchema,
 } from '~/features/shared/schemas';
@@ -26,9 +27,10 @@ const userCreated = async (user: UserJSON) => {
 };
 
 const saveOnboardingResults = async (
-  userId: string,
+  clerkId: string,
   token: string,
-  data: SaveOnboardingInput
+  data: SaveOnboardingInput,
+  clerkUserData: CreateUserInput
 ) => {
   const validationResult = saveOnboardingSchema.safeParse(data);
   if (!validationResult.success) {
@@ -39,6 +41,18 @@ const saveOnboardingResults = async (
   }
 
   try {
+    let userId: string;
+    const user = await dataUser.findOneByClerkId(clerkId);
+    if (user) {
+      userId = user._id;
+    } else {
+      const newUser = await dataUser.createOne({
+        ...clerkUserData,
+        onboardingStatus: 'completed',
+      });
+      userId = newUser._id;
+    }
+
     const result = await dataUser.updateOne(userId, {
       ...data,
       onboardingStatus: 'completed',

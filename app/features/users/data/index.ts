@@ -2,7 +2,7 @@ import { defineQuery } from 'groq';
 import type { User } from 'sanity.types';
 import { client } from '~/lib/sanity-client';
 
-interface CreateUser {
+export interface CreateUser {
   username: string;
   firstname: string;
   lastname: string;

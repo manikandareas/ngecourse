@@ -49,6 +49,10 @@ export async function loader(args: Route.LoaderArgs) {
     throw new Response('Unauthorized', { status: 401 });
   }
 
+  if (!currentSession._id) {
+    throw new Response('User ID is missing', { status: 400 });
+  }
+
   // Load initial recommendation data for SSR hydration using direct Sanity client
   // This ensures consistency with our live client implementation
   const initialData = await client.fetch<RecommendationData>(
@@ -80,7 +84,7 @@ export default function RecommendationPage(props: Route.ComponentProps) {
     message,
     error: recommendationError,
   } = useLiveRecommendationData(
-    props.loaderData.session._id,
+    props.loaderData.session._id as string,
     props.loaderData.initial
   );
 
@@ -109,7 +113,10 @@ export default function RecommendationPage(props: Route.ComponentProps) {
     }) => usecaseEnrollments.enroll(courseSlug, userId),
     onSettled: (_, __, variable) => {
       queryClient.invalidateQueries(
-        enrollmentQueryOption(props.loaderData.session._id, variable.courseSlug)
+        enrollmentQueryOption(
+          props.loaderData.session._id as string,
+          variable.courseSlug
+        )
       );
     },
     onError: (error) => {
@@ -264,6 +271,7 @@ export default function RecommendationPage(props: Route.ComponentProps) {
                           >
                             <CourseCard
                               {...(course as CoursesQueryResult[number])}
+                              isLoading={isPending}
                               onEnroll={() =>
                                 handleEnroll(course.slug as string)
                               }

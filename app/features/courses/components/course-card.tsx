@@ -1,4 +1,4 @@
-import { ArrowRight, Clock, Users } from 'lucide-react';
+import { Clock, Loader2, Users } from 'lucide-react';
 import { Link } from 'react-router';
 import type { CoursesQueryResult, Topic } from 'sanity.types';
 import { Button } from '~/components/ui/button';
@@ -9,6 +9,7 @@ import DetailEnrollDialog from './detail-enroll-dialog';
 type CourseCardProps = CoursesQueryResult[number] & {
   withEnrollButton?: boolean;
   onEnroll?: () => void;
+  isLoading?: boolean;
 };
 
 export const CourseCard = (props: CourseCardProps) => {
@@ -87,15 +88,23 @@ export const CourseCard = (props: CourseCardProps) => {
                 duration="TBD"
                 id={props._id}
                 image={urlFor(props.thumbnail ?? '')?.url() as string}
-                isLoading={false}
+                isLoading={props.isLoading}
                 lessonsCount={8}
                 onEnroll={props.onEnroll}
                 slug={props.slug as string}
                 title={props.title as string}
                 topics={props.topics as Topic[]}
               >
-                <Button className="z-50" type="button">
-                  Enroll <ArrowRight />
+                <Button
+                  className="z-50"
+                  disabled={props.isLoading}
+                  type="button"
+                >
+                  {props.isLoading ? (
+                    <Loader2 className="animate-spin" />
+                  ) : (
+                    'Enroll'
+                  )}
                 </Button>
               </DetailEnrollDialog>
             )}

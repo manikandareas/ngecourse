@@ -1,3 +1,4 @@
+import { useAuth, useUser } from '@clerk/react-router';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import confetti from 'canvas-confetti';
@@ -44,21 +45,13 @@ export function meta() {
 
 export async function loader(args: Route.LoaderArgs) {
   const currentSession = await getCurrentSession(args);
-  if (!currentSession) {
+  if (!currentSession?.clerkId) {
     throw new Response('Unauthorized', { status: 401 });
   }
 
   if (currentSession.onboardingStatus === 'completed') {
     return redirect('/');
   }
-
-  const token = await currentSession.getToken();
-
-  if (!token) {
-    throw new Response('Unauthorized', { status: 401 });
-  }
-
-  return { session: currentSession, token };
 }
 
 const formSchema = z.object({
@@ -101,16 +94,25 @@ const steps = [
   },
 ];
 
-export default function LearningGoalsPage(props: Route.ComponentProps) {
+export default function LearningGoalsPage() {
   const navigate = useNavigate();
+  const { getToken } = useAuth();
+  const { user } = useUser();
   const { mutate: saveOnboarding, isPending } = useMutation({
     mutationFn: async ({
-      userId,
+      clerkId,
       data,
     }: {
-      userId: string;
+      clerkId: string;
       data: SaveOnboardingInput;
-    }) => usecaseUser.saveOnboarding(userId, props.loaderData.token, data),
+    }) =>
+      usecaseUser.saveOnboarding(clerkId, (await getToken()) as string, data, {
+        clerkId,
+        email: user?.emailAddresses[0].emailAddress as string,
+        username: user?.username as string,
+        firstname: user?.firstName as string,
+        lastname: user?.lastName as string,
+      }),
     onSuccess: (data) => {
       if (data.success) {
         try {
@@ -188,7 +190,7 @@ export default function LearningGoalsPage(props: Route.ComponentProps) {
     try {
       saveOnboarding({
         data: values,
-        userId: props.loaderData.session._id,
+        clerkId: user?.id as string,
       });
       // This is a background job, so we don't need to await it.
       // TODO: Get Recommendations Courses
