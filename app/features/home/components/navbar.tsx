@@ -19,24 +19,25 @@ import {
   NavbarLogo,
   NavItems,
 } from '~/components/ui/resizable-navbar';
+import { NAVBAR_COPY } from '~/features/home/constants/navbar-copy';
 
 export function Navbar() {
   const navItems = [
     {
-      name: 'Home',
+      name: NAVBAR_COPY.navigation.home,
       link: '/',
     },
     {
-      name: 'Courses',
+      name: NAVBAR_COPY.navigation.courses,
       link: '/courses',
     },
     {
-      name: 'Progress',
+      name: NAVBAR_COPY.navigation.progress,
       link: '/progress',
       isAuthRequired: true,
     },
     {
-      name: 'Community (Upcoming)',
+      name: NAVBAR_COPY.navigation.community,
       link: '/threads',
       upcoming: true,
     },
@@ -86,12 +87,12 @@ export function Navbar() {
           <SignedOut>
             <SignInButton mode="modal">
               <Button className="z-50" type="button" variant="secondary">
-                Sign In
+                {NAVBAR_COPY.auth.signIn}
               </Button>
             </SignInButton>
             <SignUpButton mode="modal">
               <Button className="z-50" type="button">
-                Get Started
+                {NAVBAR_COPY.auth.getStarted}
               </Button>
             </SignUpButton>
           </SignedOut>
@@ -101,7 +102,7 @@ export function Navbar() {
               type="button"
             >
               <Ticket className="size-4" />
-              <span className="hidden sm:inline">Feedback 🙏🏻</span>
+              <span className="hidden sm:inline">{NAVBAR_COPY.feedback.desktop}</span>
             </button>
             <div className="ml-2">
               <UserButton
@@ -135,7 +136,7 @@ export function Navbar() {
           ref={mobileMenuRef}
         >
           <nav
-            aria-label="Mobile navigation"
+            aria-label={NAVBAR_COPY.accessibility.mobileNav}
             className=" flex w-full flex-col gap-4"
           >
             {navItems.map((item, idx) => (
@@ -158,7 +159,7 @@ export function Navbar() {
                   onClick={closeMobileMenu}
                   variant="secondary"
                 >
-                  Sign In
+                  {NAVBAR_COPY.auth.signIn}
                 </Button>
               </SignInButton>
               <SignUpButton mode="modal">
@@ -166,19 +167,19 @@ export function Navbar() {
                   className="w-full justify-center"
                   onClick={closeMobileMenu}
                 >
-                  Get Started
+                  {NAVBAR_COPY.auth.getStarted}
                 </Button>
               </SignUpButton>
             </SignedOut>
             <SignedIn>
               <button
-                aria-label="Send feedback"
+                aria-label={NAVBAR_COPY.feedback.ariaLabel}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border-hairline bg-white/5 px-4 py-3 text-text-secondary transition-all duration-150 hover:border-border-strong hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
                 onClick={closeMobileMenu}
                 type="button"
               >
                 <Ticket className="size-4" />
-                Send Feedback
+                {NAVBAR_COPY.feedback.mobile}
               </button>
               <div className="flex justify-center pt-2">
                 <UserButton

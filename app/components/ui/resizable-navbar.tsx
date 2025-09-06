@@ -115,7 +115,7 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
   return (
     // biome-ignore lint/nursery/noNoninteractiveElementInteractions: false positive
     <nav
-      aria-label="Main navigation"
+      aria-label="Navigasi utama"
       className={cn(
         'absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 font-medium text-sm text-text-primary transition duration-150 lg:flex lg:space-x-2',
         className
@@ -254,7 +254,7 @@ export const MobileNavToggle = React.forwardRef<
   return (
     <motion.button
       aria-expanded={isOpen}
-      aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
+      aria-label={isOpen ? 'Tutup menu navigasi' : 'Buka menu navigasi'}
       className="inline-flex size-11 items-center justify-center rounded-full border border-border-hairline bg-white/5 transition-all duration-150 hover:border-border-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 active:translate-y-[1px]"
       onClick={onClick}
       ref={ref}
@@ -275,7 +275,7 @@ MobileNavToggle.displayName = 'MobileNavToggle';
 export const NavbarLogo = () => {
   return (
     <Link
-      aria-label="Go to homepage"
+      aria-label="Kembali ke beranda"
       className="group relative z-20 mr-4 flex items-center space-x-3 rounded-full px-3 py-2 transition-all duration-150 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
       to="/"
     >

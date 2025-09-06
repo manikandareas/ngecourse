@@ -1,10 +1,13 @@
+import { SignInButton } from '@clerk/react-router';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useLocation } from 'react-router';
 import type {
   CourseContentsQueryResult,
   EnrollmentQueryResult,
 } from 'sanity.types';
 import { toast } from 'sonner';
 import { Badge } from '~/components/ui/badge';
+import { Button } from '~/components/ui/button';
 import { HeroVideoDialog } from '~/components/ui/hero-video-dialog';
 import { enrollmentQueryOption } from '~/features/enrollments/hooks/get-enrollment';
 import { usecaseEnrollments } from '~/features/enrollments/usecase';
@@ -21,6 +24,8 @@ type IDetailHero = {
 };
 
 export function DetailHero(props: IDetailHero) {
+  const location = useLocation();
+  console.log(location);
   const queryClient = useQueryClient();
   const thumbnailUrl = props.course?.thumbnail
     ? urlFor(props.course?.thumbnail)?.url()
@@ -110,13 +115,19 @@ export function DetailHero(props: IDetailHero) {
       >
         {props.course.description}
       </p>
-      <DetailCTA
-        course={props.course}
-        enrollment={props.enrollment}
-        isPending={isPending}
-        onEnroll={handleEnroll}
-        thumbnailUrl={thumbnailUrl || ''}
-      />
+      {props.userId ? (
+        <DetailCTA
+          course={props.course}
+          enrollment={props.enrollment}
+          isPending={isPending}
+          onEnroll={handleEnroll}
+          thumbnailUrl={thumbnailUrl || ''}
+        />
+      ) : (
+        <SignInButton fallbackRedirectUrl={location.pathname} mode="modal">
+          <Button>Sign In Untuk Belajar</Button>
+        </SignInButton>
+      )}
       <HeroVideoDialog
         className="mt-8 overflow-hidden rounded-xl border border-hairline"
         videoUrl={props.course.trailer as string}

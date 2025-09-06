@@ -63,7 +63,7 @@ export default function CourseDetailPage(props: Route.ComponentProps) {
   }
 
   return (
-    <div className="relative mx-auto w-full max-w-6xl space-y-36 px-6 py-16 xl:px-0">
+    <div className="relative mx-auto w-full max-w-6xl space-y-36 px-6 py-8 md:py-16 xl:px-0">
       <DetailHero
         course={courseQuery.data}
         enrollment={enrollmentQuery.data as EnrollmentQueryResult}
