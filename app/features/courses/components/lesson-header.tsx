@@ -146,7 +146,7 @@ export const LessonHeader = ({
     return null;
   }
   return (
-    <header className="tinted-blur sticky top-0 z-30 w-full border-hairline border-b px-4 py-3 sm:px-6">
+    <header className="sticky top-0 z-30 w-full border-hairline border-b px-4 py-3 backdrop-blur-md sm:px-6">
       <div className="mx-auto flex w-full items-center justify-between gap-4">
         {/* Left: Structure trigger */}
         <div className="flex min-w-0 flex-1 items-center gap-2">
@@ -159,7 +159,9 @@ export const LessonHeader = ({
             variant={'outline'}
           >
             <ChevronLeft aria-hidden="true" size={16} />
-            <span className="sr-only">{LESSON_COPY.header.backToCourse.label}</span>
+            <span className="sr-only">
+              {LESSON_COPY.header.backToCourse.label}
+            </span>
           </Button>
           <LessonFileTree course={course} enrollment={enrollment}>
             <Button
@@ -169,7 +171,9 @@ export const LessonHeader = ({
               variant="outline"
             >
               <FolderTree aria-hidden="true" size={16} />
-              <span className="ml-2 hidden sm:inline">{LESSON_COPY.header.outline.label}</span>
+              <span className="ml-2 hidden sm:inline">
+                {LESSON_COPY.header.outline.label}
+              </span>
             </Button>
           </LessonFileTree>
         </div>
@@ -180,7 +184,9 @@ export const LessonHeader = ({
             {title}
           </h1>
           <p className="mt-1 hidden truncate text-text-muted text-xs sm:block">
-            {course?.title ? `${LESSON_COPY.progress.courseInfo.replace('{{courseTitle}}', course.title)}` : LESSON_COPY.progress.current}
+            {course?.title
+              ? `${LESSON_COPY.progress.courseInfo.replace('{{courseTitle}}', course.title)}`
+              : LESSON_COPY.progress.current}
           </p>
         </div>
 
@@ -190,7 +196,9 @@ export const LessonHeader = ({
             /* Desktop: Only fullscreen button (chat handled by FAB) */
             <button
               aria-label={
-                isMaximized ? LESSON_COPY.header.fullscreen.exit : LESSON_COPY.header.fullscreen.enter
+                isMaximized
+                  ? LESSON_COPY.header.fullscreen.exit
+                  : LESSON_COPY.header.fullscreen.enter
               }
               className="btn-ghost p-2.5"
               onClick={() => {
@@ -206,7 +214,9 @@ export const LessonHeader = ({
                 <Maximize aria-hidden="true" size={16} />
               )}
               <span className="sr-only">
-                {isMaximized ? LESSON_COPY.header.fullscreen.exitTitle : LESSON_COPY.header.fullscreen.enterTitle}
+                {isMaximized
+                  ? LESSON_COPY.header.fullscreen.exitTitle
+                  : LESSON_COPY.header.fullscreen.enterTitle}
               </span>
             </button>
           ) : (
@@ -219,7 +229,9 @@ export const LessonHeader = ({
                   type="button"
                 >
                   <MoreVertical aria-hidden="true" size={16} />
-                  <span className="sr-only">{LESSON_COPY.header.menu.open}</span>
+                  <span className="sr-only">
+                    {LESSON_COPY.header.menu.open}
+                  </span>
                 </button>
               </PopoverTrigger>
               <PopoverContent
@@ -236,7 +248,9 @@ export const LessonHeader = ({
                       >
                         <Sparkles aria-hidden="true" size={16} />
                         <span className="ml-2">
-                          {isChatOpen ? LESSON_COPY.chat.buttons.close : LESSON_COPY.chat.buttons.open}
+                          {isChatOpen
+                            ? LESSON_COPY.chat.buttons.close
+                            : LESSON_COPY.chat.buttons.open}
                         </span>
                       </button>
 
@@ -259,7 +273,9 @@ export const LessonHeader = ({
                       <Maximize aria-hidden="true" size={16} />
                     )}
                     <span className="ml-2">
-                      {isMaximized ? LESSON_COPY.header.fullscreen.exit : LESSON_COPY.header.fullscreen.enter}
+                      {isMaximized
+                        ? LESSON_COPY.header.fullscreen.exit
+                        : LESSON_COPY.header.fullscreen.enter}
                     </span>
                   </button>
                 </div>

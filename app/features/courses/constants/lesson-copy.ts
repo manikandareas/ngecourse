@@ -10,7 +10,8 @@ export const LESSON_COPY = {
   // Meta Tags
   meta: {
     titleSuffix: '| Genii - Belajar Praktis dengan AI Assistant',
-    fallbackDescription: 'Mengapa belajar sendiri tanpa bantuan? Dapatkan pemahaman mendalam dengan AI assistant yang siap membantu kapan saja!',
+    fallbackDescription:
+      'Mengapa belajar sendiri tanpa bantuan? Dapatkan pemahaman mendalam dengan AI assistant yang siap membantu kapan saja!',
   },
 
   // Loading and Error States
@@ -18,7 +19,8 @@ export const LESSON_COPY = {
     loading: 'Menyiapkan pembelajaran terbaikmu...',
     error: {
       title: 'Ups! Ada kendala teknis',
-      message: 'Jangan khawatir, ini bukan karena kemampuanmu. Mari kita coba lagi dan lanjutkan perjalanan belajarmu!',
+      message:
+        'Jangan khawatir, ini bukan karena kemampuanmu. Mari kita coba lagi dan lanjutkan perjalanan belajarmu!',
       retry: 'Coba Lagi Sekarang',
     },
     chatLoading: 'AI assistant sedang bersiap membantu...',
@@ -45,10 +47,10 @@ export const LESSON_COPY = {
     },
   },
 
-  // AI Chat Interface  
+  // AI Chat Interface
   chat: {
     sideTrigger: {
-      default: 'Butuh Bantuan?',
+      default: 'Butuh Bantuan ?',
       alternative: 'Tanya AI Sekarang',
     },
     window: {
@@ -63,7 +65,8 @@ export const LESSON_COPY = {
       loadingMessage: 'AI sedang menyiapkan jawaban terbaik untukmu...',
       emptyState: {
         title: 'Siap membantu perjalanan belajarmu!',
-        subtitle: 'Tanya apa saja tentang materi ini. Genii akan menjelaskan dengan cara yang mudah dipahami.',
+        subtitle:
+          'Tanya apa saja tentang materi ini. Genii akan menjelaskan dengan cara yang mudah dipahami.',
       },
     },
     buttons: {
@@ -129,8 +132,10 @@ export const LESSON_COPY = {
 
   // Call-to-Action Messages
   cta: {
-    chatHelp: 'Jangan biarkan kebingungan menghambat belajarmu. Tanya AI sekarang!',
-    continueProgress: 'Jangan berhenti di sini! Lanjutkan perjalanan belajarmu.',
+    chatHelp:
+      'Jangan biarkan kebingungan menghambat belajarmu. Tanya AI sekarang!',
+    continueProgress:
+      'Jangan berhenti di sini! Lanjutkan perjalanan belajarmu.',
     completeLesson: 'Selesaikan materi ini dan buktikan kemajuanmu!',
     askForHelp: 'Ada yang tidak jelas? AI assistant siap membantu 24/7!',
   },

@@ -6,7 +6,7 @@ import { useMediaQuery } from 'usehooks-ts';
 import { ChatCloseButton } from '~/components/ui/chat-close-button';
 import { ChatSideTrigger } from '~/components/ui/chat-side-trigger';
 import { Drawer, DrawerContent } from '~/components/ui/drawer';
-import { MarkdownRenderer } from '~/components/ui/markdown-renderer';
+import { PortableTextRenderer } from '~/components/ui/portable-text-renderer';
 import { Separator } from '~/components/ui/separator';
 import {
   ChatWindow,
@@ -79,7 +79,7 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
   });
 
   const { data: chatHistory, isPending: chatHistoryPending } = useChatHistory(
-    props.loaderData.currentSession._id,
+    props.loaderData.currentSession._id as string,
     lesson?._id as string
   );
   // Session and activity tracking
@@ -163,10 +163,8 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
   };
 
   const lessonContent = (
-    <div className="space-y-8">
-      <div className="prose prose-slate dark:prose-invert max-w-none">
-        <MarkdownRenderer content={lesson?.content ?? ''} />
-      </div>
+    <div className="space-y-8 py-12">
+      <PortableTextRenderer value={lesson?.content || []} />
       <Separator className="my-8 border-hairline" />
       <LessonNavigation {...commonProps} />
     </div>
@@ -193,7 +191,7 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
   }
 
   return (
-    <div className="relative w-full ">
+    <div className="relative w-full">
       <LessonHeader
         {...commonProps}
         isChatOpen={isChatOpen}
@@ -217,7 +215,7 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
           }`}
         >
           <main
-            className={'mx-auto w-full max-w-5xl transition-all duration-300'}
+            className={'mx-auto w-full max-w-4xl transition-all duration-300'}
           >
             <article>{lessonContent}</article>
           </main>

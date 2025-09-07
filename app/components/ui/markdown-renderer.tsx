@@ -30,16 +30,18 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
   className,
 }) => {
   return (
-    <div className={cn(
-      'prose prose-slate max-w-none prose-lg',
-      'prose-headings:text-text-primary prose-headings:font-light prose-headings:tracking-tight',
-      'prose-p:text-text-secondary prose-p:leading-8 prose-p:text-lg',
-      'prose-strong:text-text-primary prose-em:text-text-primary',
-      'prose-li:text-text-secondary prose-li:leading-7',
-      'prose-blockquote:text-text-secondary prose-blockquote:border-accent/30',
-      'prose-hr:border-hairline',
-      className
-    )}>
+    <div
+      className={cn(
+        'prose prose-slate prose-lg max-w-none',
+        'prose-headings:font-light prose-headings:text-text-primary prose-headings:tracking-tight',
+        'prose-p:text-lg prose-p:text-text-secondary prose-p:leading-8',
+        'prose-em:text-text-primary prose-strong:text-text-primary',
+        'prose-li:text-text-secondary prose-li:leading-7',
+        'prose-blockquote:border-accent/30 prose-blockquote:text-text-secondary',
+        'prose-hr:border-hairline',
+        className
+      )}
+    >
       <ReactMarkdown
         components={{
           // Code block styling
@@ -51,7 +53,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
             if (!inline && language) {
               return (
                 <div className="relative my-6 overflow-hidden rounded-xl border border-hairline bg-white/3 backdrop-blur-sm">
-                  <div className="border-b border-hairline bg-white/5 px-4 py-2 text-text-muted font-mono text-xs uppercase tracking-wider">
+                  <div className="border-hairline border-b bg-white/5 px-4 py-2 font-mono text-text-muted text-xs uppercase tracking-wider">
                     {language}
                   </div>
                   <SyntaxHighlighter
@@ -77,7 +79,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
             if (inline) {
               return (
                 <code
-                  className="rounded-md bg-white/10 px-2 py-1 text-accent font-mono text-sm border border-hairline"
+                  className="rounded-md border border-hairline bg-white/10 px-2 py-1 font-mono text-accent text-sm"
                   {...props}
                 >
                   {children}
@@ -87,7 +89,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
             return (
               <div className="my-6 overflow-x-auto rounded-xl border border-hairline bg-white/3 p-6 backdrop-blur-sm">
                 <code
-                  className="whitespace-pre-wrap text-text-primary font-mono text-sm leading-6"
+                  className="whitespace-pre-wrap font-mono text-sm text-text-primary leading-6"
                   {...props}
                 >
                   {children}
@@ -100,10 +102,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
           table({ children, ...props }: MarkdownComponentProps) {
             return (
               <div className="my-8 overflow-x-auto rounded-xl border border-hairline bg-white/3 backdrop-blur-sm">
-                <table
-                  className="w-full border-collapse"
-                  {...props}
-                >
+                <table className="w-full border-collapse" {...props}>
                   {children}
                 </table>
               </div>
@@ -112,7 +111,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
           th({ children, ...props }: MarkdownComponentProps) {
             return (
               <th
-                className="border-b border-hairline bg-white/5 px-6 py-4 text-left text-text-primary font-medium"
+                className="border-hairline border-b bg-white/5 px-6 py-4 text-left font-medium text-text-primary"
                 {...props}
               >
                 {children}
@@ -121,7 +120,10 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
           },
           td({ children, ...props }: MarkdownComponentProps) {
             return (
-              <td className="border-b border-hairline px-6 py-4 text-text-secondary" {...props}>
+              <td
+                className="border-hairline border-b px-6 py-4 text-text-secondary"
+                {...props}
+              >
                 {children}
               </td>
             );
@@ -133,14 +135,20 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
           // List styling
           ul({ children, ...props }: MarkdownComponentProps) {
             return (
-              <ul className="list-disc space-y-3 pl-8 marker:text-accent" {...props}>
+              <ul
+                className="list-disc space-y-3 pl-8 marker:text-accent"
+                {...props}
+              >
                 {children}
               </ul>
             );
           },
           ol({ children, ...props }: MarkdownComponentProps) {
             return (
-              <ol className="list-decimal space-y-3 pl-8 marker:text-accent marker:font-medium" {...props}>
+              <ol
+                className="list-decimal space-y-3 pl-8 marker:font-medium marker:text-accent"
+                {...props}
+              >
                 {children}
               </ol>
             );
@@ -156,21 +164,30 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
           // Heading styling
           h1({ children, ...props }: MarkdownComponentProps) {
             return (
-              <h1 className="mt-12 mb-6 text-text-primary font-light text-4xl tracking-tight leading-tight" {...props}>
+              <h1
+                className="mt-12 mb-6 font-light text-4xl text-text-primary leading-tight tracking-tight"
+                {...props}
+              >
                 {children}
               </h1>
             );
           },
           h2({ children, ...props }: MarkdownComponentProps) {
             return (
-              <h2 className="mt-10 mb-5 text-text-primary font-light text-3xl tracking-tight leading-tight" {...props}>
+              <h2
+                className="mt-10 mb-5 font-light text-3xl text-text-primary leading-tight tracking-tight"
+                {...props}
+              >
                 {children}
               </h2>
             );
           },
           h3({ children, ...props }: MarkdownComponentProps) {
             return (
-              <h3 className="mt-8 mb-4 text-text-primary font-medium text-2xl tracking-tight leading-tight" {...props}>
+              <h3
+                className="mt-8 mb-4 font-medium text-2xl text-text-primary leading-tight tracking-tight"
+                {...props}
+              >
                 {children}
               </h3>
             );
@@ -180,7 +197,10 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
           p({ children, ...props }: MarkdownComponentProps) {
             // To avoid hydration errors with nested divs in paragraphs
             return (
-              <div className="paragraph mb-6 text-text-secondary text-lg leading-8" {...props}>
+              <div
+                className="paragraph mb-6 text-lg text-text-secondary leading-8"
+                {...props}
+              >
                 {children}
               </div>
             );
@@ -190,7 +210,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
           blockquote({ children, ...props }: MarkdownComponentProps) {
             return (
               <blockquote
-                className="my-8 rounded-xl border-l-4 border-accent/30 bg-white/3 pl-6 pr-6 py-4 italic text-text-secondary backdrop-blur-sm"
+                className="my-8 rounded-xl border-accent/30 border-l-4 bg-white/3 py-4 pr-6 pl-6 text-text-secondary italic backdrop-blur-sm"
                 {...props}
               >
                 {children}
@@ -207,7 +227,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
             const isExternal = href && /^https?:\/\//.test(href);
             return (
               <a
-                className="inline-flex items-center gap-1 text-accent font-medium underline decoration-accent/30 underline-offset-4 transition-all duration-200 hover:text-accent-alt hover:decoration-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:rounded-sm"
+                className="inline-flex items-center gap-1 font-medium text-accent underline decoration-accent/30 underline-offset-4 transition-all duration-200 hover:text-accent-alt hover:decoration-accent/60 focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
                 href={href}
                 rel={isExternal ? 'noopener noreferrer' : undefined}
                 target={isExternal ? '_blank' : undefined}

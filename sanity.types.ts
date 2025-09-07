@@ -13,6 +13,39 @@
  */
 
 // Source: schema.json
+export type BlockContent = Array<{
+  children?: Array<{
+    marks?: Array<string>;
+    text?: string;
+    _type: "span";
+    _key: string;
+  }>;
+  style?: "normal" | "h1" | "h2" | "h3" | "h4" | "blockquote";
+  listItem?: "bullet" | "number";
+  markDefs?: Array<{
+    href?: string;
+    _type: "link";
+    _key: string;
+  }>;
+  level?: number;
+  _type: "block";
+  _key: string;
+} | {
+  asset?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+  };
+  media?: unknown;
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  _type: "image";
+  _key: string;
+} | {
+  _key: string;
+} & Code>;
+
 export type EmailNotification = {
   _id: string;
   _type: "emailNotification";
@@ -389,7 +422,7 @@ export type Lesson = {
     _key: string;
     [internalGroqTypeReferenceTo]?: "chapter";
   }>;
-  content?: string;
+  content?: BlockContent;
   videoUrl?: string;
 };
 
@@ -559,7 +592,13 @@ export type HslaColor = {
   a?: number;
 };
 
-export type Markdown = string;
+export type Code = {
+  _type: "code";
+  language?: string;
+  filename?: string;
+  code?: string;
+  highlightedLines?: Array<number>;
+};
 
 export type SanityImagePaletteSwatch = {
   _type: "sanity.imagePaletteSwatch";
@@ -679,7 +718,7 @@ export type SanityAssetSourceData = {
   url?: string;
 };
 
-export type AllSanitySchemaTypes = EmailNotification | ChatMessage | ChatSession | UserAchievement | Achievement | LearningSession | Recommendation | Enrollment | QuizAttempt | Quiz | Lesson | Chapter | Course | Topic | User | Color | RgbaColor | HsvaColor | HslaColor | Markdown | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
+export type AllSanitySchemaTypes = BlockContent | EmailNotification | ChatMessage | ChatSession | UserAchievement | Achievement | LearningSession | Recommendation | Enrollment | QuizAttempt | Quiz | Lesson | Chapter | Course | Topic | User | Color | RgbaColor | HsvaColor | HslaColor | Code | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./app/features/achievements/data/index.ts
 // Variable: getUserAchievementsQuery
@@ -1220,7 +1259,7 @@ export type CourseContentsQueryResult = {
       _updatedAt: string;
       title: string | null;
       slug: Slug | null;
-      content: string | null;
+      content: BlockContent | null;
     } | {
       _id: string;
       _type: "quiz";
@@ -1255,7 +1294,7 @@ export type CourseContentsQueryResult = {
 // Query: count(*[_type == "course" && _id == $id][0].chapters[]->contents[])
 export type CountCourseContentsQueryResult = number | null;
 // Variable: lessonQuery
-// Query: *[_type == "lesson" && slug.current == $slug][0]
+// Query: *[_type == "lesson" && slug.current == $slug][0]{    ...,     content[]{    ...,    _type == "image" => {      ...,      asset->    }  }    }
 export type LessonQueryResult = {
   _id: string;
   _type: "lesson";
@@ -1271,7 +1310,59 @@ export type LessonQueryResult = {
     _key: string;
     [internalGroqTypeReferenceTo]?: "chapter";
   }>;
-  content?: string;
+  content: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "normal";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  } | {
+    _key: string;
+    _type: "code";
+    language?: string;
+    filename?: string;
+    code?: string;
+    highlightedLines?: Array<number>;
+  } | {
+    asset: {
+      _id: string;
+      _type: "sanity.imageAsset";
+      _createdAt: string;
+      _updatedAt: string;
+      _rev: string;
+      originalFilename?: string;
+      label?: string;
+      title?: string;
+      description?: string;
+      altText?: string;
+      sha1hash?: string;
+      extension?: string;
+      mimeType?: string;
+      size?: number;
+      assetId?: string;
+      uploadId?: string;
+      path?: string;
+      url?: string;
+      metadata?: SanityImageMetadata;
+      source?: SanityAssetSourceData;
+    } | null;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+    _key: string;
+  }> | null;
   videoUrl?: string;
 } | null;
 // Variable: chapterQuery
@@ -1888,7 +1979,7 @@ declare module "@sanity/client" {
     "*[_type == \"course\" && _id == $id][0]": CourseByIdQueryResult;
     "\n    *[_type == \"course\" && slug.current == $slug][0]{\n      _id,\n      _type,\n      _createdAt,\n      _updatedAt,\n      title,\n      slug,\n      description,\n      price,\n      level,\n      thumbnail,\n      trailer,\n      difficulty,\n      \"chapters\": chapters[]->{\n        _id,\n        _type,\n        _createdAt,\n        _updatedAt,\n        title,\n        slug,\n        description,\n        \"contents\": contents[]->{\n          _id,\n          _type,\n          _createdAt,\n          _updatedAt,\n          title,\n          slug,\n          _type == \"lesson\" => {\n            content\n          },\n          _type == \"quiz\" => {\n            description,\n            questions\n          }\n        }\n      },\n      \"topics\": topics[]->{\n        _id,\n        _type,\n        _createdAt,\n        _updatedAt,\n        title,\n        slug,\n        description,\n        icon,\n        color\n      }\n    }\n  ": CourseContentsQueryResult;
     "\n    count(*[_type == \"course\" && _id == $id][0].chapters[]->contents[])\n  ": CountCourseContentsQueryResult;
-    "*[_type == \"lesson\" && slug.current == $slug][0]": LessonQueryResult;
+    "*[_type == \"lesson\" && slug.current == $slug][0]{\n    ...,\n     content[]{\n    ...,\n    _type == \"image\" => {\n      ...,\n      asset->\n    }\n  }\n    }": LessonQueryResult;
     "*[_type == \"chapter\" && slug.current == $slug][0]{\n    ...,\n      \"contents\": contents[]->{\n          _id,\n          _type,\n          _createdAt,\n          _updatedAt,\n          title,\n          slug,\n        }\n    }": ChapterQueryResult;
     "\n    *[_type == \"enrollment\" &&\n      userEnrolled[0]._ref == $userId &&\n      course[0]->.slug.current == $courseSlug][0]{\n      _id,\n      _type,\n      _rev,\n      _createdAt,\n      _updatedAt,\n      \"userEnrolled\": userEnrolled[0]->,\n      \"course\": course[0]->,\n      \"contentsCompleted\": contentsCompleted[]->{\n        _id,\n        _type,\n        _createdAt,\n        _updatedAt,\n        title,\n        slug,\n      },\n      dateCompleted,\n      percentComplete\n    }\n  ": EnrollmentQueryResult;
     "\n  *[_type == \"user\" && clerkId == $clerkId][0]{\n    _id,\n    username,\n    firstname,\n    lastname,\n    studyStreak,\n    streakStartDate,\n    learningGoals,\n    studyPlan,\n    level,\n    onboardingStatus,\n    analytics\n  }\n": GetUserProgressDataQueryResult;

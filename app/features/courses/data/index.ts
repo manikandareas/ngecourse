@@ -121,7 +121,16 @@ const countCourseContents = async (id: string) => {
 
 const getLessonBySlug = async (slug: string) => {
   const lessonQuery = defineQuery(
-    `*[_type == "lesson" && slug.current == $slug][0]`
+    `*[_type == "lesson" && slug.current == $slug][0]{
+    ...,
+     content[]{
+    ...,
+    _type == "image" => {
+      ...,
+      asset->
+    }
+  }
+    }`
   );
   try {
     return await client.fetch(lessonQuery, { slug });
