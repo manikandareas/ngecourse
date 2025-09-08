@@ -24,7 +24,8 @@
       "routes/sign-in": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/sign-up": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/onboarding": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
-      "routes/recommendation": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
+      "routes/recommendation": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/health": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
     },
     "routes": {
       "root": {
@@ -138,6 +139,13 @@
         "file": "app/routes/recommendation.tsx",
         "path": "/recommendation",
         "config": {}
+      },
+      "routes/health": {
+        "id": "routes/health",
+        "parentId": "root",
+        "file": "app/routes/health.tsx",
+        "path": "/health",
+        "config": {}
       }
     }
   },
@@ -246,6 +254,12 @@
         "parentId": "root",
         "file": "routes/recommendation.tsx",
         "path": "/recommendation"
+      },
+      "routes/health": {
+        "id": "routes/health",
+        "parentId": "root",
+        "file": "routes/health.tsx",
+        "path": "/health"
       }
     },
     "routeDiscovery": {

@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { useMemo } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import dark from 'react-syntax-highlighter/dist/esm/styles/prism/one-dark';
+import dark from 'react-syntax-highlighter/dist/cjs/styles/prism/one-dark';
 import type { BlockContent, Code } from 'sanity.types';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent } from '~/components/ui/card';
@@ -59,7 +59,6 @@ function CodeBlock({ value }: { value: Code }) {
     }
   };
 
-  console.log(value);
   return (
     <div className="group relative my-6">
       <div className="flex items-center justify-between rounded-t-lg bg-gray-800 px-4 py-2">
@@ -128,8 +127,8 @@ function Callout({ type, children }: CalloutProps) {
     warning: {
       icon: AlertCircle,
       className:
-        'border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-100',
-      iconClassName: 'text-amber-600 dark:text-amber-400',
+        'border-yellow-200 bg-yellow-50 text-yellow-900 dark:border-yellow-800 dark:bg-yellow-950 dark:text-yellow-100',
+      iconClassName: 'text-yellow-600 dark:text-yellow-400',
     },
     tip: {
       icon: Lightbulb,
@@ -155,8 +154,8 @@ function Callout({ type, children }: CalloutProps) {
   const Icon = config.icon;
 
   return (
-    <Card className={cn('my-6 border-l-4', config.className)}>
-      <CardContent className="flex gap-3 p-4">
+    <Card className={cn('my-6 max-h-fit border-l-4 py-2', config.className)}>
+      <CardContent className="flex items-center gap-3">
         <Icon className={cn('mt-0.5 h-5 w-5 shrink-0', config.iconClassName)} />
         <div className="flex-1">{children}</div>
       </CardContent>
