@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { useMemo } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import dark from 'react-syntax-highlighter/dist/cjs/styles/prism/one-dark';
+import dark from 'react-syntax-highlighter/dist/cjs/styles/prism/material-oceanic';
 import type { BlockContent, Code } from 'sanity.types';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent } from '~/components/ui/card';
