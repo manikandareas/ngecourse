@@ -9,7 +9,7 @@ export function meta() {
 
 export default function SignUpPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center p-4 cosmic-bg">
+    <div className="cosmic-bg flex min-h-screen items-center justify-center p-4">
       <div className="glass-card w-full max-w-md">
         <SignUp />
       </div>

@@ -2,7 +2,6 @@ import {
   SignedIn,
   SignedOut,
   SignInButton,
-  SignUpButton,
   UserButton,
 } from '@clerk/react-router';
 import { Ticket } from 'lucide-react';
@@ -86,15 +85,15 @@ export function Navbar() {
         <div className="flex items-center gap-3">
           <SignedOut>
             <SignInButton mode="modal">
-              <Button className="z-50" type="button" variant="secondary">
+              <Button className="z-50" type="button">
                 {NAVBAR_COPY.auth.signIn}
               </Button>
             </SignInButton>
-            <SignUpButton mode="modal">
+            {/* <SignUpButton mode="modal">
               <Button className="z-50" type="button">
                 {NAVBAR_COPY.auth.getStarted}
               </Button>
-            </SignUpButton>
+            </SignUpButton> */}
           </SignedOut>
           <SignedIn>
             <button
@@ -102,7 +101,9 @@ export function Navbar() {
               type="button"
             >
               <Ticket className="size-4" />
-              <span className="hidden sm:inline">{NAVBAR_COPY.feedback.desktop}</span>
+              <span className="hidden sm:inline">
+                {NAVBAR_COPY.feedback.desktop}
+              </span>
             </button>
             <div className="ml-2">
               <UserButton
@@ -157,19 +158,18 @@ export function Navbar() {
                 <Button
                   className="w-full justify-center"
                   onClick={closeMobileMenu}
-                  variant="secondary"
                 >
                   {NAVBAR_COPY.auth.signIn}
                 </Button>
               </SignInButton>
-              <SignUpButton mode="modal">
+              {/* <SignUpButton mode="modal">
                 <Button
                   className="w-full justify-center"
                   onClick={closeMobileMenu}
                 >
                   {NAVBAR_COPY.auth.getStarted}
                 </Button>
-              </SignUpButton>
+              </SignUpButton> */}
             </SignedOut>
             <SignedIn>
               <button
