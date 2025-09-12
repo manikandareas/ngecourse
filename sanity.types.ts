@@ -44,7 +44,34 @@ export type BlockContent = Array<{
   _key: string;
 } | {
   _key: string;
-} & Code>;
+} & Code | {
+  type?: "info" | "warning" | "tip" | "quiz" | "important";
+  content?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  _type: "callout";
+  _key: string;
+} | {
+  type?: "praktek" | "teori";
+  label?: string;
+  _type: "badge";
+  _key: string;
+}>;
 
 export type EmailNotification = {
   _id: string;
@@ -1311,6 +1338,11 @@ export type LessonQueryResult = {
     [internalGroqTypeReferenceTo]?: "chapter";
   }>;
   content: Array<{
+    type?: "praktek" | "teori";
+    label?: string;
+    _type: "badge";
+    _key: string;
+  } | {
     children?: Array<{
       marks?: Array<string>;
       text?: string;
@@ -1326,6 +1358,28 @@ export type LessonQueryResult = {
     }>;
     level?: number;
     _type: "block";
+    _key: string;
+  } | {
+    type?: "important" | "info" | "quiz" | "tip" | "warning";
+    content?: Array<{
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?: "normal";
+      listItem?: "bullet" | "number";
+      markDefs?: Array<{
+        href?: string;
+        _type: "link";
+        _key: string;
+      }>;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }>;
+    _type: "callout";
     _key: string;
   } | {
     _key: string;

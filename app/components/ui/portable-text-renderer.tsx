@@ -11,6 +11,7 @@ import {
   HelpCircle,
   Info,
   Lightbulb,
+  Tag,
 } from 'lucide-react';
 import { useMemo } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -160,6 +161,45 @@ function Callout({ type, children }: CalloutProps) {
         <div className="flex-1">{children}</div>
       </CardContent>
     </Card>
+  );
+}
+
+// Badge component for lesson categorization
+interface BadgeProps {
+  type: 'praktek' | 'teori';
+  label?: string;
+}
+
+function Badge({ type, label }: BadgeProps) {
+  const displayLabel = label || type.charAt(0).toUpperCase() + type.slice(1);
+
+  const configs = {
+    praktek: {
+      className:
+        'bg-green-100 text-green-800 border-green-200 dark:bg-green-900 dark:text-green-300 dark:border-green-700',
+      iconClassName: 'text-green-600 dark:text-green-400',
+    },
+    teori: {
+      className:
+        'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:border-blue-700',
+      iconClassName: 'text-blue-600 dark:text-blue-400',
+    },
+  };
+
+  const config = configs[type];
+
+  return (
+    <div className="my-4 flex">
+      <div
+        className={cn(
+          'inline-flex items-center gap-2 rounded-full border px-4 py-2 font-medium text-sm',
+          config.className
+        )}
+      >
+        <Tag className={cn('h-4 w-4', config.iconClassName)} />
+        {displayLabel}
+      </div>
+    </div>
   );
 }
 
@@ -336,6 +376,7 @@ export function PortableTextRenderer({
             <PortableText components={components} value={value.content || []} />
           </Callout>
         ),
+        badge: ({ value }) => <Badge label={value.label} type={value.type} />,
       },
 
       // Handle unknown elements gracefully
