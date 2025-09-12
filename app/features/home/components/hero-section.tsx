@@ -1,3 +1,4 @@
+import { SignedIn, SignedOut, SignInButton } from '@clerk/react-router';
 import {
   BookOpen,
   Brain,
@@ -80,18 +81,35 @@ export default function HeroSection() {
                     className="rounded-[calc(var(--radius-xl)+0.125rem)] border bg-foreground/10 p-0.5"
                     key={1}
                   >
-                    <Button
-                      asChild
-                      className="rounded-xl px-8 text-base"
-                      size="lg"
-                    >
-                      <Link to="#link">
-                        <span className="text-nowrap">Mulai Gratis</span>
-                      </Link>
-                    </Button>
+                    <SignedOut>
+                      <SignInButton
+                        fallbackRedirectUrl="/progress"
+                        mode="modal"
+                        signUpFallbackRedirectUrl="/onboarding"
+                      >
+                        <Button
+                          asChild
+                          className="rounded-xl px-8 text-base"
+                          size="lg"
+                        >
+                          <span className="text-nowrap">Mulai Gratis</span>
+                        </Button>
+                      </SignInButton>
+                    </SignedOut>
+                    <SignedIn>
+                      <Button
+                        asChild
+                        className="rounded-xl px-8 text-base"
+                        size="lg"
+                      >
+                        <Link to={'/progress'}>
+                          <span className="text-nowrap">Progress Saya</span>
+                        </Link>
+                      </Button>
+                    </SignedIn>
                   </div>
-                  <div className="flex gap-2">
-                    <Button
+                  {/* <div className="flex gap-2"> */}
+                  {/* <Button
                       asChild
                       className="h-10.5 rounded-xl px-5 text-base"
                       key={2}
@@ -114,8 +132,8 @@ export default function HeroSection() {
                       <Link to="#link">
                         <span className="text-nowrap">Coba AI Tutor</span>
                       </Link>
-                    </Button>
-                  </div>
+                    </Button> */}
+                  {/* </div> */}
                 </AnimatedGroup>
               </div>
             </div>
