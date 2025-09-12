@@ -203,6 +203,67 @@ function Badge({ type, label }: BadgeProps) {
   );
 }
 
+// Table component for structured data
+interface TableProps {
+  rows: Array<{
+    cells: Array<{
+      content: BlockContent;
+      isHeader?: boolean;
+    }>;
+  }>;
+  caption?: string;
+  components: PortableTextComponents;
+}
+
+function Table({ rows, caption, components }: TableProps) {
+  if (!rows || rows.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="min-w-full divide-y divide-gray-300 border border-gray-200 dark:divide-gray-600 dark:border-gray-700">
+        {caption && (
+          <caption className="mb-2 caption-bottom text-gray-600 text-sm dark:text-gray-400">
+            {caption}
+          </caption>
+        )}
+        <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
+          {rows.map((row, rowIndex) => (
+            <tr
+              className="hover:bg-gray-50 dark:hover:bg-gray-800"
+              key={`row-${rowIndex.toString()}`}
+            >
+              {row.cells.map((cell, cellIndex) => {
+                const CellTag = cell.isHeader ? 'th' : 'td';
+                return (
+                  <CellTag
+                    className={cn(
+                      'px-4 py-3 text-left text-sm',
+                      cell.isHeader
+                        ? 'bg-gray-50 font-semibold text-gray-900 dark:bg-gray-800 dark:text-gray-100'
+                        : 'text-gray-700 dark:text-gray-300'
+                    )}
+                    key={`cell-${rowIndex.toString()}-${cellIndex.toString()}`}
+                    scope={cell.isHeader ? 'col' : undefined}
+                  >
+                    <div className="prose prose-sm dark:prose-invert max-w-none">
+                      <PortableText
+                        components={components}
+                        value={cell.content}
+                      />
+                    </div>
+                  </CellTag>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 // Linkable heading component
 function LinkableHeading({
   level,
@@ -377,6 +438,13 @@ export function PortableTextRenderer({
           </Callout>
         ),
         badge: ({ value }) => <Badge label={value.label} type={value.type} />,
+        table: ({ value }) => (
+          <Table
+            caption={value.caption}
+            components={components}
+            rows={value.rows}
+          />
+        ),
       },
 
       // Handle unknown elements gracefully
