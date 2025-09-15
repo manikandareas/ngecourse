@@ -235,6 +235,11 @@ export const ONBOARDING_COPY = {
       description: 'Langsung to the point, fokus pada aplikasi praktis',
       quote:
         'Efisien! Belajar yang penting-penting saja, langsung bisa dipraktikkan.',
+      exampleMaterial: {
+        topic: 'React useState Hook',
+        content: 'useState berfungsi untuk menyimpan data di komponen. Cara pakai: const [jumlah, setJumlah] = useState(0). Panggil setJumlah(1) untuk mengubah nilai.',
+        highlight: 'Langsung praktek - tanpa teori, fokus ke kode!'
+      }
     },
     {
       id: 'detailed',
@@ -242,6 +247,11 @@ export const ONBOARDING_COPY = {
       description: 'Penjelasan komprehensif dengan teori dan best practices',
       quote:
         'Melalui Pendekatan! Kamu akan paham tidak hanya "how" tapi juga "why" nya.',
+      exampleMaterial: {
+        topic: 'React useState Hook',
+        content: 'useState adalah Hook fundamental yang memungkinkan komponen fungsional mengelola state lokal. Hook ini mengembalikan array: [stateSekarang, fungsiPengubah]. Fungsi pengubah memicu re-render dan mengikuti aturan batching React untuk performa optimal.',
+        highlight: 'Pemahaman lengkap - teori, best practice, dan implikasi performa'
+      }
     },
     {
       id: 'analogy',
@@ -250,15 +260,20 @@ export const ONBOARDING_COPY = {
         'Menggunakan perumpamaan dan cerita untuk memudahkan pemahaman',
       quote:
         'Belajar kreatif! Konsep sulit jadi mudah dengan analogi yang relate-able.',
+      exampleMaterial: {
+        topic: 'React useState Hook',
+        content: 'Bayangkan useState seperti papan tulis ajaib. Kamu menulis sebuah nilai (state saat ini) dan mendapat penghapus sakti (fungsi setter). Ketika kamu menghapus dan menulis ulang, React otomatis menampilkan papan tulis yang sudah diperbarui kepada semua orang yang melihat komponenmu!',
+        highlight: 'Belajar lewat cerita dan analogi yang mudah dipahami'
+      }
     },
-    {
-      id: 'visual',
-      title: 'Visual & Interaktif',
-      description:
-        'Banyak diagram, chart, dan elemen visual untuk pembelajaran optimal',
-      quote:
-        'Visual ! Seeing is believing - kamu akan paham lebih cepat dengan pendekatan ini.',
-    },
+    // {
+    //   id: 'visual',
+    //   title: 'Visual & Interaktif',
+    //   description:
+    //     'Banyak diagram, chart, dan elemen visual untuk pembelajaran optimal',
+    //   quote:
+    //     'Visual ! Seeing is believing - kamu akan paham lebih cepat dengan pendekatan ini.',
+    // },
   ],
 
   // Navigation and Action Buttons
@@ -273,6 +288,8 @@ export const ONBOARDING_COPY = {
   validation: {
     focusRequired:
       'Pilih minimal 1 area fokus untuk memulai perjalanan karirmu',
+    focusTooLong:
+      'Singkat saja, maksimal 3 area fokus agar fokus dan actionable',
     goalRequired:
       'Ceritakan target karirmu agar kami bisa membantu mewujudkannya',
     goalTooLong:

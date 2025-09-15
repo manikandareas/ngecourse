@@ -57,7 +57,9 @@ export async function loader(args: Route.LoaderArgs) {
 const formSchema = z.object({
   learningGoals: z
     .array(z.string())
-    .min(1, ONBOARDING_COPY.validation.focusRequired), // as focus
+    .min(1, ONBOARDING_COPY.validation.focusRequired)
+    .max(3, ONBOARDING_COPY.validation.focusTooLong),
+
   goal: z
     .string()
     .min(1, ONBOARDING_COPY.validation.goalRequired)
@@ -170,7 +172,10 @@ export default function LearningGoalsPage() {
     const values = watchedValues as FormData;
     switch (stepIndex) {
       case 0:
-        return (values.learningGoals?.length ?? 0) > 0;
+        return (
+          (values.learningGoals?.length ?? 0) > 0 &&
+          values.learningGoals.length <= 3
+        );
       case 1:
         return (values.goal?.length ?? 0) > 0 && values.goal.length <= 120;
       case 2:

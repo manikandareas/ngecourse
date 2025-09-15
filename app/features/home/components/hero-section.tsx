@@ -59,7 +59,7 @@ export default function HeroSection() {
                 Susah cari mentor coding? Bingung mulai dari mana? Genii hadir
                 dengan AI tutor yang siap bantu kamu 24/7. Jalur belajar yang
                 disesuaikan sama goals kamu, plus praktek langsung buat
-                portfolio—semua dirancang khusus untuk job market Indonesia.
+                portfolio.
               </TextEffect>
 
               <div className=" mt-12 max-w-md">

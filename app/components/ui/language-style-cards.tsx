@@ -11,12 +11,19 @@ export interface LanguageOption {
   quote: string;
 }
 
+export interface ExampleMaterial {
+  topic: string;
+  content: string;
+  highlight: string;
+}
+
 export interface StyleOption {
   value: string;
   label: string;
   description: string;
   icon: React.ReactNode;
   quote: string;
+  exampleMaterial?: ExampleMaterial;
 }
 
 interface LanguageStyleCardsProps {
@@ -29,12 +36,14 @@ interface LanguageStyleCardsProps {
   className?: string;
 }
 
-const defaultLanguageOptions: LanguageOption[] = ONBOARDING_COPY.languages.map(lang => ({
-  value: lang.id,
-  label: lang.title,
-  icon: <Globe className="h-5 w-5" />,
-  quote: lang.quote,
-}));
+const defaultLanguageOptions: LanguageOption[] = ONBOARDING_COPY.languages.map(
+  (lang) => ({
+    value: lang.id,
+    label: lang.title,
+    icon: <Globe className="h-5 w-5" />,
+    quote: lang.quote,
+  })
+);
 
 const getIconForStyle = (id: string) => {
   switch (id) {
@@ -51,13 +60,15 @@ const getIconForStyle = (id: string) => {
   }
 };
 
-const defaultStyleOptions: StyleOption[] = ONBOARDING_COPY.explanationStyles.map(style => ({
-  value: style.id,
-  label: style.title,
-  description: style.description,
-  icon: getIconForStyle(style.id),
-  quote: style.quote,
-}));
+const defaultStyleOptions: StyleOption[] =
+  ONBOARDING_COPY.explanationStyles.map((style) => ({
+    value: style.id,
+    label: style.title,
+    description: style.description,
+    icon: getIconForStyle(style.id),
+    quote: style.quote,
+    exampleMaterial: style.exampleMaterial,
+  }));
 
 export function LanguageStyleCards({
   languageOptions = defaultLanguageOptions,
@@ -70,6 +81,8 @@ export function LanguageStyleCards({
 }: LanguageStyleCardsProps) {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [showQuote, setShowQuote] = useState<string | null>(null);
+  const [showExampleMaterial, setShowExampleMaterial] =
+    useState<ExampleMaterial | null>(null);
 
   const handleLanguageClick = (value: string) => {
     if (selectedLanguage === value) return;
@@ -91,6 +104,9 @@ export function LanguageStyleCards({
     if (selectedOption?.quote) {
       setShowQuote(selectedOption.quote);
     }
+    if (selectedOption?.exampleMaterial) {
+      setShowExampleMaterial(selectedOption.exampleMaterial);
+    }
   };
 
   return (
@@ -106,6 +122,88 @@ export function LanguageStyleCards({
             transition={{ duration: 0.3 }}
           >
             <p className="text-sm italic">{showQuote}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Chat bubble for example material */}
+      <AnimatePresence>
+        {showExampleMaterial && (
+          <motion.div
+            animate={{ opacity: 1, x: 0, y: 0 }}
+            className="fixed right-4 bottom-4 left-4 z-50 max-w-sm sm:right-6 sm:bottom-6 sm:left-auto sm:max-w-md"
+            exit={{ opacity: 0, x: 20, y: 10 }}
+            initial={{ opacity: 0, x: 20, y: 10 }}
+            transition={{
+              duration: 0.5,
+              type: 'spring',
+              stiffness: 300,
+              damping: 25,
+            }}
+          >
+            {/* Chat bubble container */}
+            <div className="relative rounded-2xl border border-border bg-card p-4 shadow-xl backdrop-blur-sm">
+              {/* Chat bubble tail */}
+              <div className="-bottom-2 absolute left-8 h-4 w-4 rotate-45 border-border border-r border-b bg-card sm:right-8 sm:left-auto" />
+
+              {/* Avatar and header */}
+              <div className="mb-3 flex items-center gap-3">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent">
+                  <svg
+                    className="h-4 w-4 text-accent-foreground"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <title>Learning Assistant</title>
+                    <path d="M10 2L13 8h6l-5 4 2 6-6-4-6 4 2-6-5-4h6l3-6z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-medium text-muted-foreground text-xs">
+                    Contoh Pembelajaran
+                  </p>
+                  <h4 className="font-semibold text-foreground text-sm">
+                    {showExampleMaterial.topic}
+                  </h4>
+                </div>
+
+                {/* Close button */}
+                <button
+                  aria-label="Tutup contoh"
+                  className="ml-auto rounded-full p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  onClick={() => setShowExampleMaterial(null)}
+                  type="button"
+                >
+                  <svg
+                    className="h-4 w-4"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <title>Close</title>
+                    <path
+                      clipRule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      fillRule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="space-y-3">
+                <div className="rounded-lg bg-muted/50 p-3">
+                  <p className="text-foreground text-sm leading-relaxed">
+                    {showExampleMaterial.content}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className="inline-flex items-center rounded-full bg-accent px-2 py-1 font-medium text-accent-foreground text-xs">
+                    ✨ {showExampleMaterial.highlight}
+                  </div>
+                </div>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

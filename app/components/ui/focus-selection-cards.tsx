@@ -10,6 +10,7 @@ import {
   Smartphone,
 } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { ONBOARDING_COPY } from '~/features/shared/constants/onboarding-copy';
 import { cn } from '~/lib/utils';
 
@@ -27,6 +28,7 @@ interface FocusSelectionCardsProps {
   selectedValues?: string[];
   onValueChange?: (values: string[]) => void;
   className?: string;
+  maxSelection?: number;
 }
 
 const getIconForFocusArea = (id: string) => {
@@ -52,23 +54,32 @@ const getIconForFocusArea = (id: string) => {
   }
 };
 
-const defaultFocusAreas: FocusArea[] = ONBOARDING_COPY.focusAreas.map(area => ({
-  ...area,
-  icon: getIconForFocusArea(area.id),
-  category: area.id.includes('development') ? 'Development' : 
-            area.id.includes('design') ? 'Design' :
-            area.id.includes('data') ? 'Analytics' :
-            area.id.includes('ai') ? 'AI/ML' :
-            area.id.includes('security') ? 'Security' :
-            area.id.includes('cloud') || area.id.includes('devops') ? 'Infrastructure' :
-            'Technology'
-}));
+const defaultFocusAreas: FocusArea[] = ONBOARDING_COPY.focusAreas.map(
+  (area) => ({
+    ...area,
+    icon: getIconForFocusArea(area.id),
+    category: area.id.includes('development')
+      ? 'Development'
+      : area.id.includes('design')
+        ? 'Design'
+        : area.id.includes('data')
+          ? 'Analytics'
+          : area.id.includes('ai')
+            ? 'AI/ML'
+            : area.id.includes('security')
+              ? 'Security'
+              : area.id.includes('cloud') || area.id.includes('devops')
+                ? 'Infrastructure'
+                : 'Technology',
+  })
+);
 
 export function FocusSelectionCards({
   areas = defaultFocusAreas,
   selectedValues = [],
   onValueChange,
   className,
+  maxSelection = 3,
 }: FocusSelectionCardsProps) {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [showQuote, setShowQuote] = useState<string | null>(null);
@@ -82,7 +93,16 @@ export function FocusSelectionCards({
       newSelectedValues.splice(index, 1);
     } else {
       // Add if not selected
+      if (newSelectedValues.length >= maxSelection) {
+        toast.error('Aduh, pilih area fokus maksimal 3 ya!');
+        return;
+      }
+
       newSelectedValues.push(areaId);
+    }
+
+    if (newSelectedValues.length > maxSelection) {
+      newSelectedValues.pop();
     }
 
     onValueChange?.(newSelectedValues);

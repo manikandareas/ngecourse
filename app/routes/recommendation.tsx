@@ -89,7 +89,7 @@ export default function RecommendationPage(props: Route.ComponentProps) {
   );
 
   const handleSkip = () => {
-    navigate('/');
+    navigate('/courses');
   };
 
   const handleBrowseCourses = () => {
