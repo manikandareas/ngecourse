@@ -12,19 +12,143 @@ import {
   Info,
   Lightbulb,
   Tag,
+  Zap,
 } from 'lucide-react';
-import { useMemo } from 'react';
+import { type KeyboardEvent, useContext, useMemo } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import dark from 'react-syntax-highlighter/dist/cjs/styles/prism/material-oceanic';
+import dark from 'react-syntax-highlighter/dist/cjs/styles/prism/dracula';
 import type { BlockContent, Code } from 'sanity.types';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent } from '~/components/ui/card';
+import { SectionAskContext } from '~/features/ai-ask/context/ask-context';
 import { urlFor } from '~/lib/sanity-client';
 import { cn } from '~/lib/utils';
 
 interface PortableTextRendererProps {
   value: BlockContent;
   className?: string;
+  lessonId?: string;
+}
+
+const HEADING_STYLES = new Set(['h1', 'h2', 'h3', 'h4']);
+const MAX_SECTION_CONTEXT_CHARS = 1500;
+
+type PortableBlock = BlockContent[number];
+
+function isHeadingBlock(block: PortableBlock): block is Extract<PortableBlock, { _type: 'block' }> {
+  return (
+    typeof block === 'object' &&
+    block !== null &&
+    block._type === 'block' &&
+    typeof block.style === 'string' &&
+    HEADING_STYLES.has(block.style)
+  );
+}
+
+function blocksToPlainText(
+  blocks: PortableBlock[] | undefined
+): string {
+  if (!blocks || blocks.length === 0) {
+    return '';
+  }
+
+  const plain = toPlainText(blocks as Parameters<typeof toPlainText>[0]);
+  return plain.trim();
+}
+
+function blockToContextString(block: PortableBlock): string | null {
+  if (!block) return null;
+
+  switch (block._type) {
+    case 'block': {
+      const text = blocksToPlainText([block]);
+      return text.length ? text : null;
+    }
+    case 'code': {
+      if (!block.code) return null;
+      const languageLabel = block.language ? ` (${block.language})` : '';
+      return `Kode contoh${languageLabel}:\n${block.code}`;
+    }
+    case 'callout': {
+      const contentText = blocksToPlainText(block.content as PortableBlock[] | undefined);
+      if (!contentText) return null;
+      const typeLabel = block.type ? block.type.toUpperCase() : 'CATATAN';
+      return `Catatan ${typeLabel}: ${contentText}`;
+    }
+    case 'badge': {
+      const details = [block.type, block.label].filter(Boolean).join(' - ');
+      return details ? `Badge: ${details}` : null;
+    }
+    case 'table': {
+      const rows = block.rows
+        ?.map((row) =>
+          row.cells
+            ?.map((cell) => blocksToPlainText(cell.content as PortableBlock[] | undefined))
+            .filter(Boolean)
+            .join(' | ')
+        )
+        .filter(Boolean)
+        .join('\n');
+      return rows ? `Tabel:\n${rows}` : null;
+    }
+    case 'image': {
+      const altText = (block as { alt?: string }).alt;
+      return altText ? `Gambar: ${altText}` : null;
+    }
+    default:
+      return null;
+  }
+}
+
+function buildSectionContentMap(blocks: BlockContent): Record<string, string> {
+  if (!Array.isArray(blocks)) {
+    return {};
+  }
+
+  const contentMap: Record<string, string> = {};
+  let activeKey: string | null = null;
+  let activeContent: string[] = [];
+
+  const flushActive = () => {
+    if (!activeKey) return;
+    const text = activeContent.join('\n\n').trim();
+    if (!text) return;
+    const truncated =
+      text.length > MAX_SECTION_CONTEXT_CHARS
+        ? `${text.slice(0, MAX_SECTION_CONTEXT_CHARS)}...`
+        : text;
+    contentMap[activeKey] = truncated;
+  };
+
+  for (const block of blocks) {
+    if (!block || typeof block !== 'object') {
+      continue;
+    }
+
+    if (isHeadingBlock(block)) {
+      if (activeKey) {
+        flushActive();
+      }
+      activeKey = block._key;
+      activeContent = [];
+      continue;
+    }
+
+    if (!activeKey) {
+      continue;
+    }
+
+    const text = blockToContextString(block);
+    if (text) {
+      activeContent.push(text);
+    }
+  }
+
+  if (activeKey) {
+    flushActive();
+  }
+
+  return contentMap;
 }
 
 // Utility function to slugify text for anchor links
@@ -269,11 +393,16 @@ function LinkableHeading({
   level,
   children,
   value,
+  lessonId,
+  sectionContent,
 }: {
   level: 1 | 2 | 3 | 4;
   children: React.ReactNode;
   value: unknown;
+  lessonId?: string;
+  sectionContent?: string;
 }) {
+  const askContext = useContext(SectionAskContext);
   const slug = slugify(toPlainText(value as Parameters<typeof toPlainText>[0]));
   const HeadingTag = `h${level}` as const;
 
@@ -284,20 +413,114 @@ function LinkableHeading({
     4: 'text-xl font-medium text-gray-900 dark:text-gray-100 mb-2 mt-4',
   };
 
-  return (
-    <HeadingTag
-      className={cn(headingClasses[level], 'group scroll-mt-24')}
-      id={slug}
-    >
+  const block = value as { _key?: string } | undefined;
+  const blockKey = block?._key;
+  const title = toPlainText(value as Parameters<typeof toPlainText>[0]);
+  const isActive = askContext?.context?.sectionKey === blockKey;
+  const hasHistory = blockKey ? askContext?.hasHistory(blockKey) : false;
+
+  const handleHeadingAsk = () => {
+    if (!(lessonId && blockKey && askContext)) return;
+
+    askContext.setContext({
+      lessonId,
+      sectionKey: blockKey,
+      title,
+      content: sectionContent?.trim() ? sectionContent.trim() : undefined,
+    });
+  };
+
+  const handleHistoryOpen = () => {
+    if (!(lessonId && blockKey && askContext)) return;
+
+    askContext.openHistory({
+      lessonId,
+      sectionKey: blockKey,
+      title,
+    });
+  };
+
+  const buttonColorClass = isActive
+    ? 'text-green-500 hover:text-green-400'
+    : 'text-muted-foreground hover:text-green-500';
+
+  const iconFillClass = isActive ? 'fill-green-500 text-green-500' : undefined;
+
+  const iconHoverClass = isActive
+    ? 'group-hover/h1:fill-green-500 group-hover/h1:text-green-500'
+    : hasHistory
+      ? 'group-hover/h1:fill-amber-500 group-hover/h1:text-amber-500'
+      : 'group-hover/h1:fill-green-500 group-hover/h1:text-green-500';
+
+  const handleHeadingKeyDown = (event: KeyboardEvent<HTMLHeadingElement>) => {
+    if (!hasHistory) return;
+
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleHistoryOpen();
+    }
+  };
+
+  const headingContent = hasHistory ? (
+    <span className="after:-z-10 relative inline-block px-1 after:absolute after:inset-x-0 after:bottom-1 after:h-2 after:rounded-sm after:bg-amber-200/70 after:transition-colors after:duration-200 after:content-[''] group-hover/h1:after:bg-amber-300/80 dark:after:bg-amber-500/30">
       {children}
-      <a
-        aria-label={`Link to ${toPlainText(value as Parameters<typeof toPlainText>[0])}`}
-        className="ml-2 text-gray-400 no-underline opacity-0 transition-opacity hover:text-gray-600 group-hover:opacity-100 dark:hover:text-gray-300"
-        href={`#${slug}`}
+    </span>
+  ) : (
+    children
+  );
+
+  return (
+    <div className="group/h1 relative">
+      {!hasHistory && (
+        <Button
+          aria-pressed={isActive}
+          className={cn(
+            '-left-12 absolute top-0 opacity-0 transition-colors group-hover/h1:opacity-100',
+            isActive ? 'opacity-100' : 'opacity-0',
+            buttonColorClass
+          )}
+          disabled={!(askContext && lessonId)}
+          onClick={handleHeadingAsk}
+          size={'icon'}
+          type="button"
+          variant={'ghost'}
+        >
+          <Zap
+            className={cn(
+              'transition-colors ease-in-out',
+              iconHoverClass,
+              iconFillClass
+            )}
+            size={16}
+          />
+        </Button>
+      )}
+      <HeadingTag
+        className={cn(
+          headingClasses[level],
+          'group scroll-mt-24',
+          hasHistory &&
+            'hover:-translate-y-0.5 w-fit cursor-pointer rounded-md transition-transform duration-200 focus-visible:outline-2 focus-visible:outline-amber-400 focus-visible:outline-offset-2 dark:focus-visible:outline-amber-300'
+        )}
+        id={slug}
+        onClick={() => (hasHistory ? handleHistoryOpen() : null)}
+        onKeyDown={handleHeadingKeyDown}
+        tabIndex={hasHistory ? 0 : undefined}
       >
-        #
-      </a>
-    </HeadingTag>
+        {headingContent}
+        <a
+          aria-label={`Link to ${toPlainText(value as Parameters<typeof toPlainText>[0])}`}
+          className={cn(
+            'z-50 ml-2 text-gray-400 no-underline opacity-0 transition-opacity hover:text-gray-600 group-hover:opacity-100 dark:hover:text-gray-300',
+            hasHistory &&
+              'text-amber-400 hover:text-amber-500 dark:text-amber-300 dark:hover:text-amber-200'
+          )}
+          href={`#${slug}`}
+        >
+          #
+        </a>
+      </HeadingTag>
+    </div>
   );
 }
 
@@ -344,27 +567,55 @@ function EnhancedImage({
 export function PortableTextRenderer({
   value,
   className,
+  lessonId,
 }: PortableTextRendererProps) {
-  const components: PortableTextComponents = useMemo(
-    () => ({
+  const sectionContentMap = useMemo(() => buildSectionContentMap(value), [value]);
+
+  const components: PortableTextComponents = useMemo(() => {
+    const getSectionContent = (blockValue: unknown) => {
+      const key = (blockValue as { _key?: string })?._key;
+      return key ? sectionContentMap[key] : undefined;
+    };
+
+    const components: PortableTextComponents = {
       block: {
         h1: ({ children, value }) => (
-          <LinkableHeading level={1} value={value}>
+          <LinkableHeading
+            lessonId={lessonId}
+            level={1}
+            sectionContent={getSectionContent(value)}
+            value={value}
+          >
             {children}
           </LinkableHeading>
         ),
         h2: ({ children, value }) => (
-          <LinkableHeading level={2} value={value}>
+          <LinkableHeading
+            lessonId={lessonId}
+            level={2}
+            sectionContent={getSectionContent(value)}
+            value={value}
+          >
             {children}
           </LinkableHeading>
         ),
         h3: ({ children, value }) => (
-          <LinkableHeading level={3} value={value}>
+          <LinkableHeading
+            lessonId={lessonId}
+            level={3}
+            sectionContent={getSectionContent(value)}
+            value={value}
+          >
             {children}
           </LinkableHeading>
         ),
         h4: ({ children, value }) => (
-          <LinkableHeading level={4} value={value}>
+          <LinkableHeading
+            lessonId={lessonId}
+            level={4}
+            sectionContent={getSectionContent(value)}
+            value={value}
+          >
             {children}
           </LinkableHeading>
         ),
@@ -455,9 +706,10 @@ export function PortableTextRenderer({
           </p>
         </div>
       ),
-    }),
-    []
-  );
+    };
+
+    return components;
+  }, [lessonId, sectionContentMap]);
 
   return (
     <div

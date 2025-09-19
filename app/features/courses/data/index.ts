@@ -2,7 +2,8 @@ import { defineQuery } from 'groq';
 import { client } from '~/lib/sanity-client';
 
 const getCourses = async () => {
-  const coursesQuery = defineQuery(`*[_type == "course"]{
+  const coursesQuery =
+    defineQuery(`*[_type == "course"] | order(featured asc, _createdAt desc){
     ...,
     "slug": slug.current,
     "topics": topics[]->

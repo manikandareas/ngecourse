@@ -1,20 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useMemo, useState } from 'react';
-import { useLocation, useNavigation } from 'react-router';
-import type { ChatMessage } from 'sanity.types';
-import { useMediaQuery } from 'usehooks-ts';
-import { ChatCloseButton } from '~/components/ui/chat-close-button';
-import { ChatSideTrigger } from '~/components/ui/chat-side-trigger';
-import { Drawer, DrawerContent } from '~/components/ui/drawer';
+import { useEffect } from 'react';
+import type { BlockContent } from 'sanity.types';
 import { PortableTextRenderer } from '~/components/ui/portable-text-renderer';
 import { Separator } from '~/components/ui/separator';
-import {
-  ChatWindow,
-  toUIMessage,
-} from '~/features/ai-chat/components/chat-window';
-import { useChatHistory } from '~/features/ai-chat/hooks/get-chat-history';
+import { SectionAskProvider } from '~/features/ai-ask/context/ask-context';
 import { LessonHeader } from '~/features/courses/components/lesson-header';
 import { LessonNavigation } from '~/features/courses/components/lesson-navigation';
+import { SectionAwareAsk } from '~/features/courses/components/section-aware-ask';
 import { LESSON_COPY } from '~/features/courses/constants/lesson-copy';
 import { dataCourses } from '~/features/courses/data';
 import { dataEnrollment } from '~/features/enrollments/data';
@@ -51,37 +43,18 @@ export async function loader(args: Route.LoaderArgs) {
 }
 
 export default function LessonDetailPage(props: Route.ComponentProps) {
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const isDesktop = useMediaQuery('(min-width: 1024px)');
-  const navigation = useNavigation();
-  const location = useLocation();
   const { startSession, endSession, startActivity } = useEventTracking();
-
-  useEffect(() => {
-    if (navigation.state === 'loading' && isChatOpen) {
-      setIsChatOpen(false);
-    }
-  }, [navigation.state, isChatOpen]);
-
-  useEffect(() => {
-    setIsChatOpen(false);
-  }, [location.pathname]);
 
   const {
     data: lesson,
     isPending,
     isError,
-    error,
   } = useQuery({
     queryKey: ['lesson', props.loaderData.lesson.slug],
     queryFn: () => dataCourses.getLessonBySlug(props.params.lessonSlug),
     initialData: props.loaderData.lesson,
   });
 
-  const { data: chatHistory, isPending: chatHistoryPending } = useChatHistory(
-    props.loaderData.currentSession._id as string,
-    lesson?._id as string
-  );
   // Session and activity tracking
   useEffect(() => {
     let sessionStarted = false;
@@ -131,40 +104,17 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
     };
   }, [startActivity]);
 
-  // Focus management for chat
-  useEffect(() => {
-    if (isChatOpen && !chatHistoryPending) {
-      // Small delay to ensure chat window is rendered
-      const focusTimer = setTimeout(() => {
-        const chatInput = document.querySelector(
-          '[data-chat-input]'
-        ) as HTMLTextAreaElement;
-        if (chatInput) {
-          chatInput.focus();
-        }
-      }, 150);
-
-      return () => clearTimeout(focusTimer);
-    }
-  }, [isChatOpen, chatHistoryPending]);
-
-  const toggleChat = () => setIsChatOpen(!isChatOpen);
-
-  const chatMessages = useMemo(() => {
-    return (
-      chatHistory?.map((msg) => toUIMessage(msg as unknown as ChatMessage)) ||
-      []
-    );
-  }, [chatHistory]);
-
   const commonProps = {
     courseSlug: props.params.slug,
-    userId: props.loaderData.currentSession._id,
+    userId: props.loaderData.currentSession._id || '',
   };
 
   const lessonContent = (
     <div className="space-y-8 py-12">
-      <PortableTextRenderer value={lesson?.content || []} />
+      <PortableTextRenderer
+        lessonId={lesson?._id}
+        value={(lesson?.content as BlockContent) || []}
+      />
       <Separator className="my-8 border-hairline" />
       <LessonNavigation {...commonProps} />
     </div>
@@ -191,111 +141,16 @@ export default function LessonDetailPage(props: Route.ComponentProps) {
   }
 
   return (
-    <div className="relative w-full">
-      <LessonHeader
-        {...commonProps}
-        isChatOpen={isChatOpen}
-        onChatToggle={toggleChat}
-        title={lesson.title || 'Lesson Title'}
-      />
+    <SectionAskProvider>
+      <div className="relative w-full">
+        <SectionAwareAsk lessonId={lesson._id} />
 
-      {/* Desktop Chat Trigger */}
-      {isDesktop && (
-        <ChatSideTrigger
-          isOpen={isChatOpen}
-          onClick={toggleChat}
-          text={LESSON_COPY.chat.sideTrigger.default}
-        />
-      )}
+        <LessonHeader {...commonProps} title={lesson.title || 'Lesson Title'} />
 
-      {isDesktop ? (
-        <div
-          className={`grid gap-6 px-4 transition-all duration-300 sm:px-6 ${
-            isChatOpen ? 'grid-cols-[2fr_1fr]' : 'grid-cols-1'
-          }`}
-        >
-          <main
-            className={'mx-auto w-full max-w-4xl transition-all duration-300'}
-          >
-            <article>{lessonContent}</article>
-          </main>
-
-          {isChatOpen && !chatHistoryPending && (
-            <aside className="slide-in-from-right-full relative max-w-2xl animate-in duration-300">
-              {/* Close Button positioned outside chat */}
-              <ChatCloseButton isOpen={isChatOpen} onClick={toggleChat} />
-              <div className="sticky top-4 h-[calc(100vh-4rem-1rem)] overflow-hidden rounded-r-2xl border-hairline border-l bg-background">
-                <ChatWindow
-                  chatHistory={chatMessages}
-                  lessonId={lesson._id}
-                  variant="desktop"
-                />
-              </div>
-            </aside>
-          )}
-        </div>
-      ) : (
-        <>
-          <main className="mx-auto max-w-4xl px-4 sm:px-6">
-            <article className="glass-card">{lessonContent}</article>
-          </main>
-
-          {isChatOpen && (
-            <Drawer onOpenChange={setIsChatOpen} open={isChatOpen}>
-              <DrawerContent className="h-[100vh] max-h-[100vh] border-strong border-t bg-background/95 backdrop-blur-xl">
-                {chatHistoryPending ? (
-                  <div className="flex h-full items-center justify-center p-4">
-                    <div className="text-center">
-                      <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
-                      <p className="text-text-secondary">
-                        {LESSON_COPY.states.chatLoading}
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex h-full flex-col p-4">
-                    {/* Mobile Chat Header */}
-                    <div className="mb-4 flex items-center justify-between border-hairline border-b pb-4">
-                      <h2 className="font-semibold text-lg text-text-primary">
-                        {LESSON_COPY.chat.window.mobileHeader}
-                      </h2>
-                      <button
-                        aria-label={LESSON_COPY.accessibility.chatClose}
-                        className="btn-ghost p-2"
-                        onClick={() => setIsChatOpen(false)}
-                        type="button"
-                      >
-                        <svg
-                          className="h-5 w-5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <title>Close</title>
-                          <path
-                            d="M6 18L18 6M6 6l12 12"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                    <div className="flex-1 overflow-hidden">
-                      <ChatWindow
-                        chatHistory={chatMessages}
-                        lessonId={lesson._id}
-                        onClose={() => setIsChatOpen(false)}
-                        variant="mobile"
-                      />
-                    </div>
-                  </div>
-                )}
-              </DrawerContent>
-            </Drawer>
-          )}
-        </>
-      )}
-    </div>
+        <main className="mx-auto max-w-4xl px-4 sm:px-6">
+          <article className="glass-card">{lessonContent}</article>
+        </main>
+      </div>
+    </SectionAskProvider>
   );
 }

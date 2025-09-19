@@ -1,8 +1,10 @@
-import { Clock, Loader2, Users } from 'lucide-react';
+import { Clock, GlobeIcon, Loader2, Star, Users } from 'lucide-react';
 import { Link } from 'react-router';
 import type { CoursesQueryResult, Topic } from 'sanity.types';
+import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { urlFor } from '~/lib/sanity-client';
+import { cn } from '~/lib/utils';
 import { CourseBadge } from './course-badge';
 import DetailEnrollDialog from './detail-enroll-dialog';
 
@@ -32,7 +34,18 @@ export const CourseCard = (props: CourseCardProps) => {
           />
 
           {/* Difficulty Badge - Floating */}
-          <div className="absolute top-3 left-3 z-20">
+          <div className="absolute top-3 left-3 z-20 flex items-center gap-2">
+            {props.featured && (
+              <Badge
+                className={cn(
+                  'flex items-center gap-1.5 px-2.5 py-1 font-medium text-xs shadow-sm backdrop-blur-sm'
+                )}
+                variant={'secondary'}
+              >
+                <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
+                Featured
+              </Badge>
+            )}
             <CourseBadge difficulty={props.difficulty || 'beginner'} />
           </div>
         </div>

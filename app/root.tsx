@@ -1,4 +1,4 @@
-import { ClerkProvider } from '@clerk/react-router';
+import { ClerkProvider, useAuth } from '@clerk/react-router';
 import { getAuth, rootAuthLoader } from '@clerk/react-router/ssr.server';
 import {
   isRouteErrorResponse,
@@ -12,13 +12,41 @@ import {
 } from 'react-router';
 import type { Route } from './+types/root';
 import './app.css';
+import { ConvexQueryClient } from '@convex-dev/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import { ConvexReactClient } from 'convex/react';
+import { ConvexProviderWithClerk } from 'convex/react-clerk';
 import { useState } from 'react';
 import { ErrorFallback } from './components/ui/error-fallback';
 import { Toaster } from './components/ui/sonner';
 import { usecaseUser } from './features/users/usecase';
-import ReactQueryProvider from './lib/react-query';
+
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+const VITE_CONVEX_URL = import.meta.env.VITE_CONVEX_URL;
+
+if (!PUBLISHABLE_KEY) {
+  throw new Error('Missing Clerk publishable key');
+}
+
+if (!VITE_CONVEX_URL) {
+  throw new Error('Missing Convex URL');
+}
+const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
+
+const convexQueryClient = new ConvexQueryClient(convex);
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      queryKeyHashFn: convexQueryClient.hashFn(),
+      queryFn: convexQueryClient.queryFn(),
+    },
+  },
+});
+
+convexQueryClient.connect(queryClient);
 
 export async function loader(args: Route.LoaderArgs) {
   return await rootAuthLoader(args);
@@ -82,17 +110,21 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App({ loaderData }: Route.ComponentProps) {
   return (
-    <ReactQueryProvider>
-      <ClerkProvider
-        loaderData={loaderData}
-        signInFallbackRedirectUrl={'/'}
-        signUpFallbackRedirectUrl={'/onboarding'}
-      >
-        <Outlet />
-        <Analytics />
-        <SpeedInsights />
-      </ClerkProvider>
-    </ReactQueryProvider>
+    <ClerkProvider
+      afterSignOutUrl={'/'}
+      loaderData={loaderData}
+      publishableKey={PUBLISHABLE_KEY}
+      signInFallbackRedirectUrl={'/progress'}
+      signUpFallbackRedirectUrl={'/onboarding'}
+    >
+      <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
+        <QueryClientProvider client={queryClient}>
+          <Outlet />
+          <Analytics />
+          <SpeedInsights />
+        </QueryClientProvider>
+      </ConvexProviderWithClerk>
+    </ClerkProvider>
   );
 }
 
