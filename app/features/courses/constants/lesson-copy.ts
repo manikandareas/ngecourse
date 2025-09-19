@@ -53,22 +53,6 @@ export const LESSON_COPY = {
       default: 'Butuh Bantuan ?',
       alternative: 'Tanya AI Sekarang',
     },
-    window: {
-      mobileHeader: 'Tanya Genii',
-      closeButton: 'Tutup Chat',
-      suggestions: [
-        'Bisakah dijelaskan dengan analogi yang mudah dipahami?',
-        'Bagaimana cara menerapkan ini di proyek nyata?',
-        'Boleh kasih contoh kode yang lebih detail?',
-      ],
-      searchButton: 'Cari Referensi',
-      loadingMessage: 'AI sedang menyiapkan jawaban terbaik untukmu...',
-      emptyState: {
-        title: 'Siap membantu perjalanan belajarmu!',
-        subtitle:
-          'Tanya apa saja tentang materi ini. Genii akan menjelaskan dengan cara yang mudah dipahami.',
-      },
-    },
     buttons: {
       open: 'Tanya Genii',
       close: 'Tutup Chat',

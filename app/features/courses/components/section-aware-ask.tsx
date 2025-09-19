@@ -1,158 +1,97 @@
-import { useAuth } from '@clerk/react-router';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-
-import { AIResponseDialog } from '~/components/ai-elements/ai-response-dialog';
+import { api } from 'convex/_generated/api';
+import { useQuery } from 'convex/react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AskContextChip } from '~/components/ai-elements/context-chip';
 import { FloatingBar } from '~/components/ai-elements/floating-input';
+import { AIResponseDialog } from '~/features/ai-ask/components/ai-response-dialog';
 import { useSectionAsk } from '~/features/ai-ask/context/ask-context';
+import { useCreateThread } from '~/features/ai-ask/hooks/use-create-thread';
 
 interface SectionAwareAskProps {
   lessonId: string;
 }
 
-const FALLBACK_ENDPOINT = 'http://localhost:4000/api/agent/ask';
-const SSE_DONE_TOKEN = '[DONE]';
-
-function sanitizeStreamChunk(rawChunk: string) {
-  if (!rawChunk) return '';
-
-  return rawChunk
-    .replace(/\r\n/g, '\n')
-    .split('\n')
-    .map((line) => {
-      if (line.startsWith('data:')) {
-        return line.slice(5);
-      }
-      return line;
-    })
-    .filter((line) => line.trim() !== SSE_DONE_TOKEN)
-    .join('\n');
-}
-
 export function SectionAwareAsk({ lessonId }: SectionAwareAskProps) {
-  const { context, clearContext, isDialogOpen, setDialogOpen } =
-    useSectionAsk();
-  const [question, setQuestion] = useState('');
-  const [response, setResponse] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const abortControllerRef = useRef<AbortController | null>(null);
-  const { getToken } = useAuth();
+  const {
+    context,
+    clearContext,
+    isDialogOpen,
+    setDialogOpen,
+    setHistorySections,
+    historySelection,
+    clearHistorySelection,
+  } = useSectionAsk();
 
-  const endpoint = useMemo(
-    () => import.meta.env.VITE_AGENT_ASK_ENDPOINT ?? FALLBACK_ENDPOINT,
-    []
-  );
+  const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
 
-  const appendChunk = useCallback((chunk: string) => {
-    const sanitized = sanitizeStreamChunk(chunk);
-    if (!sanitized) return;
+  const { createThread, isLoading: isCreatingThread } = useCreateThread();
 
-    setResponse((prev) => {
-      if (!prev) return sanitized;
+  const userRooms = useQuery(api.agents.queries.userRooms, {});
 
-      const needsSeparator = !(
-        prev.endsWith(' ') ||
-        prev.endsWith('\n') ||
-        sanitized.startsWith(' ') ||
-        sanitized.startsWith('\n')
-      );
-
-      return `${prev}${needsSeparator ? ' ' : ''}${sanitized}`;
-    });
-  }, []);
-
-  const cancelInFlight = useCallback(() => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
-    }
-  }, []);
+  const lessonThreads = useMemo(() => {
+    if (!userRooms) return;
+    return userRooms.filter((room) => room.lessonId === lessonId);
+  }, [lessonId, userRooms]);
 
   useEffect(() => {
-    return () => {
-      cancelInFlight();
-    };
-  }, [cancelInFlight]);
+    if (!lessonThreads) return;
+    setHistorySections(lessonThreads.map((room) => room.sectionKey ?? null));
+  }, [lessonThreads, setHistorySections]);
+
+  useEffect(() => {
+    if (!lessonThreads) return;
+    if (!historySelection?.sectionKey) return;
+
+    const match = lessonThreads
+      .filter((room) => room.sectionKey === historySelection.sectionKey)
+      .sort((a, b) => b.updatedAt - a.updatedAt)[0];
+
+    if (!match) {
+      clearHistorySelection();
+      return;
+    }
+
+    setActiveThreadId(match.threadId);
+    setDialogOpen(true);
+  }, [historySelection, lessonThreads, clearHistorySelection, setDialogOpen]);
 
   const handleSubmit = useCallback(
-    async (value: string) => {
-      cancelInFlight();
-      setQuestion(value);
-      setResponse('');
-      setDialogOpen(true);
-      setIsLoading(true);
-
-      const controller = new AbortController();
-      abortControllerRef.current = controller;
-
+    async (rawValue: string) => {
+      const prompt = rawValue.trim();
+      if (!prompt) return;
+      console.log({
+        prompt,
+        lessonId,
+        sectionKey: context?.sectionKey,
+        contextTitle: context?.title,
+        sectionContent: context?.content,
+      });
       try {
-        const res = await fetch(endpoint, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${await getToken()}`,
-          },
-          body: JSON.stringify({
-            prompt: value,
-            lessonId,
-            sectionKey: context?.sectionKey ?? undefined,
-          }),
-          signal: controller.signal,
+        const threadId = await createThread({
+          prompt,
+          lessonId,
+          sectionKey: context?.sectionKey,
+          contextTitle: context?.title,
+          sectionContent: context?.content,
         });
 
-        if (!res.ok) {
-          const message = await res.text();
-          throw new Error(message || 'Permintaan gagal diproses');
-        }
+        if (!threadId) return;
 
-        if (!res.body) {
-          const text = await res.text();
-          appendChunk(text);
-          setIsLoading(false);
-          return;
-        }
-
-        const reader = res.body.getReader();
-        const decoder = new TextDecoder();
-
-        while (true) {
-          const { value: chunk, done } = await reader.read();
-          if (done) {
-            const remaining = decoder.decode();
-            appendChunk(remaining);
-            break;
-          }
-
-          if (chunk) {
-            const text = decoder.decode(chunk, { stream: true });
-            appendChunk(text);
-          }
-        }
+        setActiveThreadId(threadId);
+        setDialogOpen(true);
+        clearHistorySelection();
       } catch (error) {
-        if (controller.signal.aborted) {
-          return;
-        }
-
-        console.error('Section-aware ask failed', error);
-        setResponse(
-          'Maaf, kami tidak bisa mendapatkan jawaban sekarang. Silakan coba lagi nanti.'
-        );
-      } finally {
-        if (!controller.signal.aborted) {
-          setIsLoading(false);
-        }
-        if (abortControllerRef.current === controller) {
-          abortControllerRef.current = null;
-        }
+        console.error('Failed to create thread', error);
       }
     },
     [
-      appendChunk,
-      cancelInFlight,
       context?.sectionKey,
-      endpoint,
+      context?.title,
+      context?.content,
+      createThread,
       lessonId,
       setDialogOpen,
+      clearHistorySelection,
     ]
   );
 
@@ -160,12 +99,33 @@ export function SectionAwareAsk({ lessonId }: SectionAwareAskProps) {
     (open: boolean) => {
       setDialogOpen(open);
       if (!open) {
-        cancelInFlight();
-        setIsLoading(false);
+        setActiveThreadId(null);
       }
     },
-    [cancelInFlight, setDialogOpen]
+    [setDialogOpen]
   );
+
+  const handleThreadSelect = useCallback(
+    (threadId: string) => {
+      clearHistorySelection();
+      setActiveThreadId(threadId);
+      setDialogOpen(true);
+    },
+    [clearHistorySelection, setDialogOpen]
+  );
+
+  const dialogContextTitle = useMemo(() => {
+    const activeThread = lessonThreads?.find(
+      (thread) => thread.threadId === activeThreadId
+    );
+
+    if (activeThread?.contextTitle) return activeThread.contextTitle;
+    if (activeThread?.sectionKey && historySelection?.title) {
+      return historySelection.title;
+    }
+
+    return context?.title;
+  }, [activeThreadId, context?.title, historySelection?.title, lessonThreads]);
 
   return (
     <>
@@ -183,12 +143,14 @@ export function SectionAwareAsk({ lessonId }: SectionAwareAskProps) {
       />
 
       <AIResponseDialog
-        contextTitle={context?.title}
-        isLoading={isLoading}
+        contextTitle={dialogContextTitle ?? undefined}
+        isCreatingThread={isCreatingThread}
+        isThreadsLoading={lessonThreads === undefined}
         onOpenChange={handleDialogChange}
+        onThreadSelect={handleThreadSelect}
         open={isDialogOpen}
-        question={question}
-        streamedText={response}
+        threadId={activeThreadId}
+        threads={lessonThreads}
       />
     </>
   );

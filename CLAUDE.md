@@ -51,7 +51,7 @@ app/
 │   ├── ai-elements/    # AI chat interface components
 │   └── ui/            # Base UI components (shadcn/ui-style)
 ├── features/          # Feature modules
-│   ├── ai-chat/       # AI chatbot functionality
+│   ├── ai-ask/        # AI assistant with Convex threads
 │   ├── courses/       # Course management
 │   ├── enrollments/   # User enrollments
 │   ├── home/          # Homepage

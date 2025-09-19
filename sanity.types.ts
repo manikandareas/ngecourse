@@ -71,6 +71,37 @@ export type BlockContent = Array<{
   label?: string;
   _type: "badge";
   _key: string;
+} | {
+  rows?: Array<{
+    cells?: Array<{
+      content?: Array<{
+        children?: Array<{
+          marks?: Array<string>;
+          text?: string;
+          _type: "span";
+          _key: string;
+        }>;
+        style?: "normal";
+        listItem?: "bullet" | "number";
+        markDefs?: Array<{
+          href?: string;
+          _type: "link";
+          _key: string;
+        }>;
+        level?: number;
+        _type: "block";
+        _key: string;
+      }>;
+      isHeader?: boolean;
+      _type: "cell";
+      _key: string;
+    }>;
+    _type: "row";
+    _key: string;
+  }>;
+  caption?: string;
+  _type: "table";
+  _key: string;
 }>;
 
 export type EmailNotification = {
@@ -526,6 +557,8 @@ export type Course = {
     _type: "resource";
     _key: string;
   }>;
+  featured?: boolean;
+  readonly?: boolean;
   resourcesDigest?: string;
 };
 
@@ -814,6 +847,8 @@ export type GetUserAchievementsQueryResult = Array<{
         _type: "resource";
         _key: string;
       }>;
+      featured?: boolean;
+      readonly?: boolean;
       resourcesDigest?: string;
     } | null;
   } | null;
@@ -878,6 +913,8 @@ export type GetAvailableAchievementsQueryResult = Array<{
       _type: "resource";
       _key: string;
     }>;
+    featured?: boolean;
+    readonly?: boolean;
     resourcesDigest?: string;
   } | null;
 }>;
@@ -941,6 +978,8 @@ export type GetAchievementByIdQueryResult = {
       _type: "resource";
       _key: string;
     }>;
+    featured?: boolean;
+    readonly?: boolean;
     resourcesDigest?: string;
   } | null;
 } | null;
@@ -1097,7 +1136,7 @@ export type ChatHistoryQueryResult = Array<{
 
 // Source: ./app/features/courses/data/index.ts
 // Variable: coursesQuery
-// Query: *[_type == "course"]{    ...,    "slug": slug.current,    "topics": topics[]->    }
+// Query: *[_type == "course"] | order(featured desc, _createdAt desc){    ...,    "slug": slug.current,    "topics": topics[]->    }
 export type CoursesQueryResult = Array<{
   _id: string;
   _type: "course";
@@ -1147,6 +1186,8 @@ export type CoursesQueryResult = Array<{
     _type: "resource";
     _key: string;
   }>;
+  featured?: boolean;
+  readonly?: boolean;
   resourcesDigest?: string;
 }>;
 // Variable: courseQuery
@@ -1195,6 +1236,8 @@ export type CourseQueryResult = {
     _type: "resource";
     _key: string;
   }>;
+  featured?: boolean;
+  readonly?: boolean;
   resourcesDigest?: string;
 } | null;
 // Variable: courseByIdQuery
@@ -1243,6 +1286,8 @@ export type CourseByIdQueryResult = {
     _type: "resource";
     _key: string;
   }>;
+  featured?: boolean;
+  readonly?: boolean;
   resourcesDigest?: string;
 } | null;
 // Variable: courseContentsQuery
@@ -1416,6 +1461,37 @@ export type LessonQueryResult = {
     crop?: SanityImageCrop;
     _type: "image";
     _key: string;
+  } | {
+    rows?: Array<{
+      cells?: Array<{
+        content?: Array<{
+          children?: Array<{
+            marks?: Array<string>;
+            text?: string;
+            _type: "span";
+            _key: string;
+          }>;
+          style?: "normal";
+          listItem?: "bullet" | "number";
+          markDefs?: Array<{
+            href?: string;
+            _type: "link";
+            _key: string;
+          }>;
+          level?: number;
+          _type: "block";
+          _key: string;
+        }>;
+        isHeader?: boolean;
+        _type: "cell";
+        _key: string;
+      }>;
+      _type: "row";
+      _key: string;
+    }>;
+    caption?: string;
+    _type: "table";
+    _key: string;
   }> | null;
   videoUrl?: string;
 } | null;
@@ -1550,6 +1626,8 @@ export type EnrollmentQueryResult = {
       _type: "resource";
       _key: string;
     }>;
+    featured?: boolean;
+    readonly?: boolean;
     resourcesDigest?: string;
   } | null;
   contentsCompleted: Array<{
@@ -2028,7 +2106,7 @@ declare module "@sanity/client" {
     "\n  *[_type == \"userAchievement\" && user._ref == $userId && achievement._ref == $achievementId][0]\n": GetUserAchievementRecordQueryResult;
     "\n  {\n    \"user\": *[_type == \"user\" && _id == $userId][0]{\n      _id,\n      studyStreak,\n      streakStartDate\n    },\n    \"enrollments\": *[_type == \"enrollment\" && userEnrolled[0]._ref == $userId]{\n      _id,\n      percentComplete,\n      dateCompleted,\n      \"totalContent\": count(course[0]->chapters[]->contents[]),\n      \"completedContent\": count(contentsCompleted),\n      \"course\": course[0]->{\n        _id,\n        title,\n        \"slug\": slug.current\n      }\n    },\n    \"completedCourses\": count(*[_type == \"enrollment\" && userEnrolled[0]._ref == $userId && percentComplete == 100 && defined(dateCompleted)]),\n    \"completedCoursesList\": *[_type == \"enrollment\" && userEnrolled[0]._ref == $userId && percentComplete == 100 && defined(dateCompleted)]{\n      _id,\n      dateCompleted,\n      \"course\": course[0]->{\n        _id,\n        title,\n        \"slug\": slug.current\n      }\n    },\n    \"quizAttempts\": *[_type == \"quizAttempt\" && user[0]._ref == $userId && status == \"graded\"]{\n      percentage,\n      submittedAt\n    },\n    \"highScoringQuizzes\": count(*[_type == \"quizAttempt\" && user[0]._ref == $userId && status == \"graded\" && percentage >= 90])\n  }\n": GetUserProgressForAchievementsQueryResult;
     "*[_type == \"chatMessage\" &&\n    session._ref in *[_type == \"chatSession\" &&\n      $userId in users[]._ref &&\n      $lessonId in lessons[]._ref &&\n      status == \"active\"]._id\n  ] | order(_createdAt asc) {\n    _id,\n    messageId,\n    role,\n    parts,\n    metadata,\n    session->{\n      _id,\n      sessionId,\n      status\n    }\n  }": ChatHistoryQueryResult;
-    "*[_type == \"course\"]{\n    ...,\n    \"slug\": slug.current,\n    \"topics\": topics[]->\n    }": CoursesQueryResult;
+    "*[_type == \"course\"] | order(featured desc, _createdAt desc){\n    ...,\n    \"slug\": slug.current,\n    \"topics\": topics[]->\n    }": CoursesQueryResult;
     "*[_type == \"course\" && slug.current == $slug][0]{\n    ...,\n    \"slug\": slug.current,\n    }": CourseQueryResult;
     "*[_type == \"course\" && _id == $id][0]": CourseByIdQueryResult;
     "\n    *[_type == \"course\" && slug.current == $slug][0]{\n      _id,\n      _type,\n      _createdAt,\n      _updatedAt,\n      title,\n      slug,\n      description,\n      price,\n      level,\n      thumbnail,\n      trailer,\n      difficulty,\n      \"chapters\": chapters[]->{\n        _id,\n        _type,\n        _createdAt,\n        _updatedAt,\n        title,\n        slug,\n        description,\n        \"contents\": contents[]->{\n          _id,\n          _type,\n          _createdAt,\n          _updatedAt,\n          title,\n          slug,\n          _type == \"lesson\" => {\n            content\n          },\n          _type == \"quiz\" => {\n            description,\n            questions\n          }\n        }\n      },\n      \"topics\": topics[]->{\n        _id,\n        _type,\n        _createdAt,\n        _updatedAt,\n        title,\n        slug,\n        description,\n        icon,\n        color\n      }\n    }\n  ": CourseContentsQueryResult;
