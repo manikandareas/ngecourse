@@ -149,7 +149,7 @@ export default function ProgressPage(props: Route.ComponentProps) {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-8 xl:px-0">
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 xl:px-0">
       <div className="space-y-8">
         {/* Progress Overview Section */}
         <ProgressOverview
@@ -159,10 +159,10 @@ export default function ProgressPage(props: Route.ComponentProps) {
         />
 
         {/* Main Content Grid - Enhanced Responsive */}
-        <div className="grid grid-cols-1 gap-8 xl:grid-cols-5 xl:gap-12">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-5 xl:gap-12">
           {/* Left Column - Courses (3/5 width on xl) */}
-          <div className="space-y-8 xl:col-span-3">
-            <div className="flex items-center justify-between">
+          <div className="space-y-8 lg:col-span-3">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="mb-2 font-bold text-2xl text-text-primary">
                   {PROGRESS_COPY.sections.enrolledCourses.title}
@@ -173,7 +173,7 @@ export default function ProgressPage(props: Route.ComponentProps) {
               </div>
               {enrollments && enrollments.length > 4 && (
                 <button
-                  className="group flex items-center gap-2 rounded-full border border-accent/20 bg-accent/10 px-4 py-2 font-medium text-muted-foreground text-sm transition-all duration-200 hover:scale-105 hover:bg-accent/20"
+                  className="group flex w-full items-center justify-center gap-2 rounded-full border border-accent/20 bg-accent/10 px-4 py-2 font-medium text-muted-foreground text-sm transition-all duration-200 hover:scale-105 hover:bg-accent/20 sm:w-auto"
                   type="button"
                 >
                   {PROGRESS_COPY.sections.enrolledCourses.viewAllButton(
@@ -210,7 +210,7 @@ export default function ProgressPage(props: Route.ComponentProps) {
                 className={`grid gap-4 2xl:gap-6 ${
                   enrollments.length === 1
                     ? 'grid-cols-1'
-                    : 'grid-cols-1 md:grid-cols-2'
+                    : 'grid-cols-1 sm:grid-cols-2'
                 }`}
               >
                 {(enrollments as Enrollment[])
@@ -255,7 +255,7 @@ export default function ProgressPage(props: Route.ComponentProps) {
           </div>
 
           {/* Right Column - Activity Tabs (2/5 width on xl) */}
-          <div className="xl:col-span-2">
+          <div className="lg:col-span-2">
             <ActivityTabs
               achievements={achievementsForDisplay}
               isLoading={progressActivityLoading || achievementsLoading}

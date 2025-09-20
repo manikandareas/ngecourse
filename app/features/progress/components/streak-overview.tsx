@@ -76,7 +76,7 @@ export function StreakOverview({ user, className }: StreakOverviewProps) {
       {/* 7-Day Streak Indicator */}
       <div className="space-y-3">
         <h4 className="font-medium text-sm text-text-primary">This Week</h4>
-        <div className="flex justify-between gap-1">
+        <div className="flex flex-wrap justify-center gap-2 sm:justify-between sm:gap-1">
           {weeklyStreak.map((day, index) => (
             <div
               className="flex flex-col items-center gap-2"
@@ -103,7 +103,7 @@ export function StreakOverview({ user, className }: StreakOverviewProps) {
       </div>
 
       {/* Simplified stats - reduced from 4 to 2 cards */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="tinted-blur-subtle rounded-xl p-4 text-center">
           <TrendingUp className="mx-auto mb-2 h-5 w-5 text-success" />
           <div className="font-bold text-lg text-success">

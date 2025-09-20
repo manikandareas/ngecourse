@@ -80,7 +80,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
 
   if (activities.length === 0) {
     return (
-      <div className="tinted-blur-subtle rounded-2xl p-6">
+      <div className="tinted-blur-subtle rounded-2xl p-4 sm:p-6">
         <h3 className="mb-4 font-medium text-lg text-text-primary">
           Recent Activity
         </h3>
@@ -95,7 +95,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
   }
 
   return (
-    <div className="tinted-blur-subtle rounded-2xl p-6">
+    <div className="tinted-blur-subtle rounded-2xl p-4 sm:p-6">
       <h3 className="mb-4 font-medium text-lg text-text-primary">
         Recent Activity
       </h3>
@@ -119,7 +119,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
             </div>
 
             <div className="min-w-0 flex-1">
-              <div className="flex items-start justify-between gap-2">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <h4 className="line-clamp-1 font-medium text-sm text-text-primary">
                     {activity.title}
@@ -138,7 +138,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
                   )}
                 </div>
 
-                <div className="flex items-center gap-1 whitespace-nowrap text-text-muted text-xs">
+                <div className="flex items-center gap-1 whitespace-nowrap text-text-muted text-xs sm:justify-end sm:self-start">
                   <Clock className="h-3 w-3" />
                   {formatTimeAgo(activity.timestamp)}
                 </div>

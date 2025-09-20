@@ -104,6 +104,24 @@ export type BlockContent = Array<{
   _key: string;
 }>;
 
+export type AiArtifact = {
+  _id: string;
+  _type: "aiArtifact";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  userId?: string;
+  lesson?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "lesson";
+  };
+  sectionKey?: string;
+  type?: "explainer" | "summary" | "example" | "exercise";
+  text?: string;
+};
+
 export type EmailNotification = {
   _id: string;
   _type: "emailNotification";
@@ -778,7 +796,7 @@ export type SanityAssetSourceData = {
   url?: string;
 };
 
-export type AllSanitySchemaTypes = BlockContent | EmailNotification | ChatMessage | ChatSession | UserAchievement | Achievement | LearningSession | Recommendation | Enrollment | QuizAttempt | Quiz | Lesson | Chapter | Course | Topic | User | Color | RgbaColor | HsvaColor | HslaColor | Code | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
+export type AllSanitySchemaTypes = BlockContent | AiArtifact | EmailNotification | ChatMessage | ChatSession | UserAchievement | Achievement | LearningSession | Recommendation | Enrollment | QuizAttempt | Quiz | Lesson | Chapter | Course | Topic | User | Color | RgbaColor | HsvaColor | HslaColor | Code | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./app/features/achievements/data/index.ts
 // Variable: getUserAchievementsQuery
@@ -1045,98 +1063,31 @@ export type GetUserProgressForAchievementsQueryResult = {
   highScoringQuizzes: number;
 };
 
-// Source: ./app/features/ai-chat/data/index.ts
-// Variable: chatHistoryQuery
-// Query: *[_type == "chatMessage" &&    session._ref in *[_type == "chatSession" &&      $userId in users[]._ref &&      $lessonId in lessons[]._ref &&      status == "active"]._id  ] | order(_createdAt asc) {    _id,    messageId,    role,    parts,    metadata,    session->{      _id,      sessionId,      status    }  }
-export type ChatHistoryQueryResult = Array<{
+// Source: ./app/features/ai-ask/data/index.ts
+// Variable: lessonArtifactsQuery
+// Query: *[_type == "aiArtifact" && coalesce(lesson._ref, lesson[0]._ref) == $lessonId &&    (!defined($userId) || $userId == "" || userId == $userId)]  | order(coalesce(createdAt, _createdAt) desc) {    _id,    _createdAt,    _updatedAt,    sectionKey,    type,    question,    prompt,    title,    summary,    text,    response,    content,    body,    createdAt,    updatedAt,    resources[]{      _key,      label,      title,      url,      note,      description,      snippet,      resourceType,      resourceId,      href,      "resolvedResource": select(        defined(resource) => resource->{          _id,          _type,          title,          "slug": slug.current        },        defined(reference) => reference->{          _id,          _type,          title,          "slug": slug.current        },        null      )    }  }
+export type LessonArtifactsQueryResult = Array<{
   _id: string;
-  messageId: string | null;
-  role: "assistant" | "system" | "user" | null;
-  parts: Array<{
-    type?: string;
-    name?: string;
-    dataId?: string;
-    data?: {
-      content?: string;
-    };
-    _type: "dataUIPart";
-    _key: string;
-  } | {
-    type?: string;
-    mediaType?: string;
-    filename?: string;
-    url?: string;
-    _type: "fileUIPart";
-    _key: string;
-  } | {
-    type?: string;
-    text?: string;
-    state?: "done" | "streaming";
-    providerMetadata?: {
-      data?: string;
-    };
-    _type: "reasoningUIPart";
-    _key: string;
-  } | {
-    type?: string;
-    sourceId?: string;
-    mediaType?: string;
-    title?: string;
-    filename?: string;
-    providerMetadata?: {
-      data?: string;
-    };
-    _type: "sourceDocumentUIPart";
-    _key: string;
-  } | {
-    type?: string;
-    sourceId?: string;
-    url?: string;
-    title?: string;
-    providerMetadata?: {
-      data?: string;
-    };
-    _type: "sourceUrlUIPart";
-    _key: string;
-  } | {
-    type?: string;
-    _type: "stepStartUIPart";
-    _key: string;
-  } | {
-    type?: string;
-    text?: string;
-    state?: "done" | "streaming";
-    _type: "textUIPart";
-    _key: string;
-  } | {
-    type?: string;
-    name?: string;
-    toolCallId?: string;
-    state?: "input-available" | "input-streaming" | "output-available" | "output-error";
-    input?: {
-      data?: string;
-    };
-    output?: {
-      data?: string;
-    };
-    errorText?: string;
-    providerExecuted?: boolean;
-    _type: "toolUIPart";
-    _key: string;
-  }> | null;
-  metadata: {
-    custom?: string;
-  } | null;
-  session: {
-    _id: string;
-    sessionId: string | null;
-    status: "active" | "ended" | "inactive" | null;
-  } | null;
+  _createdAt: string;
+  _updatedAt: string;
+  sectionKey: string | null;
+  type: "example" | "exercise" | "explainer" | "summary" | null;
+  question: null;
+  prompt: null;
+  title: null;
+  summary: null;
+  text: string | null;
+  response: null;
+  content: null;
+  body: null;
+  createdAt: null;
+  updatedAt: null;
+  resources: null;
 }>;
 
 // Source: ./app/features/courses/data/index.ts
 // Variable: coursesQuery
-// Query: *[_type == "course"] | order(featured desc, _createdAt desc){    ...,    "slug": slug.current,    "topics": topics[]->    }
+// Query: *[_type == "course"] | order(featured asc, _createdAt desc){    ...,    "slug": slug.current,    "topics": topics[]->    }
 export type CoursesQueryResult = Array<{
   _id: string;
   _type: "course";
@@ -2105,8 +2056,8 @@ declare module "@sanity/client" {
     "\n  *[_type == \"achievement\" && id == $achievementId][0]{\n    _id,\n    id,\n    title,\n    description,\n    icon,\n    category,\n    criteria,\n    points,\n    isActive,\n    course->\n  }\n": GetAchievementByIdQueryResult;
     "\n  *[_type == \"userAchievement\" && user._ref == $userId && achievement._ref == $achievementId][0]\n": GetUserAchievementRecordQueryResult;
     "\n  {\n    \"user\": *[_type == \"user\" && _id == $userId][0]{\n      _id,\n      studyStreak,\n      streakStartDate\n    },\n    \"enrollments\": *[_type == \"enrollment\" && userEnrolled[0]._ref == $userId]{\n      _id,\n      percentComplete,\n      dateCompleted,\n      \"totalContent\": count(course[0]->chapters[]->contents[]),\n      \"completedContent\": count(contentsCompleted),\n      \"course\": course[0]->{\n        _id,\n        title,\n        \"slug\": slug.current\n      }\n    },\n    \"completedCourses\": count(*[_type == \"enrollment\" && userEnrolled[0]._ref == $userId && percentComplete == 100 && defined(dateCompleted)]),\n    \"completedCoursesList\": *[_type == \"enrollment\" && userEnrolled[0]._ref == $userId && percentComplete == 100 && defined(dateCompleted)]{\n      _id,\n      dateCompleted,\n      \"course\": course[0]->{\n        _id,\n        title,\n        \"slug\": slug.current\n      }\n    },\n    \"quizAttempts\": *[_type == \"quizAttempt\" && user[0]._ref == $userId && status == \"graded\"]{\n      percentage,\n      submittedAt\n    },\n    \"highScoringQuizzes\": count(*[_type == \"quizAttempt\" && user[0]._ref == $userId && status == \"graded\" && percentage >= 90])\n  }\n": GetUserProgressForAchievementsQueryResult;
-    "*[_type == \"chatMessage\" &&\n    session._ref in *[_type == \"chatSession\" &&\n      $userId in users[]._ref &&\n      $lessonId in lessons[]._ref &&\n      status == \"active\"]._id\n  ] | order(_createdAt asc) {\n    _id,\n    messageId,\n    role,\n    parts,\n    metadata,\n    session->{\n      _id,\n      sessionId,\n      status\n    }\n  }": ChatHistoryQueryResult;
-    "*[_type == \"course\"] | order(featured desc, _createdAt desc){\n    ...,\n    \"slug\": slug.current,\n    \"topics\": topics[]->\n    }": CoursesQueryResult;
+    "\n  *[_type == \"aiArtifact\" && coalesce(lesson._ref, lesson[0]._ref) == $lessonId &&\n    (!defined($userId) || $userId == \"\" || userId == $userId)]\n  | order(coalesce(createdAt, _createdAt) desc) {\n    _id,\n    _createdAt,\n    _updatedAt,\n    sectionKey,\n    type,\n    question,\n    prompt,\n    title,\n    summary,\n    text,\n    response,\n    content,\n    body,\n    createdAt,\n    updatedAt,\n    resources[]{\n      _key,\n      label,\n      title,\n      url,\n      note,\n      description,\n      snippet,\n      resourceType,\n      resourceId,\n      href,\n      \"resolvedResource\": select(\n        defined(resource) => resource->{\n          _id,\n          _type,\n          title,\n          \"slug\": slug.current\n        },\n        defined(reference) => reference->{\n          _id,\n          _type,\n          title,\n          \"slug\": slug.current\n        },\n        null\n      )\n    }\n  }\n": LessonArtifactsQueryResult;
+    "*[_type == \"course\"] | order(featured asc, _createdAt desc){\n    ...,\n    \"slug\": slug.current,\n    \"topics\": topics[]->\n    }": CoursesQueryResult;
     "*[_type == \"course\" && slug.current == $slug][0]{\n    ...,\n    \"slug\": slug.current,\n    }": CourseQueryResult;
     "*[_type == \"course\" && _id == $id][0]": CourseByIdQueryResult;
     "\n    *[_type == \"course\" && slug.current == $slug][0]{\n      _id,\n      _type,\n      _createdAt,\n      _updatedAt,\n      title,\n      slug,\n      description,\n      price,\n      level,\n      thumbnail,\n      trailer,\n      difficulty,\n      \"chapters\": chapters[]->{\n        _id,\n        _type,\n        _createdAt,\n        _updatedAt,\n        title,\n        slug,\n        description,\n        \"contents\": contents[]->{\n          _id,\n          _type,\n          _createdAt,\n          _updatedAt,\n          title,\n          slug,\n          _type == \"lesson\" => {\n            content\n          },\n          _type == \"quiz\" => {\n            description,\n            questions\n          }\n        }\n      },\n      \"topics\": topics[]->{\n        _id,\n        _type,\n        _createdAt,\n        _updatedAt,\n        title,\n        slug,\n        description,\n        icon,\n        color\n      }\n    }\n  ": CourseContentsQueryResult;
