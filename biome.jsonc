@@ -25,6 +25,7 @@
       },
       "complexity": {
         "noExcessiveCognitiveComplexity": "off"
+        "noVoid": "off"
       }
     }
   }

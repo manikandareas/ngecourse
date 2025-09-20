@@ -50,28 +50,30 @@ export const ProgressOverview: React.FC<ProgressOverviewProps> = ({
   return (
     <div className="space-y-10">
       {/* Enhanced Hero Section */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-accent/10 via-transparent to-purple-500/10 p-8 backdrop-blur-xl">
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-accent/10 via-transparent to-purple-500/10 p-6 backdrop-blur-xl sm:p-8">
         {/* Background decoration */}
         <div className="-right-10 -top-10 absolute h-40 w-40 rounded-full bg-accent/5 blur-3xl" />
         <div className="-bottom-10 -left-10 absolute h-32 w-32 rounded-full bg-purple-500/5 blur-2xl" />
 
-        <div className="relative flex items-center justify-between">
-          <div className="flex-1">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-accent/15 px-3 py-1 font-medium text-foreground text-sm backdrop-blur-sm">
+        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex-1 text-center lg:text-left">
+            <div className="mb-3 inline-flex w-fit items-center justify-center gap-2 rounded-full bg-accent/15 px-3 py-1 font-medium text-foreground text-sm backdrop-blur-sm sm:w-auto sm:justify-start">
               <div className="h-2 w-2 animate-pulse rounded-full bg-green-400" />
               {PROGRESS_COPY.motivational.dailyStreak(currentStreak)}
             </div>
-            <h1 className="mb-3 font-bold text-3xl text-text-primary leading-tight">
-              {PROGRESS_COPY.welcome.greeting(user?.firstname || PROGRESS_COPY.welcome.fallbackName)}
+            <h1 className="mb-3 font-bold text-3xl text-text-primary leading-tight sm:text-4xl">
+              {PROGRESS_COPY.welcome.greeting(
+                user?.firstname || PROGRESS_COPY.welcome.fallbackName
+              )}
               <span className="ml-2 text-2xl">👋</span>
             </h1>
-            <p className="max-w-lg text-lg text-text-secondary/90">
+            <p className="mx-auto max-w-2xl text-base text-text-secondary/90 sm:text-lg lg:mx-0">
               {PROGRESS_COPY.welcome.motivation}
             </p>
           </div>
 
           {/* Enhanced Level Badge */}
-          <div className="ml-8 text-center">
+          <div className="mx-auto w-full max-w-xs text-center lg:ml-8 lg:w-auto">
             <div className="relative">
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-accent/20 to-purple-500/20 blur-lg" />
               <div className="relative rounded-2xl border border-white/20 bg-gradient-to-r from-accent/10 to-purple-500/10 p-6 backdrop-blur-sm">
@@ -109,7 +111,9 @@ export const ProgressOverview: React.FC<ProgressOverviewProps> = ({
 
         <StatsCard
           color="text-blue-400"
-          description={PROGRESS_COPY.stats.courses.completedSuffix(activityStats?.completedCourses || 0)}
+          description={PROGRESS_COPY.stats.courses.completedSuffix(
+            activityStats?.completedCourses || 0
+          )}
           icon="📚"
           title={PROGRESS_COPY.stats.courses.title}
           value={activityStats?.totalEnrollments || 0}
@@ -133,7 +137,9 @@ export const ProgressOverview: React.FC<ProgressOverviewProps> = ({
                   : 'text-red-400'
               : 'text-gray-400'
           }
-          description={PROGRESS_COPY.stats.quiz.attemptsSuffix(activityStats?.totalQuizAttempts || 0)}
+          description={PROGRESS_COPY.stats.quiz.attemptsSuffix(
+            activityStats?.totalQuizAttempts || 0
+          )}
           icon="🎯"
           title={PROGRESS_COPY.stats.quiz.title}
           value={

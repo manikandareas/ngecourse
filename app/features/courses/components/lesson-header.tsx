@@ -1,22 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
-import {
-  ChevronLeft,
-  FolderTree,
-  Maximize,
-  Minimize,
-  MoreVertical,
-  Sparkles,
-} from 'lucide-react';
+import { ChevronLeft, FolderTree, Maximize, Minimize } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useMediaQuery } from 'usehooks-ts';
 import { Button } from '~/components/ui/button';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '~/components/ui/popover';
-import { Separator } from '~/components/ui/separator';
 import { LESSON_COPY } from '~/features/courses/constants/lesson-copy';
 import { enrollmentQueryOption } from '~/features/enrollments/hooks/get-enrollment';
 import { courseQueryOption } from '../hooks/get-course';
@@ -26,22 +13,16 @@ interface LessonHeaderProps {
   title: string;
   courseSlug: string;
   userId: string;
-  onChatToggle?: () => void;
-  isChatOpen?: boolean;
   onMaximizeToggle?: (isMaximized: boolean) => void;
   isMaximized?: boolean;
-  showChatButton?: boolean;
 }
 
 export const LessonHeader = ({
   title,
   courseSlug,
   userId,
-  onChatToggle,
-  isChatOpen = false,
   onMaximizeToggle,
   isMaximized: externalIsMaximized,
-  showChatButton = true,
 }: LessonHeaderProps) => {
   const { data: course } = useQuery(courseQueryOption(courseSlug));
   const { data: enrollment } = useQuery(
@@ -146,7 +127,7 @@ export const LessonHeader = ({
     return null;
   }
   return (
-    <header className="sticky top-0 z-30 w-full border-hairline border-b px-4 py-3 backdrop-blur-md sm:px-6">
+    <header className="sticky top-0 z-30 w-full border-hairline border-b px-3 py-2 backdrop-blur-md sm:px-6 sm:py-3">
       <div className="mx-auto flex w-full items-center justify-between gap-4">
         {/* Left: Structure trigger */}
         <div className="flex min-w-0 flex-1 items-center gap-2">
@@ -180,7 +161,10 @@ export const LessonHeader = ({
 
         {/* Center: Title and meta */}
         <div className="flex min-w-0 flex-1 flex-col items-center">
-          <h1 className="truncate font-medium text-base text-text-primary leading-tight sm:text-lg">
+          <h1
+            className="max-w-[14rem] truncate font-medium text-base text-text-primary leading-tight sm:text-lg md:max-w-full"
+            title={title}
+          >
             {title}
           </h1>
           <p className="mt-1 hidden truncate text-text-muted text-xs sm:block">
@@ -191,97 +175,32 @@ export const LessonHeader = ({
         </div>
 
         {/* Right: Actions */}
-        <div className="flex min-w-0 flex-1 items-center justify-end gap-3">
-          {isDesktop ? (
-            /* Desktop: Only fullscreen button (chat handled by FAB) */
-            <button
-              aria-label={
-                isMaximized
-                  ? LESSON_COPY.header.fullscreen.exit
-                  : LESSON_COPY.header.fullscreen.enter
-              }
-              className="btn-ghost p-2.5"
-              onClick={() => {
-                handleMaximizeToggle().catch(() => {
-                  // Handle error silently
-                });
-              }}
-              type="button"
-            >
-              {isMaximized ? (
-                <Minimize aria-hidden="true" size={16} />
-              ) : (
-                <Maximize aria-hidden="true" size={16} />
-              )}
-              <span className="sr-only">
-                {isMaximized
-                  ? LESSON_COPY.header.fullscreen.exitTitle
-                  : LESSON_COPY.header.fullscreen.enterTitle}
-              </span>
-            </button>
-          ) : (
-            /* Mobile: Dropdown Menu */
-            <Popover>
-              <PopoverTrigger asChild>
-                <button
-                  aria-label={LESSON_COPY.header.menu.open}
-                  className="btn-ghost p-2.5"
-                  type="button"
-                >
-                  <MoreVertical aria-hidden="true" size={16} />
-                  <span className="sr-only">
-                    {LESSON_COPY.header.menu.open}
-                  </span>
-                </button>
-              </PopoverTrigger>
-              <PopoverContent
-                align="end"
-                className="tinted-blur w-48 border border-strong p-3"
-              >
-                <div className="space-y-2">
-                  {showChatButton && (
-                    <>
-                      <button
-                        className={`w-full justify-start ${isChatOpen ? 'btn-primary' : 'btn-ghost'}`}
-                        onClick={onChatToggle}
-                        type="button"
-                      >
-                        <Sparkles aria-hidden="true" size={16} />
-                        <span className="ml-2">
-                          {isChatOpen
-                            ? LESSON_COPY.chat.buttons.close
-                            : LESSON_COPY.chat.buttons.open}
-                        </span>
-                      </button>
-
-                      <Separator className="my-2 border-hairline" />
-                    </>
-                  )}
-
-                  <button
-                    className="btn-ghost w-full justify-start"
-                    onClick={() => {
-                      handleMaximizeToggle().catch(() => {
-                        // Handle error silently
-                      });
-                    }}
-                    type="button"
-                  >
-                    {isMaximized ? (
-                      <Minimize aria-hidden="true" size={16} />
-                    ) : (
-                      <Maximize aria-hidden="true" size={16} />
-                    )}
-                    <span className="ml-2">
-                      {isMaximized
-                        ? LESSON_COPY.header.fullscreen.exit
-                        : LESSON_COPY.header.fullscreen.enter}
-                    </span>
-                  </button>
-                </div>
-              </PopoverContent>
-            </Popover>
-          )}
+        <div className="flex min-w-0 flex-1 items-center justify-end gap-2 sm:gap-3">
+          <button
+            aria-label={
+              isMaximized
+                ? LESSON_COPY.header.fullscreen.exit
+                : LESSON_COPY.header.fullscreen.enter
+            }
+            className="btn-ghost p-2.5"
+            onClick={() => {
+              handleMaximizeToggle().catch(() => {
+                // Handle error silently
+              });
+            }}
+            type="button"
+          >
+            {isMaximized ? (
+              <Minimize aria-hidden="true" size={16} />
+            ) : (
+              <Maximize aria-hidden="true" size={16} />
+            )}
+            <span className="sr-only">
+              {isMaximized
+                ? LESSON_COPY.header.fullscreen.exitTitle
+                : LESSON_COPY.header.fullscreen.enterTitle}
+            </span>
+          </button>
         </div>
       </div>
     </header>

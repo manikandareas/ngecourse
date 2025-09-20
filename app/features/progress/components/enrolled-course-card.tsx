@@ -69,7 +69,7 @@ export const EnrolledCourseCard: React.FC<EnrolledCourseCardProps> = ({
       </div>
 
       {/* Content Container */}
-      <div className="flex flex-1 flex-col space-y-4 p-6">
+      <div className="flex flex-1 flex-col space-y-4 p-4 sm:p-6">
         {/* Title */}
         <h3 className="line-clamp-2 font-medium text-text-primary text-xl tracking-tight">
           {course.title}

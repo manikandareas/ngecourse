@@ -56,11 +56,11 @@ export function ActivityTabs({
     return (
       <div className="space-y-6">
         {/* Tab skeleton */}
-        <div className="flex space-x-1 rounded-2xl bg-white/5 p-1 backdrop-blur-sm">
+        <div className="flex flex-col gap-2 rounded-2xl bg-white/5 p-1 backdrop-blur-sm sm:flex-row sm:gap-1">
           {tabs.map((tab) => (
             <div
               key={tab.id}
-              className="flex-1 rounded-xl bg-white/10 px-4 py-3 animate-pulse"
+              className="h-11 flex-1 rounded-xl bg-white/10 px-4 py-3 animate-pulse"
             />
           ))}
         </div>
@@ -101,7 +101,7 @@ export function ActivityTabs({
   return (
     <div className="space-y-6">
       {/* Tab Navigation */}
-      <div className="flex space-x-1 rounded-2xl bg-white/5 p-1 backdrop-blur-sm border border-white/10">
+      <div className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-white/5 p-1 backdrop-blur-sm sm:flex-row sm:gap-1">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -111,22 +111,22 @@ export function ActivityTabs({
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                'flex-1 flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200',
+                'flex w-full flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200',
                 isActive
                   ? 'bg-white/10 text-text-primary shadow-lg backdrop-blur-sm border border-white/20'
                   : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
               )}
             >
               <Icon className={cn('h-4 w-4', isActive ? tab.color : '')} />
-              <span className="hidden sm:inline">{tab.label}</span>
+              <span className="text-xs sm:text-sm">{tab.label}</span>
             </button>
           );
         })}
       </div>
 
       {/* Tab Content */}
-      <div className="min-h-[400px]">
-        <div className="rounded-2xl bg-white/[0.02] p-6 backdrop-blur-xl border border-white/5 transition-all duration-300 hover:border-white/10">
+      <div className="min-h-[320px] sm:min-h-[400px]">
+        <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-4 backdrop-blur-xl transition-all duration-300 hover:border-white/10 sm:p-6">
           {renderTabContent()}
         </div>
       </div>

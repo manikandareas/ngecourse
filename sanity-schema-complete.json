@@ -1,0 +1,1153 @@
+{
+  "projectInfo": {
+    "projectId": "9ef009ob",
+    "dataset": "production",
+    "workspace": "default",
+    "totalSchemas": 21,
+    "generatedAt": "2025-01-20T06:41:16Z",
+    "description": "Complete Sanity schema documentation for NgeCourse LMS platform"
+  },
+  "schemas": {
+    "documents": {
+      "course": {
+        "type": "document",
+        "fieldsCount": 13,
+        "description": "Main course document with chapters, topics, and learning outcomes",
+        "fields": {
+          "title": {
+            "type": "string",
+            "required": true,
+            "validation": {
+              "min": 5,
+              "max": 80
+            }
+          },
+          "slug": {
+            "type": "slug",
+            "required": true,
+            "source": "title",
+            "maxLength": 96
+          },
+          "description": {
+            "type": "text",
+            "required": true,
+            "validation": {
+              "min": 20,
+              "max": 500
+            }
+          },
+          "difficulty": {
+            "type": "string",
+            "required": true,
+            "options": ["beginner", "intermediate", "advanced"],
+            "layout": "radio"
+          },
+          "thumbnail": {
+            "type": "image",
+            "required": true,
+            "hotspot": true
+          },
+          "trailer": {
+            "type": "url",
+            "required": false,
+            "schemes": ["http", "https"]
+          },
+          "topics": {
+            "type": "array",
+            "of": "reference to topic",
+            "required": true,
+            "validation": {
+              "min": 1
+            }
+          },
+          "chapters": {
+            "type": "array",
+            "of": "reference to chapter",
+            "required": true,
+            "sortable": true,
+            "validation": {
+              "min": 1
+            }
+          },
+          "learningOutcomes": {
+            "type": "array",
+            "of": "string",
+            "title": "What you will learn",
+            "sortable": true,
+            "validation": {
+              "itemMin": 5,
+              "itemMax": 140
+            }
+          },
+          "resources": {
+            "type": "array",
+            "of": "resource object",
+            "fields": {
+              "label": {
+                "type": "string",
+                "required": true,
+                "validation": {
+                  "min": 2,
+                  "max": 100
+                }
+              },
+              "url": {
+                "type": "url",
+                "required": true,
+                "schemes": ["http", "https"]
+              }
+            }
+          },
+          "featured": {
+            "type": "boolean",
+            "required": false
+          },
+          "readonly": {
+            "type": "boolean",
+            "required": false
+          },
+          "resourcesDigest": {
+            "type": "string",
+            "readOnly": true,
+            "hidden": true
+          }
+        }
+      },
+      "chapter": {
+        "type": "document",
+        "fieldsCount": 5,
+        "description": "Course chapter containing lessons and quizzes",
+        "fields": {
+          "title": {
+            "type": "string",
+            "required": true,
+            "validation": {
+              "min": 3,
+              "max": 100
+            }
+          },
+          "slug": {
+            "type": "slug",
+            "required": true,
+            "source": "title",
+            "maxLength": 96
+          },
+          "course": {
+            "type": "array",
+            "of": "reference to course",
+            "required": true,
+            "validation": {
+              "max": 1
+            }
+          },
+          "description": {
+            "type": "text",
+            "required": true,
+            "validation": {
+              "min": 10,
+              "max": 300
+            }
+          },
+          "contents": {
+            "type": "array",
+            "of": "reference to lesson or quiz",
+            "required": true,
+            "sortable": true,
+            "validation": {
+              "min": 1
+            }
+          }
+        }
+      },
+      "lesson": {
+        "type": "document",
+        "fieldsCount": 5,
+        "description": "Individual lesson with rich content",
+        "fields": {
+          "title": {
+            "type": "string",
+            "required": true,
+            "validation": {
+              "min": 3,
+              "max": 120
+            }
+          },
+          "slug": {
+            "type": "slug",
+            "required": true,
+            "source": "title",
+            "maxLength": 96
+          },
+          "chapter": {
+            "type": "array",
+            "of": "reference to chapter",
+            "required": true,
+            "validation": {
+              "max": 1
+            }
+          },
+          "content": {
+            "type": "blockContent",
+            "required": true,
+            "description": "Rich text content with images, code blocks, callouts, etc."
+          },
+          "videoUrl": {
+            "type": "url",
+            "required": false,
+            "title": "Video URL",
+            "schemes": ["http", "https"]
+          }
+        }
+      },
+      "quiz": {
+        "type": "document",
+        "fieldsCount": 5,
+        "description": "Interactive quiz with multiple choice questions",
+        "fields": {
+          "title": {
+            "type": "string",
+            "required": true,
+            "validation": {
+              "min": 3,
+              "max": 120
+            }
+          },
+          "slug": {
+            "type": "slug",
+            "required": true,
+            "source": "title",
+            "maxLength": 96
+          },
+          "description": {
+            "type": "text",
+            "required": true,
+            "validation": {
+              "min": 10,
+              "max": 300
+            }
+          },
+          "maxAttempt": {
+            "type": "number",
+            "title": "Max Attempt Per User",
+            "validation": {
+              "min": 1
+            }
+          },
+          "questions": {
+            "type": "array",
+            "of": "question object",
+            "required": true,
+            "sortable": true,
+            "validation": {
+              "min": 1
+            },
+            "fields": {
+              "question": {
+                "type": "string",
+                "title": "Question Text",
+                "required": true,
+                "validation": {
+                  "min": 10
+                }
+              },
+              "options": {
+                "type": "array",
+                "of": "string",
+                "required": true,
+                "validation": {
+                  "min": 2,
+                  "max": 6
+                }
+              },
+              "correctOptionIndex": {
+                "type": "number",
+                "required": true,
+                "validation": {
+                  "min": 0
+                }
+              },
+              "explanation": {
+                "type": "text",
+                "required": false,
+                "validation": {
+                  "min": 10
+                }
+              }
+            }
+          }
+        }
+      },
+      "topic": {
+        "type": "document",
+        "fieldsCount": 5,
+        "description": "Course topic/category with icon and color",
+        "fields": {
+          "title": {
+            "type": "string",
+            "required": true,
+            "validation": {
+              "min": 3,
+              "max": 60
+            }
+          },
+          "slug": {
+            "type": "slug",
+            "required": true,
+            "source": "title",
+            "maxLength": 96
+          },
+          "description": {
+            "type": "text",
+            "required": true,
+            "validation": {
+              "min": 10,
+              "max": 200
+            }
+          },
+          "icon": {
+            "type": "string",
+            "required": false
+          },
+          "color": {
+            "type": "color",
+            "required": false
+          }
+        }
+      },
+      "user": {
+        "type": "document",
+        "fieldsCount": 19,
+        "description": "User profile with learning analytics and preferences",
+        "fields": {
+          "username": {
+            "type": "string",
+            "required": true
+          },
+          "firstname": {
+            "type": "string",
+            "required": true
+          },
+          "lastname": {
+            "type": "string",
+            "required": true
+          },
+          "email": {
+            "type": "string",
+            "required": true
+          },
+          "clerkId": {
+            "type": "string",
+            "required": true,
+            "description": "Clerk authentication ID"
+          },
+          "onboardingStatus": {
+            "type": "string",
+            "options": ["not_started", "completed"],
+            "layout": "radio"
+          },
+          "learningGoals": {
+            "type": "array",
+            "of": "string",
+            "title": "Focus",
+            "layout": "tags"
+          },
+          "studyReason": {
+            "type": "string",
+            "hidden": true
+          },
+          "studyPlan": {
+            "type": "string",
+            "hidden": true
+          },
+          "level": {
+            "type": "string",
+            "options": ["beginner", "intermediate", "advanced"],
+            "layout": "radio"
+          },
+          "studyStreak": {
+            "type": "number"
+          },
+          "streakStartDate": {
+            "type": "number"
+          },
+          "explanationStyle": {
+            "type": "string"
+          },
+          "languagePreference": {
+            "type": "string",
+            "options": ["id", "en", "mix"],
+            "layout": "radio"
+          },
+          "goal": {
+            "type": "string",
+            "validation": {
+              "max": 120
+            }
+          },
+          "analytics": {
+            "type": "object",
+            "title": "Learning Analytics",
+            "collapsible": true,
+            "collapsed": true,
+            "fields": {
+              "totalXP": {
+                "type": "number",
+                "title": "Total Experience Points",
+                "validation": {
+                  "min": 0
+                }
+              },
+              "currentLevel": {
+                "type": "number",
+                "validation": {
+                  "min": 1
+                }
+              },
+              "totalStudyTimeMinutes": {
+                "type": "number",
+                "title": "Total Study Time (Minutes)",
+                "validation": {
+                  "min": 0
+                }
+              },
+              "averageSessionTime": {
+                "type": "number",
+                "title": "Average Session Time (Minutes)",
+                "validation": {
+                  "min": 0
+                }
+              },
+              "strongestSkills": {
+                "type": "array",
+                "of": "string"
+              },
+              "improvementAreas": {
+                "type": "array",
+                "of": "string",
+                "title": "Areas for Improvement"
+              }
+            }
+          },
+          "emailPreferences": {
+            "type": "object",
+            "collapsible": true,
+            "collapsed": true,
+            "fields": {
+              "welcomeEmail": {
+                "type": "boolean"
+              },
+              "achievementEmails": {
+                "type": "boolean"
+              },
+              "courseCompletionEmails": {
+                "type": "boolean"
+              },
+              "weeklyDigest": {
+                "type": "boolean"
+              },
+              "unsubscribedAt": {
+                "type": "datetime"
+              }
+            }
+          },
+          "lastEmailSent": {
+            "type": "datetime"
+          },
+          "emailStats": {
+            "type": "object",
+            "title": "Email Statistics",
+            "collapsible": true,
+            "collapsed": true,
+            "fields": {
+              "totalSent": {
+                "type": "number"
+              },
+              "totalOpened": {
+                "type": "number"
+              },
+              "lastOpenedAt": {
+                "type": "datetime"
+              }
+            }
+          }
+        }
+      },
+      "enrollment": {
+        "type": "document",
+        "fieldsCount": 5,
+        "description": "User course enrollment with progress tracking",
+        "fields": {
+          "userEnrolled": {
+            "type": "array",
+            "of": "reference to user",
+            "required": true,
+            "validation": {
+              "max": 1
+            }
+          },
+          "course": {
+            "type": "array",
+            "of": "reference to course",
+            "required": true,
+            "validation": {
+              "max": 1
+            }
+          },
+          "contentsCompleted": {
+            "type": "array",
+            "of": "reference to lesson or quiz"
+          },
+          "dateCompleted": {
+            "type": "datetime"
+          },
+          "percentComplete": {
+            "type": "number",
+            "validation": {
+              "min": 0,
+              "max": 100
+            }
+          }
+        }
+      },
+      "quizAttempt": {
+        "type": "document",
+        "fieldsCount": 16,
+        "description": "Quiz attempt with answers and scoring",
+        "fields": {
+          "user": {
+            "type": "array",
+            "of": "reference to user",
+            "required": true,
+            "validation": {
+              "max": 1
+            }
+          },
+          "quiz": {
+            "type": "array",
+            "of": "reference to quiz",
+            "required": true,
+            "validation": {
+              "max": 1
+            }
+          },
+          "course": {
+            "type": "array",
+            "of": "reference to course",
+            "validation": {
+              "max": 1
+            }
+          },
+          "chapter": {
+            "type": "array",
+            "of": "reference to chapter",
+            "validation": {
+              "max": 1
+            }
+          },
+          "attemptNumber": {
+            "type": "number",
+            "validation": {
+              "min": 1
+            }
+          },
+          "status": {
+            "type": "string",
+            "required": true,
+            "options": ["in_progress", "submitted", "graded"],
+            "layout": "radio"
+          },
+          "answers": {
+            "type": "array",
+            "of": "answer object",
+            "required": true,
+            "validation": {
+              "min": 1
+            },
+            "fields": {
+              "questionIndex": {
+                "type": "number",
+                "required": true,
+                "validation": {
+                  "min": 0
+                }
+              },
+              "selectedOptionIndex": {
+                "type": "number",
+                "required": true,
+                "validation": {
+                  "min": 0
+                }
+              },
+              "isOutcome": {
+                "type": "string",
+                "title": "Outcome",
+                "options": ["correct", "incorrect"],
+                "layout": "radio"
+              },
+              "timeTakenMs": {
+                "type": "number",
+                "title": "Time Taken (ms)"
+              }
+            }
+          },
+          "correctCount": {
+            "type": "number",
+            "validation": {
+              "min": 0
+            }
+          },
+          "totalQuestions": {
+            "type": "number",
+            "required": true,
+            "validation": {
+              "min": 1
+            }
+          },
+          "score": {
+            "type": "number"
+          },
+          "percentage": {
+            "type": "number",
+            "validation": {
+              "min": 0,
+              "max": 100
+            }
+          },
+          "startedAt": {
+            "type": "datetime"
+          },
+          "submittedAt": {
+            "type": "datetime"
+          },
+          "durationMs": {
+            "type": "number"
+          },
+          "feedback": {
+            "type": "text"
+          },
+          "metadata": {
+            "type": "object",
+            "collapsible": true,
+            "collapsed": true,
+            "fields": {
+              "custom": {
+                "type": "text",
+                "title": "Custom JSON Data"
+              }
+            }
+          }
+        }
+      },
+      "learningSession": {
+        "type": "document",
+        "fieldsCount": 6,
+        "description": "Learning session tracking with activities",
+        "fields": {
+          "user": {
+            "type": "reference",
+            "to": "user",
+            "required": true
+          },
+          "course": {
+            "type": "reference",
+            "to": "course"
+          },
+          "startTime": {
+            "type": "datetime",
+            "title": "Session Start",
+            "required": true
+          },
+          "endTime": {
+            "type": "datetime",
+            "title": "Session End"
+          },
+          "durationMinutes": {
+            "type": "number",
+            "title": "Duration (Minutes)",
+            "validation": {
+              "min": 0
+            }
+          },
+          "activitiesCompleted": {
+            "type": "array",
+            "of": "activity object",
+            "fields": {
+              "type": {
+                "type": "string",
+                "title": "Activity Type",
+                "required": true,
+                "options": ["lesson", "quiz", "reading"],
+                "layout": "radio"
+              },
+              "contentId": {
+                "type": "string",
+                "title": "Content ID"
+              },
+              "timeSpent": {
+                "type": "number",
+                "title": "Time Spent (Minutes)",
+                "validation": {
+                  "min": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "achievement": {
+        "type": "document",
+        "fieldsCount": 9,
+        "description": "Achievement definition with criteria and rewards",
+        "fields": {
+          "id": {
+            "type": "string",
+            "title": "Achievement ID",
+            "required": true
+          },
+          "title": {
+            "type": "string",
+            "required": true,
+            "validation": {
+              "max": 50
+            }
+          },
+          "description": {
+            "type": "text",
+            "required": true,
+            "validation": {
+              "max": 200
+            }
+          },
+          "icon": {
+            "type": "string",
+            "title": "Icon (Emoji)",
+            "required": true,
+            "validation": {
+              "max": 5
+            }
+          },
+          "category": {
+            "type": "string",
+            "options": ["first_steps", "streak", "quiz", "course", "social"],
+            "layout": "radio"
+          },
+          "course": {
+            "type": "reference",
+            "to": "course"
+          },
+          "criteria": {
+            "type": "object",
+            "title": "Achievement Criteria",
+            "collapsible": true,
+            "collapsed": false,
+            "fields": {
+              "type": {
+                "type": "string",
+                "title": "Criteria Type",
+                "options": ["lesson_count", "quiz_score", "course_completion", "streak_days", "custom"],
+                "layout": "radio"
+              },
+              "target": {
+                "type": "number",
+                "title": "Target Value"
+              },
+              "threshold": {
+                "type": "number",
+                "title": "Threshold (for percentages)"
+              }
+            }
+          },
+          "points": {
+            "type": "number",
+            "title": "XP Points",
+            "validation": {
+              "min": 0
+            }
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "userAchievement": {
+        "type": "document",
+        "fieldsCount": 6,
+        "description": "User's earned achievements with progress",
+        "fields": {
+          "user": {
+            "type": "reference",
+            "to": "user",
+            "required": true
+          },
+          "achievement": {
+            "type": "reference",
+            "to": "achievement",
+            "required": true
+          },
+          "earned": {
+            "type": "boolean"
+          },
+          "earnedAt": {
+            "type": "datetime"
+          },
+          "progress": {
+            "type": "number",
+            "title": "Current Progress",
+            "validation": {
+              "min": 0
+            }
+          },
+          "notified": {
+            "type": "boolean",
+            "title": "User Notified"
+          }
+        }
+      },
+      "recommendation": {
+        "type": "document",
+        "fieldsCount": 6,
+        "description": "AI-generated course recommendations",
+        "fields": {
+          "query": {
+            "type": "string",
+            "title": "Search Query",
+            "required": true
+          },
+          "reason": {
+            "type": "text",
+            "title": "Reason for Recommendation"
+          },
+          "createdFor": {
+            "type": "reference",
+            "title": "Recommended For",
+            "to": "user",
+            "required": true
+          },
+          "courses": {
+            "type": "array",
+            "title": "Recommended Courses",
+            "of": "reference to course",
+            "required": true,
+            "validation": {
+              "min": 1
+            }
+          },
+          "status": {
+            "type": "string",
+            "required": true,
+            "options": ["in_progress", "completed", "failed"],
+            "layout": "radio"
+          },
+          "message": {
+            "type": "text",
+            "validation": {
+              "max": 500
+            }
+          }
+        }
+      },
+      "chatSession": {
+        "type": "document",
+        "fieldsCount": 7,
+        "description": "AI chat session for learning assistance",
+        "fields": {
+          "users": {
+            "type": "array",
+            "of": "reference to user",
+            "required": true,
+            "validation": {
+              "min": 1
+            }
+          },
+          "lessons": {
+            "type": "array",
+            "of": "reference to lesson"
+          },
+          "sessionId": {
+            "type": "string",
+            "required": true
+          },
+          "createdAt": {
+            "type": "datetime",
+            "required": true
+          },
+          "lastActivity": {
+            "type": "datetime"
+          },
+          "status": {
+            "type": "string",
+            "required": true,
+            "options": ["active", "inactive", "ended"],
+            "layout": "radio"
+          },
+          "metadata": {
+            "type": "object",
+            "fields": {
+              "userLevel": {
+                "type": "string"
+              },
+              "lessonTitle": {
+                "type": "string"
+              },
+              "totalMessages": {
+                "type": "number",
+                "validation": {
+                  "min": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "chatMessage": {
+        "type": "document",
+        "fieldsCount": 5,
+        "description": "Individual chat message with AI SDK parts",
+        "fields": {
+          "messageId": {
+            "type": "string",
+            "title": "UIMessage ID",
+            "required": true
+          },
+          "session": {
+            "type": "reference",
+            "to": "chatSession",
+            "required": true
+          },
+          "role": {
+            "type": "string",
+            "required": true,
+            "options": ["system", "user", "assistant"],
+            "layout": "radio"
+          },
+          "metadata": {
+            "type": "object",
+            "collapsible": true,
+            "collapsed": true,
+            "fields": {
+              "custom": {
+                "type": "text",
+                "title": "Custom JSON Data"
+              }
+            }
+          },
+          "parts": {
+            "type": "array",
+            "of": "UI part objects",
+            "required": true,
+            "validation": {
+              "min": 1
+            },
+            "description": "Supports textUIPart, reasoningUIPart, toolUIPart, sourceUrlUIPart, sourceDocumentUIPart, fileUIPart, dataUIPart, stepStartUIPart"
+          }
+        }
+      },
+      "emailNotification": {
+        "type": "document",
+        "fieldsCount": 8,
+        "description": "Email notification tracking and delivery",
+        "fields": {
+          "user": {
+            "type": "reference",
+            "to": "user",
+            "required": true
+          },
+          "type": {
+            "type": "string",
+            "required": true,
+            "options": ["welcome", "achievement", "courseCompletion", "weeklyDigest"],
+            "layout": "radio"
+          },
+          "subject": {
+            "type": "string",
+            "required": true
+          },
+          "content": {
+            "type": "text",
+            "required": true
+          },
+          "sentAt": {
+            "type": "datetime"
+          },
+          "deliveryStatus": {
+            "type": "string",
+            "options": ["sent", "delivered", "opened", "failed"],
+            "layout": "radio"
+          },
+          "resendId": {
+            "type": "string",
+            "title": "Resend ID"
+          },
+          "metadata": {
+            "type": "object",
+            "collapsible": true,
+            "collapsed": true,
+            "fields": {
+              "data": {
+                "type": "text",
+                "title": "Data (JSON)"
+              }
+            }
+          }
+        }
+      }
+    },
+    "objects": {
+      "blockContent": {
+        "type": "array",
+        "description": "Rich text content with blocks, images, code, callouts, badges, and tables",
+        "of": [
+          {
+            "type": "block",
+            "marks": {
+              "decorators": ["strong", "em", "code", "underline", "strike-through"],
+              "annotations": [
+                {
+                  "name": "link",
+                  "type": "object",
+                  "title": "URL",
+                  "fields": {
+                    "href": {
+                      "type": "url",
+                      "title": "URL",
+                      "schemes": ["http", "https", "mailto", "tel"]
+                    }
+                  }
+                }
+              ]
+            },
+            "lists": ["bullet", "number"],
+            "styles": ["normal", "h1", "h2", "h3", "h4", "blockquote"]
+          },
+          {
+            "type": "image",
+            "hotspot": true
+          },
+          {
+            "type": "code"
+          },
+          {
+            "name": "callout",
+            "type": "object",
+            "fields": {
+              "type": {
+                "type": "string",
+                "options": ["info", "warning", "tip", "quiz", "important"],
+                "layout": "radio",
+                "required": true
+              },
+              "content": {
+                "type": "array",
+                "of": "block",
+                "required": true
+              }
+            }
+          },
+          {
+            "name": "badge",
+            "type": "object",
+            "fields": {
+              "type": {
+                "type": "string",
+                "options": ["praktek", "teori"],
+                "layout": "radio",
+                "required": true
+              },
+              "label": {
+                "type": "string",
+                "title": "Label (Optional)"
+              }
+            }
+          },
+          {
+            "name": "table",
+            "type": "object",
+            "fields": {
+              "rows": {
+                "type": "array",
+                "title": "Table Rows",
+                "of": "row object with cells"
+              },
+              "caption": {
+                "type": "string",
+                "title": "Table Caption (Optional)"
+              }
+            }
+          }
+        ]
+      },
+      "code": {
+        "type": "object",
+        "fieldsCount": 4,
+        "description": "Code block with syntax highlighting"
+      },
+      "color": {
+        "type": "object",
+        "fieldsCount": 5,
+        "description": "Color picker with multiple formats"
+      },
+      "hslaColor": {
+        "type": "object",
+        "fieldsCount": 4,
+        "title": "Hue Saturation Lightness",
+        "description": "HSLA color format"
+      },
+      "hsvaColor": {
+        "type": "object",
+        "fieldsCount": 4,
+        "title": "Hue Saturation Value",
+        "description": "HSVA color format"
+      },
+      "rgbaColor": {
+        "type": "object",
+        "fieldsCount": 4,
+        "title": "Red Green Blue (rgb)",
+        "description": "RGBA color format"
+      }
+    }
+  },
+  "relationships": {
+    "course": {
+      "hasMany": ["chapters", "topics"],
+      "belongsToMany": ["users (via enrollment)"]
+    },
+    "chapter": {
+      "belongsTo": ["course"],
+      "hasMany": ["contents (lessons/quizzes)"]
+    },
+    "lesson": {
+      "belongsTo": ["chapter"]
+    },
+    "quiz": {
+      "belongsTo": ["chapter"],
+      "hasMany": ["quizAttempts"]
+    },
+    "user": {
+      "hasMany": ["enrollments", "quizAttempts", "learningSession", "userAchievements", "chatSessions", "emailNotifications", "recommendations"]
+    },
+    "enrollment": {
+      "belongsTo": ["user", "course"],
+      "hasMany": ["contentsCompleted"]
+    }
+  },
+  "summary": {
+    "totalDocuments": 15,
+    "totalObjects": 6,
+    "coreFeatures": [
+      "Learning Management System (LMS)",
+      "Course progression tracking",
+      "Interactive quizzes with attempts",
+      "Achievement system with gamification",
+      "AI-powered chat assistance",
+      "Email notification system",
+      "Rich content with blocks, images, code",
+      "User analytics and learning sessions"
+    ],
+    "keyIntegrations": [
+      "Clerk Authentication (clerkId)",
+      "Resend Email Service (resendId)",
+      "AI SDK for chat messages",
+      "Rich text editor with portable text"
+    ]
+  }
+}

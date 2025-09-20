@@ -89,8 +89,11 @@ const addProgression = async (params: ProgressionInput) => {
   const { userId, contentId, nextPath, courseSlug, courseId } = params;
 
   try {
+    const enrollmentPromise = dataEnrollment.oneByUserId(userId, courseSlug);
+    const totalContentsPromise = dataCourses.countContents(courseId);
+
     // Validate user enrollment
-    const userEnrollment = await dataEnrollment.oneByUserId(userId, courseSlug);
+    const userEnrollment = await enrollmentPromise;
     if (!userEnrollment) {
       throw createProgressionError(
         'User not enrolled in this course',
@@ -101,9 +104,10 @@ const addProgression = async (params: ProgressionInput) => {
     // Extract completed content IDs (now strings for Sanity)
     const existingCompletedContentIds =
       userEnrollment.contentsCompleted?.map((content) => content._id) ?? [];
+    const completedContentIdSet = new Set(existingCompletedContentIds);
 
     // Prevent duplicate completion
-    if (existingCompletedContentIds.includes(contentId)) {
+    if (completedContentIdSet.has(contentId)) {
       throw createProgressionError(
         'Content already completed',
         'ALREADY_COMPLETED'
@@ -111,8 +115,9 @@ const addProgression = async (params: ProgressionInput) => {
     }
 
     // Calculate updated progress
-    const updatedCompletedIds = [...existingCompletedContentIds, contentId];
-    const totalContentCount = await dataCourses.countContents(courseId);
+    completedContentIdSet.add(contentId);
+    const updatedCompletedIds = Array.from(completedContentIdSet);
+    const totalContentCount = await totalContentsPromise;
 
     if (totalContentCount === 0) {
       throw createProgressionError(
@@ -132,6 +137,7 @@ const addProgression = async (params: ProgressionInput) => {
       contentsCompleted: updatedCompletedIds,
       dateCompleted: isCourseCompleted ? new Date().toISOString() : undefined,
       percentComplete: completionPercentage,
+      _rev: userEnrollment._rev,
     });
 
     // Award achievements if course is completed
