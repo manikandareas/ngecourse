@@ -275,7 +275,7 @@ export const ONBOARDING_COPY = {
   // Navigation and Action Buttons
   actions: {
     back: 'Kembali',
-    next: 'Lanjut',
+    next: 'Lanjutkan',
     finishSetup: 'Mulai Belajar Sekarang!',
     saving: 'Menyimpan preferensimu...',
   },

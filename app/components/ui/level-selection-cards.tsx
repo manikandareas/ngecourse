@@ -116,7 +116,7 @@ export function LevelSelectionCards({
         )}
       </AnimatePresence>
 
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {levels.map((level, index) => {
           const selected = isSelected(level.value);
           const hovered = hoveredCard === level.value;
@@ -139,7 +139,7 @@ export function LevelSelectionCards({
             >
               <motion.div
                 className={cn(
-                  'group relative cursor-pointer rounded-xl border-2 bg-white/5 p-6 transition-all duration-200 hover:shadow-lg',
+                  'group relative cursor-pointer rounded-xl border-2 bg-white/5 p-4 transition-all duration-200 hover:shadow-lg sm:p-5 lg:p-6',
                   selected
                     ? `${colors.border} ${colors.bg} shadow-md`
                     : 'border-border hover:border-accent/50'
@@ -175,11 +175,11 @@ export function LevelSelectionCards({
                 </AnimatePresence>
 
                 {/* Content */}
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-3 sm:gap-4">
                   {/* Icon */}
                   <div
                     className={cn(
-                      'flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-colors',
+                      'flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors sm:h-12 sm:w-12',
                       selected
                         ? colors.icon
                         : 'bg-white/10 text-muted-foreground group-hover:bg-accent/10 group-hover:text-accent'
@@ -191,7 +191,7 @@ export function LevelSelectionCards({
                   <div className="space-y-2">
                     <h3
                       className={cn(
-                        'font-semibold text-lg transition-colors',
+                        'font-semibold text-base transition-colors sm:text-lg',
                         selected ? colors.text : 'text-foreground'
                       )}
                     >

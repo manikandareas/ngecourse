@@ -110,7 +110,7 @@ export function LanguageStyleCards({
   };
 
   return (
-    <div className={cn('w-full space-y-8', className)}>
+    <div className={cn('w-full space-y-6 sm:space-y-8', className)}>
       {/* Feedback quote tooltip */}
       <AnimatePresence>
         {showQuote && (
@@ -131,7 +131,7 @@ export function LanguageStyleCards({
         {showExampleMaterial && (
           <motion.div
             animate={{ opacity: 1, x: 0, y: 0 }}
-            className="fixed right-4 bottom-4 left-4 z-50 max-w-sm sm:right-6 sm:bottom-6 sm:left-auto sm:max-w-md"
+            className="fixed inset-x-4 bottom-28 z-50 max-w-lg sm:bottom-8 sm:left-auto sm:right-6 sm:inset-x-auto sm:max-w-md"
             exit={{ opacity: 0, x: 20, y: 10 }}
             initial={{ opacity: 0, x: 20, y: 10 }}
             transition={{
@@ -213,7 +213,7 @@ export function LanguageStyleCards({
         <h3 className="font-medium text-base text-foreground">
           Preferensi Bahasa
         </h3>
-        <div className="grid grid-cols-1 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {languageOptions.map((option, index) => {
             const selected = selectedLanguage === option.value;
             const hovered = hoveredCard === `lang-${option.value}`;
@@ -234,7 +234,7 @@ export function LanguageStyleCards({
               >
                 <motion.div
                   className={cn(
-                    'group relative cursor-pointer rounded-xl border-2 bg-white/5 p-4 transition-all duration-200 hover:shadow-lg',
+                    'group relative cursor-pointer rounded-xl border-2 bg-white/5 p-3 transition-all duration-200 hover:shadow-lg sm:p-4',
                     selected
                       ? 'border-accent bg-accent/20 shadow-md'
                       : 'border-border hover:border-accent/50'
@@ -269,10 +269,10 @@ export function LanguageStyleCards({
                     )}
                   </AnimatePresence>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 sm:gap-4">
                     <div
                       className={cn(
-                        'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors',
+                        'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors sm:h-10 sm:w-10',
                         selected
                           ? 'bg-accent text-accent-foreground'
                           : 'bg-white/10 text-muted-foreground group-hover:bg-accent/10 group-hover:text-accent'
@@ -313,7 +313,7 @@ export function LanguageStyleCards({
         <h3 className="font-medium text-base text-foreground">
           Gaya Penjelasan
         </h3>
-        <div className="grid grid-cols-1 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {styleOptions.map((option, index) => {
             const selected = selectedStyle === option.value;
             const hovered = hoveredCard === `style-${option.value}`;
@@ -334,7 +334,7 @@ export function LanguageStyleCards({
               >
                 <motion.div
                   className={cn(
-                    'group relative cursor-pointer rounded-xl border-2 bg-white/5 p-4 transition-all duration-200 hover:shadow-lg',
+                    'group relative cursor-pointer rounded-xl border-2 bg-white/5 p-3 transition-all duration-200 hover:shadow-lg sm:p-4',
                     selected
                       ? 'border-accent bg-accent/20 shadow-md'
                       : 'border-border hover:border-accent/50'
@@ -369,10 +369,10 @@ export function LanguageStyleCards({
                     )}
                   </AnimatePresence>
 
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-start gap-3 sm:gap-4">
                     <div
                       className={cn(
-                        'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors',
+                        'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors sm:h-10 sm:w-10',
                         selected
                           ? 'bg-accent text-accent-foreground'
                           : 'bg-white/10 text-muted-foreground group-hover:bg-accent/10 group-hover:text-accent'
