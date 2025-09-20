@@ -134,7 +134,7 @@ export function FocusSelectionCards({
           </motion.div>
         )}
       </AnimatePresence>
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
         {areas.map((area, index) => {
           const selected = isSelected(area.id);
           const hovered = hoveredCard === area.id;
@@ -155,7 +155,7 @@ export function FocusSelectionCards({
             >
               <motion.div
                 className={cn(
-                  'group relative h-full cursor-pointer rounded-xl border-2 bg-white/5 p-4 transition-all duration-200 hover:shadow-lg',
+                  'group relative h-full cursor-pointer rounded-xl border-2 bg-white/5 p-3 transition-all duration-200 hover:shadow-lg sm:p-4',
                   selected
                     ? 'border-accent bg-accent/20 shadow-md'
                     : 'border-border hover:border-accent/50'
@@ -191,11 +191,11 @@ export function FocusSelectionCards({
                 </AnimatePresence>
 
                 {/* Content */}
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-3 sm:gap-4">
                   {/* Icon */}
                   <div
                     className={cn(
-                      'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors',
+                      'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors sm:h-10 sm:w-10',
                       selected
                         ? 'bg-accent text-accent-foreground'
                         : 'bg-white/10 text-muted-foreground group-hover:bg-accent/10 group-hover:text-accent'

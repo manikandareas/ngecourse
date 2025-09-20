@@ -216,11 +216,11 @@ export default function LearningGoalsPage() {
   const prevStep = () => setCurrentStep((prev) => (prev > 0 ? prev - 1 : prev));
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center px-4 py-8">
-      <div className=" w-full max-w-2xl">
+    <div className="relative flex min-h-screen flex-col justify-start px-4 pt-12 pb-20 sm:px-6 sm:pt-14 sm:pb-16 lg:items-center lg:justify-center lg:pb-12 xl:px-8">
+      <div className="w-full max-w-2xl">
         {/* Step Progress Header */}
         <div className="mb-8 text-center">
-          <div className="mb-4 flex items-center justify-center space-x-2">
+          <div className="mb-4 flex flex-wrap items-center justify-center gap-2">
             {steps.map((step, index) => {
               const stepComplete = index < currentStep;
               const stepCurrent = index === currentStep;
@@ -230,7 +230,7 @@ export default function LearningGoalsPage() {
                 <button
                   aria-label={`Go to step ${index + 1}: ${step.name}`}
                   className={cn(
-                    'flex size-8 items-center justify-center rounded-full font-medium text-sm transition-all duration-300',
+                    'flex size-8 items-center justify-center rounded-full font-medium text-sm transition-all duration-300 sm:size-9',
                     stepComplete
                       ? 'bg-green-500 text-white'
                       : stepCurrent
@@ -255,15 +255,18 @@ export default function LearningGoalsPage() {
         {/* Main Content Card */}
         <div className=" space-y-8">
           <div className="space-y-4 text-center">
-            <h1 className="font-light text-3xl text-text-primary leading-[1.1] tracking-tight md:text-4xl">
+            <h1 className="font-light text-2xl text-text-primary leading-[1.15] tracking-tight sm:text-3xl md:text-4xl">
               {steps[currentStep].name}
             </h1>
-            <p className="mx-auto max-w-md text-base/7 text-text-secondary">
+            <p className="mx-auto max-w-md text-sm/6 text-text-secondary sm:text-base/7">
               {steps[currentStep].description}
             </p>
           </div>
           <Form {...form}>
-            <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
+            <form
+              className="space-y-6 sm:space-y-8"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
               <div className="relative">
                 <AnimatePresence initial={false} mode="wait">
                   <motion.div
@@ -283,9 +286,10 @@ export default function LearningGoalsPage() {
                 </AnimatePresence>
               </div>
 
-              <div className="flex justify-between pt-6">
-                {currentStep > 0 ? (
+              <div className="flex flex-row gap-3 pt-6 sm:items-center sm:justify-between">
+                {currentStep > 0 && (
                   <Button
+                    className="w-fit"
                     disabled={isPending}
                     onClick={prevStep}
                     size="lg"
@@ -295,11 +299,10 @@ export default function LearningGoalsPage() {
                     <ChevronLeft aria-hidden="true" className="mr-2 size-4" />
                     {ONBOARDING_COPY.actions.back}
                   </Button>
-                ) : (
-                  <span />
                 )}
                 {currentStep < steps.length - 1 && (
                   <Button
+                    className="flex-1"
                     disabled={!isCurrentStepValid || isPending}
                     onClick={nextStep}
                     size="lg"
@@ -312,6 +315,7 @@ export default function LearningGoalsPage() {
                 {currentStep === steps.length - 1 && (
                   <Button
                     aria-label="Finish onboarding setup"
+                    className="flex-1"
                     disabled={isPending}
                     size="lg"
                     type="submit"
