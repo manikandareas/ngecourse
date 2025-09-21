@@ -12,6 +12,11 @@ import type * as agents_actions from "../agents/actions.js";
 import type * as agents_genii from "../agents/genii.js";
 import type * as agents_mutations from "../agents/mutations.js";
 import type * as agents_queries from "../agents/queries.js";
+import type * as lib_mcp_context7_client from "../lib/mcp/context7/client.js";
+import type * as lib_mcp_context7_getlibrarydocs from "../lib/mcp/context7/getlibrarydocs.js";
+import type * as lib_mcp_context7_index from "../lib/mcp/context7/index.js";
+import type * as lib_mcp_context7_resolvelibraryid from "../lib/mcp/context7/resolvelibraryid.js";
+import type * as lib_sanity from "../lib/sanity.js";
 import type * as thread from "../thread.js";
 
 import type {
@@ -33,6 +38,11 @@ declare const fullApi: ApiFromModules<{
   "agents/genii": typeof agents_genii;
   "agents/mutations": typeof agents_mutations;
   "agents/queries": typeof agents_queries;
+  "lib/mcp/context7/client": typeof lib_mcp_context7_client;
+  "lib/mcp/context7/getlibrarydocs": typeof lib_mcp_context7_getlibrarydocs;
+  "lib/mcp/context7/index": typeof lib_mcp_context7_index;
+  "lib/mcp/context7/resolvelibraryid": typeof lib_mcp_context7_resolvelibraryid;
+  "lib/sanity": typeof lib_sanity;
   thread: typeof thread;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
